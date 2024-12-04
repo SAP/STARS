@@ -1,0 +1,32 @@
+Hello there!
+I can help you with assessing security of **Large Language Models**.
+
+### Vulnerability Scans
+
+I can run a **vulnerability scan** against a Large Language Model of your choice.
+For that I will run a number of attacks against the Large Language Model:
+- promptmap to identify Prompt Injections
+- PyRIT to try to leak the System Prompt and to get the model to generate malicious content, e.g. writing a phishing email
+- Jailbreak tools such as "cipher" and "multilingual". These will attempt to get the model to generate malicious content.
+To start the vulnerability scan, simply answer *Start the vulnerability scan*.
+
+### Individual attacks
+
+I can run individual parameters with custom parameters.
+Say the name of the attack and I will ask for further details if required.
+Supported attacks are:
+- promptmap
+- gptfuzz
+- PyRIT
+- CodeAttack
+- cipher
+- codechameleon
+- deepinception
+- ica
+- jailbroken
+- multilingual
+- renellm
+
+### Attacks against Natural language processing models
+
+I can run attacks against NLP models using textattack. Ask me for more information.

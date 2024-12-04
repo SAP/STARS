@@ -1,14 +1,39 @@
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP/stars)](https://api.reuse.software/info/github.com/SAP/stars)
+![Changelog CI Status](https://github.com/SAP/stars/workflows/Changelog%20CI/badge.svg)
 
-# stars
+# STARS (Smart Threat AI Reporting Scanner)
+
+![stars architecture](docs/stars.png)
 
 ## About this project
 
-AI agent whose purpose is to conduct vulnerability tests on LLMs from SAP AI Core or from local deployments, or models from HuggingFace. The goal of this project is to identify and correct any potential security vulnerabilities.
+STARS is a AI agent whose purpose is to conduct vulnerability tests on LLMs from SAP AI Core or from local deployments, or models from HuggingFace. The goal of this project is to identify and correct any potential security vulnerabilities. This can be done using a AI-Agent accessible via a chat frontend or using the CLI.
+
+## Available Attacks
+
+Hereafter, a list with all the attacks the Agent is able to run, grouped by attack type.
+
+### NLP
+
+- [TextAttack](https://github.com/QData/TextAttack)
+
+### Attacks on Large Language Models
+
+- [Promptmap](https://github.com/utkusen/promptmap)
+- [GPTFuzz](https://gpt-fuzz.github.io)
+- [PyRIT](https://github.com/Azure/PyRIT)
+- [EasyJailbreak](http://easyjailbreak.org/)
+- [CodeAttack](https://github.com/renqibing/CodeAttack)
+
 
 ## Requirements and Setup
 
-*Insert a short description what is required to get your project running...*
+The project is composed of a backend (in `backend-agent` folder) and a UI (an angular application in `frontend` folder). To run the agent both of them are needed, whereas only the backend is needed for the CLI.
+
+For a tutorial on how to use the application, see [the tutorial](docs/Tutorial.md).
+
+Further documentation is available inside the `backend-agent` and `frontend` subdirectories.
+
 
 ## Support, Feedback, Contributing
 

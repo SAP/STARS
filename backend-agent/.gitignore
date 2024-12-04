@@ -1,0 +1,6 @@
+.env
+/cache
+/venv*
+
+traces
+reports
