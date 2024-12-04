@@ -1,0 +1,38 @@
+name: Tag and release on github
+
+on:
+  pull_request:
+    types: [ closed ]
+    branches: [ main ]
+
+jobs:
+  publish-github-release:
+    if: github.event.pull_request.merged
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Get version number
+        id: get-pr-number
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          echo "Pull request title is $TITLE"
+          # Parse release number from TITLE
+          PR_VERSION=$(echo "$TITLE" | sed -n 's/.*v\?\([0-9]\+\.[0-9]\+\.[0-9]\+\)/\1/p')
+          # Output release number
+          echo "Found version $PR_VERSION"
+          echo "CURRENT_PR_VERSION=$PR_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create a GitHub release
+        env:
+          VERSION: ${{ steps.get-pr-number.outputs.CURRENT_PR_VERSION }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        uses: ncipollo/release-action@v1
+        with:
+          tag: "${{ env.VERSION }}"
+          name: "Release ${{ env.VERSION }}"
+          body: "${{ env.PR_BODY }}"
