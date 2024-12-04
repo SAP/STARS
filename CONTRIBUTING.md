@@ -32,6 +32,15 @@ The following rule governs code contributions:
 * Due to legal reasons, contributors will be asked to accept a Developer Certificate of Origin (DCO) when they create the first pull request to this project. This happens in an automated fashion during the submission process. SAP uses [the standard DCO text of the Linux Foundation](https://developercertificate.org/).
 * Contributions must follow our [guidelines on AI-generated code](https://github.com/SAP/.github/blob/main/CONTRIBUTING_USING_GENAI.md) in case you are using such tools.
 
+## Styling
+
+We follow Python-'s PEP8 best practices. Some suggestions:
+
+- Respect import order. Use `isort` to enforce import order.
+- Use single quotes for strings, only use double quotes in doc strings.
+- Make sure whitespace is pep8 compliant, e.g. by using `autopep8`.
+
+
 ## Issues and Planning
 
 * We use GitHub issues to track bugs and enhancement requests.
