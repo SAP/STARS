@@ -1,0 +1,184 @@
+.main-content {
+  width: 85%;
+  height: 100vh;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+}
+
+.container {
+  height: 90%;
+  padding-top: 20px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.main-container {
+  width: 90%;
+}
+
+.status-report-container {
+  max-width: 400px;
+  width: 20%;
+}
+
+.message-container {
+  list-style-type: none;
+  padding: 20px;
+  min-height: 10em;
+  height: 90%;
+  overflow-y: scroll;
+}
+
+.title {
+  justify-content: center;
+  color: #3c226f;
+  margin: auto;
+  font-family: AmericanTypewriter;
+  background-color: unset;
+}
+
+.input-sender {
+  margin-top: 20px;
+}
+
+.ai-message {
+  align-self: self-start;
+  text-align: left;
+  color: #0d5929;
+  word-wrap: break-word !important;
+  white-space: normal !important;
+}
+
+.user-message {
+  align-self: self-end;
+  text-align: end;
+  color: #3c226f;
+  word-wrap: break-word !important;
+  white-space: normal !important;
+}
+
+.assistant-intermediate-message {
+  align-self: self-start;
+  text-align: left;
+  color: #517664;
+  word-wrap: break-word !important;
+  white-space: normal !important;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.send-button {
+  border-style: unset !important;
+  background-color: unset !important;
+}
+
+.list-item-ai-message {
+  height: auto !important;
+  width: 75%;
+  margin: 1em;
+}
+
+.list-item-assistant-intermediate-message {
+  height: auto !important;
+  width: 75%;
+  margin: 1em;
+}
+
+.list-item-user-message {
+  height: auto !important;
+  text-align: end;
+  width: 50%;
+  margin-left: auto;
+  flex-direction: row-reverse;
+}
+
+.list-item-user-message p {
+  margin: 1em 0 1em auto;
+}
+
+.mat-error {
+  color: #B71C1C;
+}
+
+.message-date {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.chat-bg {
+  background: #EEE;
+  border-radius: 20px;
+  padding: 5px 10px 5px 10px;
+}
+
+.list-item-assistant-intermediate-message .chat-bg {
+  background: #FAF9DC
+}
+
+.agent-progress {
+  margin-top: 30px;
+}
+
+.step {
+  padding-left: 0px;
+}
+
+.status-icon {
+  top: 6px;
+  margin-right: 5px;
+  position: sticky;
+}
+
+.icon-col-0 {
+  color: lightgrey;
+}
+
+.icon-col-1 {
+  color: lightgreen;
+}
+
+.icon-col-2 {
+  color: red;
+}
+
+.usage-hint {
+  color: #999;
+  font-style: italic;
+}
+
+mat-tab-group {
+  margin: 5px;
+}
+
+.footer-container {
+  display: flex;
+  flex-direction: row-reverse;
+}
+
+.footer-link {
+  margin-left: 5px;
+  font-size: small;
+  opacity: 0.5;
+  color: gray;
+}
+
+/**
+Generic classes
+**/
+
+.text-m {
+  font-size: medium;
+}
+
+.text-sm {
+  font-size: small;
+}
+
+.padding-top {
+  padding-top: 20px;
+}
