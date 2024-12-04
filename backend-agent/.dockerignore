@@ -1,0 +1,21 @@
+# Caches
+**/__pycache__
+cache
+
+# Libraries
+venv
+
+# Logs
+traces
+logger.log
+*.jsonl
+result_gptfuzz.txt
+prompt_success.txt
+
+# Sensitive data
+.env
+
+# Development files
+.vscode
+.gitignore
+README.md
