@@ -1,0 +1,42 @@
+name: Lint frontend
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+    paths:
+      - '**.json'
+      - '**.ts'
+      - '**.js'
+  workflow_dispatch:
+
+permissions:
+  checks: write
+  contents: write
+
+jobs:
+  lint-frontend:
+    name: Run frontend linters
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+            node-version: 20
+
+      - name: Install Node.js dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run linters
+        uses: wearerequired/lint-action@v2
+        with:
+          eslint: true
+          eslint_dir: frontend
+          eslint_extensions: js,ts

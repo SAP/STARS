@@ -1,0 +1,42 @@
+name: Test backend installation
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+    paths:
+      - '**.py'
+      - '**.txt'
+  workflow_dispatch:
+
+permissions:
+    checks: read
+    contents: read
+
+jobs:
+    installation:
+        name: Test backend installation
+        runs-on: ubuntu-latest
+        steps:
+            - name: Check out Git repository
+              uses: actions/checkout@v4
+
+            - name: Set up Python environment
+              uses: actions/setup-python@v5
+              with:
+                python-version: "3.10"
+                token: ${{ secrets.GITHUB_TOKEN }}
+                cache: 'pip'
+                cache-dependency-path: backend-agent/requirements.txt
+            - run: pip install -r backend-agent/requirements.txt
+
+            - name: Start server
+              run: |
+                cd backend-agent
+                DISABLE_AGENT=1 python main.py &
+                sleep 10
+
+            - name: Check server health
+              run: |
+                curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/health

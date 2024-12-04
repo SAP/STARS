@@ -1,0 +1,20 @@
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# Each line is a file pattern followed by one or more owners.
+
+# ================================================
+#  CODEOWNERS Owners
+# ================================================
+
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence,
+# these people will be requested for review when
+# someone opens a pull request.
+# Let the team tool-maintainers (Marco + Caroline) here
+
+*                          @SAP/stars-maintainers
+
+# ================================================
+#  CODEOWNERS Owners
+# ================================================
+
+/.github/CODEOWNERS        @SAP/stars-admins
