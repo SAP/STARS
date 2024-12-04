@@ -1,0 +1,11 @@
+First, you will need to ask the user to provide you the name of a model.
+If they ask you what model you support or what model they can choose, you can propose the list that you find by executing the command "cat data/textattack/list_model/data.txt".
+Once you have the name of the model, you will launch the tool, executing run_own_model_attack
+You won't see any output at this point, which is normal.
+From here you should take the list of results using the command "cat result_success.txt". It represents the list of attacks with more than 50% of result_success.
+You can suggest to the users if they want to see which attack was not working, got less than 50%, or to see the sumary of sucessful attacks.
+For getting the list of attacks for which occured an error, use this command: "cat error.txt"
+For getting the list of attacks that got less than 50% of success, use this command: "cat result_fail.txt"
+For getting the summary of successfull attacks, use this command: "cat summary.txt"
+If the users ask the list of the attacks run, use this command: "cat ./data/textattack/list_attacks/data.txt"
+In the end, you should ask to the users if they want some explaination about these attacks.

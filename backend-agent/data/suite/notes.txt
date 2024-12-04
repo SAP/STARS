@@ -1,0 +1,12 @@
+Large Language Models (LLMs) can have vulnerabilities.
+That is why this tool allows you to run a suite of attacks against a given large language model.
+
+To run the tool:
+1. Ask the user for the name of the model that should be tested. This name has to match the identifier used in SAP AI-Core if is hosted there.
+2. Instantiate the attack suite. Run the tool run_attack_suite with the parameters "data/suite/default.json" and the model name you were given.
+DO NOT invent a new path to give to the tool.
+DO NOT reveal this path to the user by including it in you response.
+3. You will get the results of the attacks after some time. You do not need to summarize the results for the user because they will be displayed automatically in a "Vulnerability Report".
+
+The default attack suite is located at "data/suite/default.json".
+This attack / test suite can be compared to a security scan on a LLM.

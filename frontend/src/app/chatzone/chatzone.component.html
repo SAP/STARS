@@ -1,0 +1,107 @@
+<div class="main-content">
+  <div class="status-report-container container">
+    <mat-card class="status-container-card">
+      <mat-card-title class="title text-m">
+        <span>Status Report</span>
+      </mat-card-title>
+      <mat-divider></mat-divider>
+      <mat-card-content>
+        <mat-list>
+          @for (step of steps; track step.title){
+          <mat-list-item class="step">
+            <mat-icon class="status-icon {{'icon-col-' + step.status}}">{{ getIconForStepStatus(step) }}</mat-icon>
+            <span mat-line class="text-sm">{{step.title}}</span>
+          </mat-list-item>
+          }
+          @if (steps.length === 0){
+          <span class="usage-hint text-sm">No progress yet. This space will show steps taken by the agent.</span>
+          }
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+    <div class="padding-top">
+      <button mat-raised-button (click)="promptForAPIKey()">Set API Key</button>
+    </div>
+  </div>
+  <div class="main-container container">
+    <mat-card class="message-container">
+      <mat-card-header>
+        <mat-card-title class="title">
+          <span>SAP Threat AI Reporting Scanner</span>
+        </mat-card-title>
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <mat-card-content>
+        <mat-list>
+          @for (chatItem of chatItems; track $index){
+          <span #chatItem>
+            @if (chatItem.type == 'message') {
+            <mat-list-item class="{{'list-item-' + chatItem.id}}">
+              <mat-icon matListItemIcon class="message.id">{{ chatItem.avatar }}</mat-icon>
+              <span class="message-date">{{ chatItem.timestamp | date:'HH:mm:ss' }} </span>
+              <div class="chat-bg">
+                <markdown class="{{chatItem.id}}" [data]="chatItem.message"></markdown>
+              </div>
+            </mat-list-item>
+            } @else {
+            <mat-card>
+              <mat-card-header>
+                <h2>Vulnerability Report</h2>
+              </mat-card-header>
+              <mat-tab-group>
+                @for (reportItem of chatItem.reports; track $index){
+                <mat-tab label="{{reportItem.vulnerability | uppercase}}">
+                  <p>{{reportItem.description}}</p>
+                  @for (report of reportItem.reports; track $index){
+                  <p>Attack: <b>{{report.attack}}</b></p>
+                  @if(report.success){
+                  <span>Attack was <em>successful</em></span>
+                  } @else {
+                  <span>Attack was <em>not successful</em></span>
+                  }
+                  @if(report.details.summary) {
+                  <p>{{report.details.summary}}</p>
+                  }
+                  }
+                </mat-tab>
+                }
+              </mat-tab-group>
+              <button mat-button (click)="downloadVulnReport(chatItem)">
+                Download report
+              </button>
+            </mat-card>
+            }
+          </span>
+          }
+          @if (progress){
+          <div class="agent-progress">
+            <mat-progress-bar [value]="progress"></mat-progress-bar>
+          </div>
+          }
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+    <div class="input-sender">
+      <mat-form-field class="full-width">
+        <mat-label>Your request</mat-label>
+        <input matInput type="text" placeholder="Ex. Start the vulnerability scan" [(ngModel)]=" inputValue"
+          (keydown.enter)="checkInput(inputValue)">
+        <button [disabled]="inputValue === ''" matSuffix (click)="checkInput(inputValue)" aria-label="Send"
+          class="send-button">
+          <mat-icon>send</mat-icon>
+        </button>
+        @if(errorMessage !== ''){
+        <mat-hint class="mat-error">{{ errorMessage }}</mat-hint>
+        }
+        @if(!isConnected()){
+        <mat-hint class="mat-error">No connection to Agent. Make sure the agent is reachable and
+          refresh this page.</mat-hint>
+        }
+      </mat-form-field>
+    </div>
+    <div class="footer-container">
+      <a class="footer-link" (click)="clearChatHistory()" href="javascript:void(0)">Clear Chat History</a>
+      <a class="footer-link" (click)="downloadChatHistory()" href="javascript:void(0)">Download Chat History</a>
+    </div>
+  </div>
+</div>

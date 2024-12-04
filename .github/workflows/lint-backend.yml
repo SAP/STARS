@@ -1,0 +1,39 @@
+name: Lint backend
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+    paths:
+      - '**.py'
+  workflow_dispatch:
+
+permissions:
+  checks: write
+  contents: write
+
+jobs:
+  lint-backend:
+    name: Run backend linter
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python environment
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        run: |
+          pip install flake8
+
+      - name: Run linters
+        uses: wearerequired/lint-action@v2
+        with:
+          flake8: true

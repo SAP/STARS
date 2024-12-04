@@ -1,0 +1,24 @@
+generative-ai-hub-sdk[all]>=3.1.1
+Deprecated==1.2.15
+python-dotenv==1.0.1
+faiss-cpu~=1.9.0
+Flask==2.3.3
+Flask-Cors==5.0.0
+flask_sock==0.7.0
+langchain~=0.2.16
+PyYAML==6.0.2
+requests==2.32.3
+scipy==1.14.1
+unstructured
+tensorflow
+tensorflow-hub
+sentence-transformers
+torchfile
+tensorflow-text
+ollama==0.4.2
+weasyprint
+easyjailbreak==0.1.3
+pyrit==0.2.1
+textattack>=0.3.10
+codeattack @ git+https://github.com/marcorosa/CodeAttack
+gptfuzzer @ git+https://github.com/marcorosa/GPTFuzz@no-vllm

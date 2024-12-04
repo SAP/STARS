@@ -1,0 +1,26 @@
+/* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+::ng-deep .mat-list .mat-list-item {
+  height:initial!important;
+}
+
+::ng-deep .mat-line {
+  word-wrap: break-word !important;
+  white-space: pre-wrap !important;
+}
+
+@font-face {
+  font-family: 'AmericanTypewriter';
+  src: url('assets/fonts/AmericanTypewriter.ttc') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* For responses from agent, which can contain very long lines */
+pre {
+  overflow-x: auto;
+}

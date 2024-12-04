@@ -1,0 +1,31 @@
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings-template.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+/.angular
+launch.json
+
+.history/*
+
+# dependencies
+/node_modules
+
+# config
+src/environments/environment.ts
+
+# System Files
+.DS_Store
+
+# Angular cache
+.nx
