@@ -3,6 +3,8 @@
 
 # STARS (Smart Threat AI Reporting Scanner)
 
+![stars architecture](docs/stars.png)
+
 ## About this project
 
 STARS is a AI agent whose purpose is to conduct vulnerability tests on LLMs from SAP AI Core or from local deployments, or models from HuggingFace. The goal of this project is to identify and correct any potential security vulnerabilities. This can be done using a AI-Agent accessible via a chat frontend or using the CLI.
