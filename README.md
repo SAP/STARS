@@ -1,7 +1,7 @@
 [![REUSE status](https://api.reuse.software/badge/github.com/SAP/stars)](https://api.reuse.software/info/github.com/SAP/stars)
 ![Changelog CI Status](https://github.com/SAP/stars/workflows/Changelog%20CI/badge.svg)
 
-# STARS (Smart Threat AI Reporting Scanner)
+# Smart Threat AI Reporting Scanner (STARS)
 
 ![stars architecture](docs/stars.png)
 

@@ -1,0 +1,65 @@
+# `dependabot.yml` file with updates
+# for pip and npn, and disabled for Docker
+
+version: 2
+updates:
+  # Enable version updates for npm
+  - package-ecosystem: "npm"
+    # Look for `package.json` and `lock` files in the `frontend` directory
+    directory: "/frontend"
+    # Check the npm registry for updates once a week
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    # Raise pull requests for version updates
+    # to pip against the `develop` branch
+    target-branch: "develop"
+    # Labels on pull requests for version updates only
+    labels:
+      - "dependencies"
+      - "frontend"
+    # Group PRs
+    groups:
+      js-dependencies:
+        patterns:
+          - "*"
+
+  - package-ecosystem: "pip"
+    directory: "/backend-agent"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    # Raise pull requests for version updates
+    # to pip against the `develop` branch
+    target-branch: "develop"
+    # Labels on pull requests for version updates only
+    labels:
+      - "dependencies"
+      - "backend"
+
+  # Maintain dependencies for GitHub Actions
+  - package-ecosystem: "github-actions"
+    # Workflow files stored in the default location of `.github/workflows`. (You don't need to specify `/.github/workflows` for `directory`. You can use `directory: "/"`.)
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    target-branch: "develop"
+    labels:
+      - "dependencies"
+      - "maintenance"
+
+  # Enable version updates for Docker
+  - package-ecosystem: "docker"
+    # Look for a `Dockerfile` in the `backend-agent` directory
+    directory: "/backend-agent"
+    # Check for updates once a week
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    target-branch: "develop"
+    # Disable all pull requests for Docker dependencies
+    open-pull-requests-limit: 0
+    # Labels on pull requests for version updates only
+    labels:
+      - "dependencies"
