@@ -52,7 +52,9 @@ updates:
   # Enable version updates for Docker
   - package-ecosystem: "docker"
     # Look for a `Dockerfile` in the `backend-agent` directory
-    directory: "/backend-agent"
+    directories:
+      - "/backend-agent"
+      - "/frontend"
     # Check for updates once a week
     schedule:
       interval: "weekly"
