@@ -31,6 +31,12 @@ logging.basicConfig(
 )
 
 
+# Part of the `arg` and `subcommand` functions has been taken from
+# ttconv Library v1.0.0
+#
+# License: BSD-3-Clause "New" or "Revised" License
+# Release Date: Jan 28, 2021
+# Matched File Path: /ttconv/tt.py
 def arg(*name_or_flags: str, **kwargs) -> tuple[list[str], dict]:
     """Convenience function to properly format arguments to pass to the
     subcommand decorator.

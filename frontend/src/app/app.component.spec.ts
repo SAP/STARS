@@ -1,3 +1,9 @@
+/*
+ * Taken from Angular v11.1.0-next.1
+ * License: MIT License
+ * Release Date: Dec 3, 2020
+ * Matched File Path: /angular-784667ca12ab9628714d858b55b61611737cd283/integration/trusted-types/src/app/app.component.spec.ts
+*/
 import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
