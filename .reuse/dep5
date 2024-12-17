@@ -32,12 +32,12 @@ Files: backend-agent/cli.py
 Copyright:
     2024 SAP SE or an SAP affiliate company and STARS contributors
     2021 Sandflow Consulting LLC
-License: Apache-2.0 and BSD-3-Clause "New" or "Revised" License
+License: Apache-2.0 and BSD-3-Clause
 Comment: these files contain content from SAP and ttconv: cli.py is overall written by SAP, but contains a code snippet from src/main/python/ttconv/tt.py file taken from ttconv
 
 Files: frontend/src/app/app.component.spec.ts
 Copyright:
     2010-2020 Google LLC. https://angular.io/license
-License: MIT License
+License: MIT
 Comment: these files contain content from Angular 11.1.0-next.1 (it contains a code snippet from integration/trusted-types/src/app/app.component.spec.ts file taken from angular)
 
