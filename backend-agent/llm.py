@@ -1,3 +1,4 @@
+from typing import Any, Dict, List
 import abc
 import logging
 import os
@@ -85,7 +86,11 @@ class LLM(abc.ABC):
         if model_name in AICORE_MODELS['vertexai']:
             return AICoreGoogleVertexLLM(model_name)
         if model_name in AICORE_MODELS['bedrock']:
-            return AICoreAmazonBedrockLLM(model_name)
+            if 'titan' in model_name:
+                # Titan models don't support system prompts
+                return AICoreAmazonBedrockLLM(model_name, False)
+            else:
+                return AICoreAmazonBedrockLLM(model_name)
         if model_name == 'mistral':
             return LocalOpenAILLM(
                 os.getenv('MISTRAL_MODEL_NAME', ''),
@@ -460,13 +465,14 @@ class AICoreGoogleVertexLLM(LLM):
 
 class AICoreAmazonBedrockLLM(LLM):
 
-    def __init__(self, model_name: str):
+    def __init__(self, model_name: str, uses_system_prompt: bool = True):
         self.model_name = model_name
         proxy_client = get_proxy_client('gen-ai-hub')
         self.model = Session().client(
             proxy_client=proxy_client,
             model_name=self.model_name
         )
+        self.uses_system_prompt = uses_system_prompt
 
     def __str__(self) -> str:
         return f'{self.model_name}/Amazon Bedrock'
@@ -477,32 +483,37 @@ class AICoreAmazonBedrockLLM(LLM):
                  temperature: float = 1,
                  max_tokens: int = 1024,
                  n: int = 1) -> LLMResponse:
-        contents = []
-        sys_prompt_param = []
-        if system_prompt:
-            # In bedrock models, the system prompt is passed as a parameter in
-            # the converse function call
-            sys_prompt_param.append(
-                {
-                    'text': system_prompt
-                }
-            )
-        contents.append(
-            {
-                'role': 'user',
-                'content': [{
-                        'text': prompt
-                }]
+
+        # Declare types for messages and kwargs to avoid mypy errors
+        messages: List[Dict[str, Any]] = []
+        kwargs: Dict[str, Any] = {
+            'inferenceConfig': {
+                'temperature': temperature,
+                'maxTokens': max_tokens
             }
-        )
+        }
+        if not system_prompt:
+            messages.append(
+                {'role': 'user', 'content': [{'text': prompt}]}
+            )
+        else:
+            if self.uses_system_prompt:
+                messages.append(
+                    {'role': 'user', 'content': [{'text': prompt}]}
+                )
+                kwargs['system'] = [{'text': system_prompt}]
+            else:
+                # Similarly to the Mistral model, also among Bedrock models
+                # there are some that do not support system prompt (e.g., titan
+                # models).
+                messages.append(
+                    {'role': 'user',
+                     'content': [{'text': f'{system_prompt}{prompt}'}]},
+                )
         try:
             responses = [self.model.converse(
-                messages=contents,
-                system=sys_prompt_param,  # It may be an empty list
-                inferenceConfig={
-                    'temperature': temperature,
-                    'maxTokens': max_tokens
-                }
+                messages=messages,
+                **kwargs  # arguments supported by converse API
             )['output']['message']['content'][0]['text'] for _ in range(n)]
             if not all(responses):
                 return Filtered(
@@ -521,6 +532,7 @@ class AICoreAmazonBedrockLLM(LLM):
             presence_penalty: float = 0.5,
             n: int = 1) -> LLMResponse:
         contents = []
+        # TODO: manage system prompt
         for message in messages:
             contents.append(
                 {
