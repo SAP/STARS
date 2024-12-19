@@ -2,14 +2,14 @@ import abc
 import logging
 import os
 
-from gen_ai_hub.proxy.core.proxy_clients import set_proxy_version
-
 from gen_ai_hub.proxy.core.proxy_clients import get_proxy_client
+from gen_ai_hub.proxy.core.proxy_clients import set_proxy_version
 from gen_ai_hub.proxy.native.openai import OpenAI as ProxyOpenAI
 from gen_ai_hub.proxy.native.google_vertexai.clients import GenerativeModel
-import httpx
+from gen_ai_hub.proxy.native.amazon.clients import Session
 from openai import OpenAI as OfficialOpenAI
 from openai import InternalServerError
+import httpx
 import ollama
 
 from llm_response import Error, Filtered, LLMResponse, Success
@@ -24,12 +24,12 @@ logger.addHandler(status.trace_logging)
 AICORE_MODELS = {
     'openai':
     [
-        'gpt-4o',
-        'gpt-4',
         'gpt-35-turbo',
         'gpt-35-turbo-0125',
         'gpt-35-turbo-16k',
+        'gpt-4',
         'gpt-4-32k',
+        'gpt-4o',
         'gpt-4o-mini'
     ],
     'opensource':
@@ -45,6 +45,18 @@ AICORE_MODELS = {
         'gemini-1.0-pro',
         'gemini-1.5-pro',
         'gemini-1.5-flash'
+    ],
+    'bedrock':
+    [
+        'amazon--titan-text-lite',
+        'amazon--titan-text-express',
+        'anthropic--claude-3-haiku',
+        'anthropic--claude-3-sonnet',
+        'anthropic--claude-3-opus',
+        'anthropic--claude-3.5-sonnet',
+        'amazon--nova-pro',
+        'amazon--nova-lite',
+        'amazon--nova-micro'
     ]
 }
 
@@ -72,6 +84,8 @@ class LLM(abc.ABC):
             return AICoreOpenAILLM(model_name, False)
         if model_name in AICORE_MODELS['vertexai']:
             return AICoreGoogleVertexLLM(model_name)
+        if model_name in AICORE_MODELS['bedrock']:
+            return AICoreAmazonBedrockLLM(model_name)
         if model_name == 'mistral':
             return LocalOpenAILLM(
                 os.getenv('MISTRAL_MODEL_NAME', ''),
@@ -436,6 +450,97 @@ class AICoreGoogleVertexLLM(LLM):
                     # 'frequency_penalty': frequency_penalty,
                     # 'presence_penalty': presence_penalty,
                 }).text for _ in range(n)]
+            if not all(responses):
+                return Filtered(
+                    'One of the generations resulted in an empty response')
+            return Success(responses)
+        except ValueError as v:
+            return Error(str(v))
+
+
+class AICoreAmazonBedrockLLM(LLM):
+
+    def __init__(self, model_name: str):
+        self.model_name = model_name
+        proxy_client = get_proxy_client('gen-ai-hub')
+        self.model = Session().client(
+            proxy_client=proxy_client,
+            model_name=self.model_name
+        )
+
+    def __str__(self) -> str:
+        return f'{self.model_name}/Amazon Bedrock'
+
+    def generate(self,
+                 system_prompt: str,
+                 prompt: str,
+                 temperature: float = 1,
+                 max_tokens: int = 1024,
+                 n: int = 1) -> LLMResponse:
+        contents = []
+        sys_prompt_param = []
+        if system_prompt:
+            # In bedrock models, the system prompt is passed as a parameter in
+            # the converse function call
+            sys_prompt_param.append(
+                {
+                    'text': system_prompt
+                }
+            )
+        contents.append(
+            {
+                'role': 'user',
+                'content': [{
+                        'text': prompt
+                }]
+            }
+        )
+        try:
+            responses = [self.model.converse(
+                messages=contents,
+                system=sys_prompt_param,  # It may be an empty list
+                inferenceConfig={
+                    'temperature': temperature,
+                    'maxTokens': max_tokens
+                }
+            )['output']['message']['content'][0]['text'] for _ in range(n)]
+            if not all(responses):
+                return Filtered(
+                    'One of the generations resulted in an empty response')
+            return Success(responses)
+        except ValueError as v:
+            return Error(str(v))
+
+    def generate_completions_for_messages(
+            self,
+            messages: list,
+            temperature: float = 1,
+            max_tokens: int = 1024,
+            top_p: int = 1,
+            frequency_penalty: float = 0.5,
+            presence_penalty: float = 0.5,
+            n: int = 1) -> LLMResponse:
+        contents = []
+        for message in messages:
+            contents.append(
+                {
+                    'role': 'user',
+                    'content': [{'text': message['content']}]
+                }
+            )
+        try:
+            responses = [self.model.converse(
+                messages=contents,
+                inferenceConfig={
+                    'temperature': temperature,
+                    'maxTokens': max_tokens,
+                    'topP': top_p
+                    # Frequency penalty and Presence penalty are not supported
+                    # by Amazon.
+                    # 'frequency_penalty': frequency_penalty,
+                    # 'presence_penalty': presence_penalty,
+                })['output']['message']['content'][0]['text']
+                for _ in range(n)]
             if not all(responses):
                 return Filtered(
                     'One of the generations resulted in an empty response')
