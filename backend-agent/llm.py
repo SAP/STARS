@@ -30,7 +30,7 @@ AICORE_MODELS = {
         'gpt-35-turbo-0125',
         'gpt-35-turbo-16k',
         'gpt-4-32k',
-        'gpt-4o-mini'
+        'gpt-4o-mini',
     ],
     'opensource':
     [
@@ -45,6 +45,10 @@ AICORE_MODELS = {
         'gemini-1.0-pro',
         'gemini-1.5-pro',
         'gemini-1.5-flash'
+    ],
+    'ibm':
+    [
+        'ibm--granite-13b-chat'
     ]
 }
 
@@ -70,6 +74,9 @@ class LLM(abc.ABC):
             return AICoreOpenAILLM(model_name)
         if model_name in AICORE_MODELS['opensource']:
             return AICoreOpenAILLM(model_name, False)
+        if model_name in AICORE_MODELS['ibm']:
+            # IBM models are compatible with OpenAI completion API
+            return AICoreOpenAILLM(model_name)
         if model_name in AICORE_MODELS['vertexai']:
             return AICoreGoogleVertexLLM(model_name)
         if model_name == 'mistral':
