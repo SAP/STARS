@@ -1,15 +1,16 @@
+from typing import Any, Dict, List
 import abc
 import logging
 import os
 
-from gen_ai_hub.proxy.core.proxy_clients import set_proxy_version
-
 from gen_ai_hub.proxy.core.proxy_clients import get_proxy_client
+from gen_ai_hub.proxy.core.proxy_clients import set_proxy_version
 from gen_ai_hub.proxy.native.openai import OpenAI as ProxyOpenAI
 from gen_ai_hub.proxy.native.google_vertexai.clients import GenerativeModel
-import httpx
+from gen_ai_hub.proxy.native.amazon.clients import Session
 from openai import OpenAI as OfficialOpenAI
 from openai import InternalServerError
+import httpx
 import ollama
 
 from llm_response import Error, Filtered, LLMResponse, Success
@@ -24,12 +25,12 @@ logger.addHandler(status.trace_logging)
 AICORE_MODELS = {
     'openai':
     [
-        'gpt-4o',
-        'gpt-4',
         'gpt-35-turbo',
         'gpt-35-turbo-0125',
         'gpt-35-turbo-16k',
+        'gpt-4',
         'gpt-4-32k',
+        'gpt-4o',
         'gpt-4o-mini'
     ],
     'opensource':
@@ -45,6 +46,18 @@ AICORE_MODELS = {
         'gemini-1.0-pro',
         'gemini-1.5-pro',
         'gemini-1.5-flash'
+    ],
+    'bedrock':
+    [
+        'amazon--titan-text-lite',
+        'amazon--titan-text-express',
+        'anthropic--claude-3-haiku',
+        'anthropic--claude-3-sonnet',
+        'anthropic--claude-3-opus',
+        'anthropic--claude-3.5-sonnet',
+        'amazon--nova-pro',
+        'amazon--nova-lite',
+        'amazon--nova-micro'
     ]
 }
 
@@ -72,6 +85,12 @@ class LLM(abc.ABC):
             return AICoreOpenAILLM(model_name, False)
         if model_name in AICORE_MODELS['vertexai']:
             return AICoreGoogleVertexLLM(model_name)
+        if model_name in AICORE_MODELS['bedrock']:
+            if 'titan' in model_name:
+                # Titan models don't support system prompts
+                return AICoreAmazonBedrockLLM(model_name, False)
+            else:
+                return AICoreAmazonBedrockLLM(model_name)
         if model_name == 'mistral':
             return LocalOpenAILLM(
                 os.getenv('MISTRAL_MODEL_NAME', ''),
@@ -436,6 +455,104 @@ class AICoreGoogleVertexLLM(LLM):
                     # 'frequency_penalty': frequency_penalty,
                     # 'presence_penalty': presence_penalty,
                 }).text for _ in range(n)]
+            if not all(responses):
+                return Filtered(
+                    'One of the generations resulted in an empty response')
+            return Success(responses)
+        except ValueError as v:
+            return Error(str(v))
+
+
+class AICoreAmazonBedrockLLM(LLM):
+
+    def __init__(self, model_name: str, uses_system_prompt: bool = True):
+        self.model_name = model_name
+        proxy_client = get_proxy_client('gen-ai-hub')
+        self.model = Session().client(
+            proxy_client=proxy_client,
+            model_name=self.model_name
+        )
+        self.uses_system_prompt = uses_system_prompt
+
+    def __str__(self) -> str:
+        return f'{self.model_name}/Amazon Bedrock'
+
+    def generate(self,
+                 system_prompt: str,
+                 prompt: str,
+                 temperature: float = 1,
+                 max_tokens: int = 1024,
+                 n: int = 1) -> LLMResponse:
+
+        # Declare types for messages and kwargs to avoid mypy errors
+        messages: List[Dict[str, Any]] = []
+        kwargs: Dict[str, Any] = {
+            'inferenceConfig': {
+                'temperature': temperature,
+                'maxTokens': max_tokens
+            }
+        }
+        if not system_prompt:
+            messages.append(
+                {'role': 'user', 'content': [{'text': prompt}]}
+            )
+        else:
+            if self.uses_system_prompt:
+                messages.append(
+                    {'role': 'user', 'content': [{'text': prompt}]}
+                )
+                kwargs['system'] = [{'text': system_prompt}]
+            else:
+                # Similarly to the Mistral model, also among Bedrock models
+                # there are some that do not support system prompt (e.g., titan
+                # models).
+                messages.append(
+                    {'role': 'user',
+                     'content': [{'text': f'{system_prompt}{prompt}'}]},
+                )
+        try:
+            responses = [self.model.converse(
+                messages=messages,
+                **kwargs  # arguments supported by converse API
+            )['output']['message']['content'][0]['text'] for _ in range(n)]
+            if not all(responses):
+                return Filtered(
+                    'One of the generations resulted in an empty response')
+            return Success(responses)
+        except ValueError as v:
+            return Error(str(v))
+
+    def generate_completions_for_messages(
+            self,
+            messages: list,
+            temperature: float = 1,
+            max_tokens: int = 1024,
+            top_p: int = 1,
+            frequency_penalty: float = 0.5,
+            presence_penalty: float = 0.5,
+            n: int = 1) -> LLMResponse:
+        contents = []
+        # TODO: manage system prompt
+        for message in messages:
+            contents.append(
+                {
+                    'role': 'user',
+                    'content': [{'text': message['content']}]
+                }
+            )
+        try:
+            responses = [self.model.converse(
+                messages=contents,
+                inferenceConfig={
+                    'temperature': temperature,
+                    'maxTokens': max_tokens,
+                    'topP': top_p
+                    # Frequency penalty and Presence penalty are not supported
+                    # by Amazon.
+                    # 'frequency_penalty': frequency_penalty,
+                    # 'presence_penalty': presence_penalty,
+                })['output']['message']['content'][0]['text']
+                for _ in range(n)]
             if not all(responses):
                 return Filtered(
                     'One of the generations resulted in an empty response')
