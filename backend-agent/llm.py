@@ -47,6 +47,10 @@ AICORE_MODELS = {
         'gemini-1.5-pro',
         'gemini-1.5-flash'
     ],
+    'ibm':
+    [
+        'ibm--granite-13b-chat'
+    ],
     'bedrock':
     [
         'amazon--titan-text-lite',
@@ -83,6 +87,9 @@ class LLM(abc.ABC):
             return AICoreOpenAILLM(model_name)
         if model_name in AICORE_MODELS['opensource']:
             return AICoreOpenAILLM(model_name, False)
+        if model_name in AICORE_MODELS['ibm']:
+            # IBM models are compatible with OpenAI completion API
+            return AICoreOpenAILLM(model_name)
         if model_name in AICORE_MODELS['vertexai']:
             return AICoreGoogleVertexLLM(model_name)
         if model_name in AICORE_MODELS['bedrock']:
