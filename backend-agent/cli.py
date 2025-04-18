@@ -203,6 +203,17 @@ def artprompt(args):
     start_spec(spec, args)
 
 
+@subcommand([arg('target_model', help='Name of the target model to attack'),
+             arg('--output_file', '-o', help='Output file with results',
+                 default=None)])
+def dan(args):
+    spec = AttackSpecification.create(
+        'dan',
+        args.target_model,
+        params=vars(args))
+    start_spec(spec, args)
+
+
 @subcommand([arg('file',
                  help='Path to the JSON file containing the attack specification.',  # noqa: E501
                  nargs='?'),

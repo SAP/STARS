@@ -9,6 +9,8 @@ from libs.artprompt import start_artprompt, \
     OUTPUT_FILE as artprompt_out_file
 from libs.codeattack import start_codeattack, \
     OUTPUT_FILE as codeattack_out_file
+from libs.garak import start_dan, \
+    OUTPUT_FILE as garak_output_file
 from libs.gptfuzz import perform_gptfuzz_attack, \
     OUTPUT_FILE as gptfuzz_out_file
 from libs.promptmap import start_prompt_map, \
@@ -166,6 +168,12 @@ class AttackSpecification:
                         self.eval_model,
                         self.parameters
                     ))
+                case 'dan':
+                    # TODO: build output_file param
+                    return t.trace(start_dan(
+                        self.target_model,
+                        self.parameters
+                    ))
                 case _:
                     raise ValueError(f'Attack {self.attack} is not known.')
 
@@ -182,6 +190,8 @@ class AttackSpecification:
                 return codeattack_out_file
             case 'artprompt':
                 return artprompt_out_file
+            case 'dan':
+                return garak_output_file
 
 
 class AttackSuite():
