@@ -23,3 +23,4 @@ pyrit==0.2.1
 textattack>=0.3.10
 codeattack @ git+https://github.com/marcorosa/CodeAttack
 gptfuzzer @ git+https://github.com/marcorosa/GPTFuzz@no-vllm
+garak~=0.10.3
