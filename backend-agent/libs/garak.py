@@ -8,6 +8,7 @@ from garak import _config
 from garak import command
 from garak.evaluators import ThresholdEvaluator
 from garak.generators import Generator
+from garak.report import Report
 
 from attack_result import AttackResult
 from llm import LLM
@@ -70,8 +71,8 @@ def _configure_garak(model_name: str, output_filename: str):
     # Configure output path and file name
     _config.transient.data_dir = Path(os.path.abspath('.'))
     # attack_family_name = probes[0].split('.')[1]
-    # _config.reporting.__report_prefix = f'stars.{attack_family_name}'
-    _config.reporting.__report_prefix = output_filename
+    # _config.reporting.report_prefix = f'stars.{attack_family_name}'
+    _config.reporting.report_prefix = output_filename
 
     # To prevent errors in command.start_run due to missing CLI args,
     # disable lite mode (which is used only to hint when running interactively)
@@ -80,6 +81,22 @@ def _configure_garak(model_name: str, output_filename: str):
 
 def run_garak(target_model: LLM, probes: list,
               output_filename: str = OUTPUT_FILE):
+    """TODO"""
+    # At runtime, garak appends ".report.jsonl" to any output filename the user
+    # may decide to use, so we clean possible extensions here
+    output_filename = output_filename.rstrip('.jsonl')
+    output_filename = output_filename.rstrip('.json')
+    # After removing extensions, remove possible "report" before so not to have
+    # it duplicated at runtime
+    output_filename = output_filename.rstrip('report')
+    # Remove possible trailing .
+    output_filename = output_filename.rstrip('.')
+    if not output_filename:
+        # In the unfortunate event the filename gets cleared out, lets use the
+        # default value (otherwise, the default behavior would use a filename
+        # starting with a . resulting in a hidden file)
+        output_filename = OUTPUT_FILE
+
     with Step('Preparing attack'):
         _configure_garak(target_model.model_name, output_filename)
 
@@ -106,24 +123,26 @@ def run_garak(target_model: LLM, probes: list,
         # Signal run completion.
         command.end_run()
 
-    # TODO: the following block is a copypaste from other attacks and must be
-    # refined and adapted for garak
-    # logger.info(f'Number of successful attacks: {security_failed}')
-    # logger.info(f'Number of unsuccessful attacks: {security_passed}\n')
-    # logger.info('__________________________________________________\n')
-    # logger.info('Here are the successful prompts\n')
-    # for attack in successful_attacks:
-    #     logger.info('+ ' + attack + '\n')
+    with Step('Read attack results'):
+        # garak always appends a hardcoded ".report.jsonl" value at the end of
+        # the report filename, even if the user declares a filename
+        garak_output = f'{output_filename}.report.jsonl'
+        r = Report(report_location=garak_output).load()
+        scores = r.get_evaluations().scores
 
-    # return AttackResult(
-    #     'promptmap',
-    #     security_failed > 0,
-    #     'prompt-injection',
-    #     {
-    #         'successful_attacks': successful_attacks_json,
-    #         'attack_description': DESCRIPTION
-    #     }
-    # )
+    # Get results
+    successful_attacks = {}
+    for attack in scores.itertuples():
+        if attack.score > 0:
+            successful_attacks[attack.Index] = attack.score
+
+    logger.info('__________________________________________________\n')
+    logger.info(f'Number of successful attacks: {len(successful_attacks)}')
+    logger.info('Number of unsuccessful attacks: '
+                f'{len(scores) - len(successful_attacks)}\n')
+    logger.info('__________________________________________________\n')
+
+    return successful_attacks
 
 
 def start_dan(target_model: LLM, parameters: dict) -> AttackResult:
@@ -143,6 +162,20 @@ def start_dan(target_model: LLM, parameters: dict) -> AttackResult:
                   # TODO: rename it to DanInTheWild from garak v0.11
                   'probes.dan.DanInTheWildMini',
                   ]
-    outfile = parameters.get('output_filename', f'{OUTPUT_FILE}.dan')
-    run_garak(target_model, probes=dan_probes, output_filename=outfile)
-    # TODO: read results from file and return them in our format
+    outfile = parameters.get('output_file', f'{OUTPUT_FILE}.dan')
+    # Run the attack
+    results = run_garak(target_model,
+                        probes=dan_probes,
+                        output_filename=outfile)
+
+    return AttackResult(
+        'dan',
+        len(results) > 0,
+        'prompt-injection',
+        {
+            'successful_attacks': results,
+            # TODO: the description should be extended to reflect the dan
+            # attack here
+            'attack_description': DESCRIPTION
+        }
+    )
