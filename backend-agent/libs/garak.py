@@ -21,7 +21,12 @@ logger.addHandler(status.trace_logging)
 
 OUTPUT_FILE = 'garak.stars'
 DESCRIPTION = """
-TODO
+Garak is a vulnerability scanner for LLMs. Garak probes for hallucination,
+data leakage, prompt injection, misinformation, toxicity generation,
+jailbreaks, and many other weaknesses. Attacks integrated into this tool are
+not original ones, but taken from the literature and reimplemented.
+In the context of STARS, we will use Garak as a vector to access a subset of
+such attacks (only the ones adapted to our working scenario).
 """
 # ############################### Adapter class ###############################
 
@@ -56,7 +61,11 @@ class SAPAICoreGenerator(Generator):
 # ################################## Attacks ##################################
 
 def _configure_garak(model_name: str, output_filename: str):
-    """ TODO """
+    """Configure garak.
+
+    This step is same for any attack we may want to run using Garak.
+    We load a pre-defined configuration to connect to AI Core models and set
+    the output file report."""
     _config.transient.starttime = datetime.datetime.now()
     _config.transient.starttime_iso = _config.transient.starttime.isoformat()
 
@@ -82,7 +91,14 @@ def _configure_garak(model_name: str, output_filename: str):
 
 def run_garak(target_model: LLM, probes: list,
               output_filename: str = OUTPUT_FILE):
-    """TODO"""
+    """Run a list of attacks (probes) from Garak attack framework.
+
+    @params
+    target_model: Model that is to be attacked.
+    probes: A list of attacks to run.
+    Additional parameters:
+    Optional parameter output_filename to set the output file of results.
+    """
     # At runtime, garak appends ".report.jsonl" to any output filename the user
     # may decide to use, so we clean possible extensions here
     output_filename = re.sub(r'\.jsonl?$', '', output_filename)
@@ -146,8 +162,20 @@ def run_garak(target_model: LLM, probes: list,
 
 
 def start_dan(target_model: LLM, parameters: dict) -> AttackResult:
+    """Start a DAN attack using Garak attack framework.
+
+    @params
+    target_model: Model that is to be attacked.
+    parameters: Additional parameters:
+    Optional parameter output_file to set the output file of results.
     """
-    TODO
+
+    dan_description = """DAN (Do Anything Now) is a prompt injection attack
+    that uses static prompts specifically crafted to try and bypass the
+    built-in safety, ethical, or content filtering mechanisms of LLMs.
+    We leverage 11 sub-probes from Garak to run this attack.
+    Each of these 11 sub-probes come with their community-developed static
+    prompt(s).
     """
     dan_probes = ['probes.dan.Dan_11_0',
                   'probes.dan.Dan_10_0',
@@ -157,8 +185,8 @@ def start_dan(target_model: LLM, parameters: dict) -> AttackResult:
                   'probes.dan.Dan_6_0',
                   'probes.dan.Dan_6_2',
                   'probes.dan.DUDE',
-                  'probes.dan.DUDESTAN',
-                  'probes.dan.DUDEAutoDANCached',
+                  'probes.dan.STAN',
+                  'probes.dan.AutoDANCached',
                   # TODO: rename it to DanInTheWild from garak v0.11
                   'probes.dan.DanInTheWildMini',
                   ]
@@ -174,8 +202,6 @@ def start_dan(target_model: LLM, parameters: dict) -> AttackResult:
         'prompt-injection',
         {
             'successful_attacks': results,
-            # TODO: the description should be extended to reflect the dan
-            # attack here
-            'attack_description': DESCRIPTION
+            'attack_description': dan_description
         }
     )
