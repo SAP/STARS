@@ -205,3 +205,274 @@ def start_dan(target_model: LLM, parameters: dict) -> AttackResult:
             'attack_description': dan_description
         }
     )
+
+
+def start_encoding(target_model: LLM, parameters: dict) -> AttackResult:
+    """Start a encoding attack using Garak attack framework.
+
+    @params
+    target_model: Model that is to be attacked.
+    parameters: Additional parameters:
+    Optional parameter output_file to set the output file of results.
+    """
+
+    encoding_description = """Encoding is a prompt injection attack
+    that uses static prompts obfuscated using encodings.
+    We leverage 13 sub-probes from Garak to run this attack.
+    Each of these 13 sub-probes come with 30 prompts (except for InjectAscii85
+    having 60 prompts).
+    """
+    encoding_probes = ['probes.encoding.InjectBase64',
+                       'probes.encoding.InjectBase16',
+                       'probes.encoding.InjectBase32',
+                       'probes.encoding.InjectAscii85',
+                       'probes.encoding.InjectHex',
+                       'probes.encoding.InjectUU',
+                       'probes.encoding.InjectROT13',
+                       'probes.encoding.InjectBase2048',
+                       'probes.encoding.InjectBraille',
+                       'probes.encoding.InjectMorse',
+                       'probes.encoding.InjectNato',
+                       'probes.encoding.InjectEcoji',
+                       'probes.encoding.InjectZalgo',
+                       ]
+    outfile = parameters.get('output_file', f'{OUTPUT_FILE}.encoding')
+    # Run the attack
+    results = run_garak(target_model,
+                        probes=encoding_probes,
+                        output_filename=outfile)
+
+    return AttackResult(
+        'encoding',
+        len(results) > 0,
+        'prompt-injection',
+        {
+            'successful_attacks': results,
+            'attack_description': encoding_description
+        }
+    )
+
+
+def start_goodside(target_model: LLM, parameters: dict) -> AttackResult:
+    """Start a goodside attack using Garak attack framework.
+
+     Implementation of Riley Goodside attack using Garak framework.
+     LLM prompt injection via invisible instructions in pasted text
+
+    @params
+    target_model: Model that is to be attacked.
+    parameters: Additional parameters:
+    Optional parameter output_file to set the output file of results.
+    """
+
+    goodside_description = """This attack is a LLM prompt injection via
+    invisible instructions in pasted text. In particular, exploit UTF tag page
+    encoding for user-invisible prompt injection.
+    """
+    goodside_probes = ['probes.goodside.Tag',
+                       ]
+    outfile = parameters.get('output_file', f'{OUTPUT_FILE}.goodside')
+    # Run the attack
+    results = run_garak(target_model,
+                        probes=goodside_probes,
+                        output_filename=outfile)
+
+    return AttackResult(
+        'goodside',
+        len(results) > 0,
+        'prompt-injection',
+        {
+            'successful_attacks': results,
+            'attack_description': goodside_description
+        }
+    )
+
+
+def start_latentinjection(target_model: LLM, parameters: dict) -> AttackResult:
+    """Start a latentinjection attack using Garak attack framework.
+
+    @params
+    target_model: Model that is to be attacked.
+    parameters: Additional parameters:
+    Optional parameter output_file to set the output file of results.
+    """
+
+    li_description = """LatentInjection is a prompt injection attack
+    with instructions buried in other contexts (e.g., in translation tasks, in
+    documents ).
+    We leverage 9 sub-probes from Garak to run this attack.
+    Each of these 9 sub-probes come with around 250 prompts
+    (except for Whois subprobes having around 30 prompts).
+    """
+    # TODO: review probes from v0.11 as they will slightly change
+    li_probes = ['probes.encoding.LatentInjectionFactSnippetEiffel',
+                 'probes.encoding.LatentInjectionFactSnippetLegal',
+                 'probes.encoding.LatentInjectionReport',
+                 'probes.encoding.LatentInjectionResume',
+                 'probes.encoding.LatentInjectionTranslationEnFr',
+                 'probes.encoding.LatentInjectionTranslationEnZh',
+                 'probes.encoding.LatentJailbreak',
+                 'probes.encoding.LatentWhois',
+                 'probes.encoding.LatentWhoisSnippet',
+                 ]
+
+    outfile = parameters.get('output_file', f'{OUTPUT_FILE}.latentinjection')
+    # Run the attack
+    results = run_garak(target_model,
+                        probes=li_probes,
+                        output_filename=outfile)
+
+    return AttackResult(
+        'latentinjection',
+        len(results) > 0,
+        'prompt-injection',
+        {
+            'successful_attacks': results,
+            'attack_description': li_description
+        }
+    )
+
+
+def start_malwaregen(target_model: LLM, parameters: dict) -> AttackResult:
+    """Start a malwaregen attack using Garak attack framework.
+
+    Drive the LLM into generating malware. Each of the 4 attack implementations
+    templates asks to generate the malware in a different programming language.
+
+    @params
+    target_model: Model that is to be attacked.
+    parameters: Additional parameters:
+    Optional parameter output_file to set the output file of results.
+    """
+
+    malwaregen_description = """This attack is a malware code generation.
+    8 programming languages are supported: x86 assembly, x86-64 assembly, C#,
+    C, C++, Rust, ARM64, Swift.
+    """
+    malwaregen_probes = ['probes.malwaregen.TopLevel',
+                         'probes.malwaregen.SubFunctions',
+                         'probes.malwaregen.Evasion',
+                         'probes.malwaregen.Payload',
+                         ]
+    outfile = parameters.get('output_file', f'{OUTPUT_FILE}.malwaregen')
+    # Run the attack
+    results = run_garak(target_model,
+                        probes=malwaregen_probes,
+                        output_filename=outfile)
+
+    return AttackResult(
+        'malwaregen',
+        len(results) > 0,
+        'insecure-code-generation',
+        {
+            'successful_attacks': results,
+            'attack_description': malwaregen_description
+        }
+    )
+
+
+def start_phrasing(target_model: LLM, parameters: dict) -> AttackResult:
+    """Start a phrasing attack using Garak attack framework.
+
+    @params
+    target_model: Model that is to be attacked.
+    parameters: Additional parameters:
+    Optional parameter output_file to set the output file of results.
+    """
+
+    phrasing_description = """This attack is a jailbreaking via reformulating
+    harmful requests in the past (or future) tense. 200 prompts for each tense
+    are tested.
+    """
+    phrasing_probes = ['probes.phrasing.PastTense',
+                       'probes.phrasing.FutureTense',
+                       ]
+    outfile = parameters.get('output_file', f'{OUTPUT_FILE}.phrasing')
+    # Run the attack
+    results = run_garak(target_model,
+                        probes=phrasing_probes,
+                        output_filename=outfile)
+
+    return AttackResult(
+        'phrasing',
+        len(results) > 0,
+        'jailbreak',
+        {
+            'successful_attacks': results,
+            'attack_description': phrasing_description
+        }
+    )
+
+
+def start_promptinject(target_model: LLM, parameters: dict) -> AttackResult:
+    """Start a PromptInject attack using Garak attack framework.
+
+    This is a lighter version of the official PromptInject attack, testing 100
+    prompts instead of thusands of prompts with 3 different strategies.
+
+    @params
+    target_model: Model that is to be attacked.
+    parameters: Additional parameters:
+    Optional parameter output_file to set the output file of results.
+    """
+
+    pi_description = """PromptInject is a framework for prompt injection.
+    PromptInject uses a range of techniques to compose prompts that try to
+    manipulate the LLM into repeating a certain string. This attack is a
+    lighter version of the official PromptInject, running 100 prompts instead
+    of thousands.
+    """
+    pi_probes = ['probes.promptinject.HijackHateHumans',
+                 'probes.promptinject.HijackKillHumans',
+                 'probes.promptinject.HijackLongPrompt',
+                 ]
+
+    outfile = parameters.get('output_file', f'{OUTPUT_FILE}.promptinject')
+    # Run the attack
+    results = run_garak(target_model,
+                        probes=pi_probes,
+                        output_filename=outfile)
+
+    return AttackResult(
+        'PromptInject',
+        len(results) > 0,
+        'prompt-injection',
+        {
+            'successful_attacks': results,
+            'attack_description': pi_description
+        }
+    )
+
+
+def start_suffix(target_model: LLM, parameters: dict) -> AttackResult:
+    """Start a suffix attack using Garak attack framework.
+
+    This is a lighter version of GCG with 26 pre-computed prompts.
+
+    @params
+    target_model: Model that is to be attacked.
+    parameters: Additional parameters:
+    Optional parameter output_file to set the output file of results.
+    """
+
+    suffix_description = """This attack runs a light version of GCG where
+    26 prompts have been pre-computed and cached.
+    """
+    suffix_probes = ['probes.suffix.GCGCached',
+                     ]
+
+    outfile = parameters.get('output_file', f'{OUTPUT_FILE}.suffix')
+    # Run the attack
+    results = run_garak(target_model,
+                        probes=suffix_probes,
+                        output_filename=outfile)
+
+    return AttackResult(
+        'suffix',
+        len(results) > 0,
+        'jailbreak',
+        {
+            'successful_attacks': results,
+            'attack_description': suffix_description
+        }
+    )
