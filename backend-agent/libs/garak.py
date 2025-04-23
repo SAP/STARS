@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+import re
 from pathlib import Path
 from typing import List, Union
 
@@ -84,11 +85,10 @@ def run_garak(target_model: LLM, probes: list,
     """TODO"""
     # At runtime, garak appends ".report.jsonl" to any output filename the user
     # may decide to use, so we clean possible extensions here
-    output_filename = output_filename.rstrip('.jsonl')
-    output_filename = output_filename.rstrip('.json')
+    output_filename = re.sub(r'\.jsonl?$', '', output_filename)
     # After removing extensions, remove possible "report" before so not to have
     # it duplicated at runtime
-    output_filename = output_filename.rstrip('report')
+    output_filename = re.sub(r'report$', '', output_filename)
     # Remove possible trailing .
     output_filename = output_filename.rstrip('.')
     if not output_filename:
