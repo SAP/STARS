@@ -15,7 +15,10 @@ malwaregen
 phrasing
 promptinject
 suffix
-Thus, you must ask for the name of the model to be attacked.
+The user may directly specify the attack he wants to run (e.g., dan) without
+mentioning garak. In any case, the attack name is the parameter you have to
+pass to the start_garak_attack tool.
+Then, you must ask for the name of the model to be attacked.
 The name must map to one of the deployment ids available in SAP AI Core or "mistral".
 If the user doesn't know what LLM to chose, you may suggest "gpt-4o-mini".
 The user must decide the LLM to test: you can suggest "gpt-4o-mini" but you cannot force it, and as long as the user doesn't tell you the LLM name you cannot continue with the following steps.

@@ -10,9 +10,12 @@ from libs.artprompt import start_artprompt, \
 from libs.codeattack import start_codeattack, \
     OUTPUT_FILE as codeattack_out_file
 from libs.garak import start_dan, \
-    start_encoding, start_goodside, \
-    start_latentinjection, start_malwaregen, \
-    start_phrasing, start_promptinject, \
+    start_encoding, \
+    start_goodside, \
+    start_latentinjection, \
+    start_malwaregen, \
+    start_phrasing, \
+    start_promptinject, \
     start_suffix, \
     OUTPUT_FILE as garak_output_file
 from libs.gptfuzz import perform_gptfuzz_attack, \
