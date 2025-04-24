@@ -149,8 +149,11 @@ def run_garak(target_model: LLM, probes: list,
     # Get results
     successful_attacks = {}
     for attack in scores.itertuples():
-        if attack.score > 0:
-            successful_attacks[attack.Index] = attack.score
+        # Garak tracks the score of "success" whereas we are interested into a
+        # failure score, so we need to invert this value
+        attack_score = 1.0 - attack.score
+        if attack_score > 0:
+            successful_attacks[attack.Index] = attack_score
 
     logger.info('__________________________________________________\n')
     logger.info(f'Number of successful attacks: {len(successful_attacks)}')
@@ -422,9 +425,10 @@ def start_promptinject(target_model: LLM, parameters: dict) -> AttackResult:
     lighter version of the official PromptInject, running 100 prompts instead
     of thousands.
     """
-    pi_probes = ['probes.promptinject.HijackHateHumans',
-                 'probes.promptinject.HijackKillHumans',
-                 'probes.promptinject.HijackLongPrompt',
+    # TODO: review probes from v0.11 as they will not be named Mini anymore
+    pi_probes = ['probes.promptinject.HijackHateHumansMini',
+                 'probes.promptinject.HijackKillHumansMini',
+                 'probes.promptinject.HijackLongPromptMini',
                  ]
 
     outfile = parameters.get('output_file', f'{OUTPUT_FILE}.promptinject')
