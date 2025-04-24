@@ -214,6 +214,83 @@ def dan(args):
     start_spec(spec, args)
 
 
+@subcommand([arg('target_model', help='Name of the target model to attack'),
+             arg('--output_file', '-o', help='Output file with results',
+                 default=None)])
+def encoding(args):
+    spec = AttackSpecification.create(
+        'encoding',
+        args.target_model,
+        params=vars(args))
+    start_spec(spec, args)
+
+
+@subcommand([arg('target_model', help='Name of the target model to attack'),
+             arg('--output_file', '-o', help='Output file with results',
+                 default=None)])
+def goodside(args):
+    spec = AttackSpecification.create(
+        'goodside',
+        args.target_model,
+        params=vars(args))
+    start_spec(spec, args)
+
+
+@subcommand([arg('target_model', help='Name of the target model to attack'),
+             arg('--output_file', '-o', help='Output file with results',
+                 default=None)])
+def latentinjection(args):
+    spec = AttackSpecification.create(
+        'latentinjection',
+        args.target_model,
+        params=vars(args))
+    start_spec(spec, args)
+
+
+@subcommand([arg('target_model', help='Name of the target model to attack'),
+             arg('--output_file', '-o', help='Output file with results',
+                 default=None)])
+def malwaregen(args):
+    spec = AttackSpecification.create(
+        'malwaregen',
+        args.target_model,
+        params=vars(args))
+    start_spec(spec, args)
+
+
+@subcommand([arg('target_model', help='Name of the target model to attack'),
+             arg('--output_file', '-o', help='Output file with results',
+                 default=None)])
+def phrasing(args):
+    spec = AttackSpecification.create(
+        'phrasing',
+        args.target_model,
+        params=vars(args))
+    start_spec(spec, args)
+
+
+@subcommand([arg('target_model', help='Name of the target model to attack'),
+             arg('--output_file', '-o', help='Output file with results',
+                 default=None)])
+def promptinject(args):
+    spec = AttackSpecification.create(
+        'promptinject',
+        args.target_model,
+        params=vars(args))
+    start_spec(spec, args)
+
+
+@subcommand([arg('target_model', help='Name of the target model to attack'),
+             arg('--output_file', '-o', help='Output file with results',
+                 default=None)])
+def suffix(args):
+    spec = AttackSpecification.create(
+        'suffix',
+        args.target_model,
+        params=vars(args))
+    start_spec(spec, args)
+
+
 @subcommand([arg('file',
                  help='Path to the JSON file containing the attack specification.',  # noqa: E501
                  nargs='?'),
