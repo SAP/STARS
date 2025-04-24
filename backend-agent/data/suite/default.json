@@ -44,6 +44,10 @@
       "parameters": {
         "num_prompts": 20
       }
+    },
+    {
+      "attack": "dan",
+      "target-model": "<target>"
     }
   ]
 }
