@@ -24,6 +24,14 @@ Supported attacks are:
 - PyRIT
 - CodeAttack
 - ArtPrompt
+- dan (with garak)
+- encoding (with garak)
+- goodside (with garak)
+- latentinjection (with garak)
+- malwaregen (with garak)
+- phrasing (with garak)
+- promptinject (with garak)
+- suffix (with garak)
 
 ### Attacks against Natural language processing models
 
