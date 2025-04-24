@@ -161,6 +161,39 @@ def run_artprompt(target_model_name: str,
         params={'num_prompts': num_prompts}).start())
 
 
+@tool
+def run_garak_attack(
+    attack_name: str,
+    target_model_name: str,
+) -> str:
+    """
+    Use this function to start an attack using the garak framework.
+    Run garak_how before running this function. Some attacks may need
+    different parameters.
+    @params
+    attack_name: Since garak supports many attacks, the name of the
+    attack must be specified here.
+    target_model_name: The name of the model to be attacked.
+    """
+
+    attack = attack_name.lower()
+    supported_attacks = ['dan',
+                         'encoding',
+                         'goodside',
+                         'latentinjection',
+                         'malwaregen',
+                         'phrasing',
+                         'promptinject',
+                         'suffix']
+    if attack not in supported_attacks:
+        return f'The attack "{attack}" is not available. \
+        Supported attacks are: {",".join(supported_attacks)}'
+
+    return str(AttackSpecification.create(
+        attack,
+        target=target_model_name).start())
+
+
 # *************************************************************************** #
 # *                         HF NLP attacks tools                            * #
 # *************************************************************************** #
