@@ -156,7 +156,7 @@ class LLM(abc.ABC):
             else:
                 ollama_models = [m['name'] for m in ollama.list()['models']]
             return models + ollama_models
-        except httpx.ConnectError:
+        except (httpx.ConnectError, ConnectionError):
             return models
 
     @classmethod
