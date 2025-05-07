@@ -167,7 +167,10 @@ def run_garak_attack(
     target_model_name: str,
 ) -> str:
     """
-    Use this function to start an attack using the garak framework.
+    Use this function to start an attack using the garak framework. Garak is a
+    framework that comprises several attacks, each of them coming with a
+    specific name (dan, encoding, goodside, latentinjection, malwaregen,
+    phrasing, promptinject, suffix).
     Run garak_how before running this function. Some attacks may need
     different parameters.
     @params
