@@ -54,8 +54,8 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
 
   //load a dropdown menu from the loadModelsData result
   loadVendorsData() {
-    this.http.get<string[]>(`http://127.0.0.1:8080/api/vendors`).subscribe({
-      // this.http.get<string[]>(`${environment.api_url}/api/vendors`).subscribe({
+    // this.http.get<string[]>(`http://127.0.0.1:8080/api/vendors`).subscribe({
+    this.http.get<string[]>(`${environment.api_url}/api/vendors`).subscribe({
       next: data => {
         console.log('📡 Données brutes reçues du serveur:', data);
         this.processVendors(data.map(vendor => vendor));
@@ -257,21 +257,21 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
 
   // getattacksNames() return an array of attacks names from the server from http://localhost:3000/api/attacks
   getAttacksNames(): Observable<string[]> {
-    // return this.http.get<any[]>(`${environment.api_url}/api/attacks`).pipe(
-    return this.http.get<any[]>(`http://127.0.0.1:8080/api/attacks`).pipe(
+    return this.http.get<any[]>(`${environment.api_url}/api/attacks`).pipe(
+      // return this.http.get<any[]>(`http://127.0.0.1:8080/api/attacks`).pipe(
       map(data => data.map(row => row['attackName'])) // Extract only attack names
     );
   }
 
   getWeightedAttacks(): Observable<{attackName: string; weight: string}[]> {
-    // return this.http.get<any[]>(`${environment.api_url}/api/attacks`);
-    return this.http.get<any[]>(`http://127.0.0.1:8080/api/attacks`);
+    return this.http.get<any[]>(`${environment.api_url}/api/attacks`);
+    // return this.http.get<any[]>(`http://127.0.0.1:8080/api/attacks`);
   }
 
   getVendors(): Observable<any[]> {
     this.changeDetector.detectChanges();
-    // return this.http.get<any[]>(`${environment.api_url}/api/vendors`);
     return this.http.get<any[]>(`${environment.api_url}/api/vendors`);
+    // return this.http.get<any[]>(`http://127.0.0.1:8080/api/vendors`);
   }
 
   uploadCSV(event: any) {
