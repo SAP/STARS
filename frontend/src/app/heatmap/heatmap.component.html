@@ -1,0 +1,36 @@
+<!-- <p>heatmap works!</p> -->
+<!-- <mat-card class="mat-elevation-z4">
+  <h1>STARS Results Heatmap</h1>
+</mat-card> -->
+
+<!-- <mat-card class="mat-elevation-z4 title-card"> -->
+  <div class="card-header">
+    <!-- <img src="../../assets/favicon.png" alt="STARS Icon" class="header-icon" /> -->
+    <span class="title">STARS Results Heatmap</span>
+  </div>
+<!-- </mat-card> -->
+<!-- <mat-card class="mat-elevation-z4"> -->
+  <div class="buttons-wrapper">
+    <div class="padding-top centered-button">
+      <button mat-raised-button style="width: 282px; height: 56px" (click)="fileInput.click()">Upload risk scores</button>
+      <input #fileInput type="file" hidden (change)="uploadCSV($event)" accept=".csv" />
+      <!-- <button mat-raised-button>Set API Key</button> -->
+    </div>
+  </div>
+    
+  <div id="vendorChoice">
+    <mat-form-field appearance="outline">
+      <mat-label>Select a Vendor</mat-label>
+      <!-- <mat-select [(ngModel)]="selectedVendor" (selectionChange)="onVendorChange($event.value)"> -->
+      <mat-select [(ngModel)]="selectedVendor" (selectionChange)="onVendorChange($event)">
+        <mat-option value="">All vendors</mat-option>
+        <mat-option *ngFor="let vendor of vendorsNames" [value]="vendor">{{ vendor }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+    <span id="overview">  overview</span>
+  </div>
+<!-- </mat-card> -->
+<!-- <mat-card class="mat-elevation-z4 heatmap-card"> -->
+  <div id="heatmapChart"></div>
+<!-- <div id="heatmapChart"></div> -->
+

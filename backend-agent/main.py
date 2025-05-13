@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 
@@ -5,6 +6,7 @@ from dotenv import load_dotenv
 from flask import Flask, abort, jsonify, request, send_file
 from flask_cors import CORS
 from flask_sock import Sock
+from werkzeug.utils import secure_filename
 
 if not os.getenv('DISABLE_AGENT'):
     from agent import agent
@@ -40,15 +42,19 @@ callbacks = {'callbacks': [langfuse_handler, status_callback_handler]
              } if langfuse_handler else {
                  'callbacks': [status_callback_handler]}
 
+# Set up the upload folder dynamically
+UPLOAD_FOLDER = './uploads'  # You can change this to a different path if needed
+ALLOWED_EXTENSIONS = {'csv'}
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Create the upload folder if it doesn't exist
+if not os.path.exists(app.config['UPLOAD_FOLDER']):
+    os.makedirs(app.config['UPLOAD_FOLDER'])
+
 
 def send_intro(sock):
     """
     Sends the intro via the websocket connection.
-
-    The intro is meant as a short tutorial on how to use the agent.
-    Also it includes meaningful suggestions for prompts that should
-    result in predictable behavior for the agent, e.g.
-    "Start the vulnerability scan".
     """
     with open('data/intro.txt', 'r') as f:
         intro = f.read()
@@ -60,18 +66,8 @@ def query_agent(sock):
     """
     Websocket route for the frontend to send prompts to the agent and receive
     responses as well as status updates.
-
-    Messages received are in this JSON format:
-
-    {
-        "type":"message",
-        "data":"Start the vulnerability scan",
-        "key":"secretapikey"
-    }
-
     """
     status.sock = sock
-    # Intro is sent after connecting successfully
     send_intro(sock)
     while True:
         data_raw = sock.receive()
@@ -127,6 +123,116 @@ def check_health():
     successful.
     """
     return jsonify({'status': 'ok'})
+
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+@app.route('/api/upload-csv', methods=['POST'])
+def upload_csv():
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file part'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        file.save(path)
+
+        # Optional: parse CSV immediately
+        try:
+            with open(path, newline='') as f:
+                reader = csv.DictReader(f)
+                data = list(reader)
+
+            return jsonify({'message': 'CSV uploaded successfully', 'data': data})
+
+        except Exception as e:
+            return jsonify({'error': f'Error reading CSV: {str(e)}'}), 500
+
+    return jsonify({'error': 'Invalid file type'}), 400
+
+
+# Endpoint to fetch all the vendors from the uploaded CSV
+@app.route('/api/vendors', methods=['GET'])
+def get_vendors():
+    # Check if CSV file exists
+    error_response = check_csv_exists('STARS_RESULTS.csv')
+    if error_response:
+        print("❌ CSV not found or error from check_csv_exists")
+        return error_response
+
+    try:
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'STARS_RESULTS.csv')
+        print(f"📄 Reading CSV from: {file_path}")
+        with open(file_path, mode='r') as f:
+            reader = csv.DictReader(f)
+            data = list(reader)
+        # Extract unique vendors
+        vendors = list(set([model['vendor'] for model in data if 'vendor' in model]))
+        return jsonify(vendors)
+
+    except Exception as e:
+        print(f"🔥 Exception occurred: {str(e)}")  # DEBUG PRINT
+        return jsonify({'error': f'Error reading vendors from CSV: {str(e)}'}), 500
+
+
+# Endpoint to fetch heatmap data from the uploaded CSV
+@app.route('/api/heatmap', methods=['GET'])
+def get_heatmap():
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'STARS_RESULTS.csv')  # Use dynamic upload folder path
+    try:
+        with open(file_path, mode='r') as f:
+            reader = csv.DictReader(f)
+            data = list(reader)
+
+        return jsonify(data)
+
+    except Exception as e:
+        return jsonify({'error': f'Error reading heatmap data from CSV: {str(e)}'}), 500
+
+
+# Endpoint to fetch heatmap data filtered by vendor from the uploaded CSV
+@app.route('/api/heatmap/<name>', methods=['GET'])
+def get_filtered_heatmap(name):
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'STARS_RESULTS.csv')  # Use dynamic upload folder path
+    try:
+        with open(file_path, mode='r') as f:
+            reader = csv.DictReader(f)
+            data = list(reader)
+
+        # Filter data by vendor name
+        filtered_data = [model for model in data if model['vendor'].lower() == name.lower()]
+        return jsonify(filtered_data)
+
+    except Exception as e:
+        return jsonify({'error': f'Error reading filtered heatmap data from CSV: {str(e)}'}), 500
+
+
+# Endpoint to fetch all attacks from the uploaded CSV
+@app.route('/api/attacks', methods=['GET'])
+def get_attacks():
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], 'attacks.csv')  # Use dynamic upload folder path
+    try:
+        with open(file_path, mode='r') as f:
+            reader = csv.DictReader(f)
+            data = list(reader)
+
+        return jsonify(data)
+
+    except Exception as e:
+        return jsonify({'error': f'Error reading attacks data from CSV: {str(e)}'}), 500
+
+
+def check_csv_exists(file_name):
+    file_path = os.path.join(app.config['UPLOAD_FOLDER'], file_name)
+    if not os.path.exists(file_path):
+        return jsonify({'error': f'{file_name} not found. Please upload the file first.'}), 404
+    return None  # No error, file exists
 
 
 if __name__ == '__main__':

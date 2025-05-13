@@ -13,14 +13,63 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   white-space: pre-wrap !important;
 }
 
-@font-face {
-  font-family: 'AmericanTypewriter';
-  src: url('assets/fonts/AmericanTypewriter.ttc') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
 
 /* For responses from agent, which can contain very long lines */
 pre {
   overflow-x: auto;
+}
+
+body {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  margin: 0;
+  padding: 30px;
+  height: 100%;
+}
+
+.apexcharts-canvas {
+  margin: auto;
+  translate: -60px;
+}
+
+.apexcharts-inner {
+  translate: 40px;
+}
+
+.apexcharts-yaxis-texts-g {
+  translate: 20px;
+}
+
+.apexcharts-yaxis-title {
+  translate: 100px;
+  > text {
+    font-size: large;
+  }
+}
+
+.apexcharts-xaxis {
+  translate: 0 10px;
+}
+
+.apexcharts-xaxis-title {
+  > text {
+    font-size: large;
+  }
+}
+
+html { height: 100%; }
+
+.card-header {
+  font-size: 2.5rem;  /* Larger font for the header */
+  font-weight: bold;  /* Make the text bold */
+  text-align: center; /* Center the text */
+  padding: 16px;
+}
+
+mat-select {
+  direction: rtl !important;
+  text-align: right !important;
+}
+
+.apexcharts-legend {
+  translate: 50px;
 }
