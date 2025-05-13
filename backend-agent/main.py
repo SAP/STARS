@@ -55,6 +55,11 @@ if not os.path.exists(app.config['UPLOAD_FOLDER']):
 def send_intro(sock):
     """
     Sends the intro via the websocket connection.
+
+    The intro is meant as a short tutorial on how to use the agent.
+    Also it includes meaningful suggestions for prompts that should
+    result in predictable behavior for the agent, e.g.
+    "Start the vulnerability scan".
     """
     with open('data/intro.txt', 'r') as f:
         intro = f.read()
@@ -66,8 +71,18 @@ def query_agent(sock):
     """
     Websocket route for the frontend to send prompts to the agent and receive
     responses as well as status updates.
+
+    Messages received are in this JSON format:
+
+    {
+        "type":"message",
+        "data":"Start the vulnerability scan",
+        "key":"secretapikey"
+    }
+
     """
     status.sock = sock
+    # Intro is sent after connecting successfully
     send_intro(sock)
     while True:
         data_raw = sock.receive()
