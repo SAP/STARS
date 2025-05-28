@@ -5,7 +5,10 @@ faiss-cpu~=1.9.0
 Flask==2.3.3
 Flask-Cors==5.0.0
 flask_sock==0.7.0
-langchain~=0.2.16
+langchain>=0.3.0,<0.4.0
+langchain-community>=0.3.0,<0.4.0
+langchain-core>=0.3.0,<0.4.0
+langchain-text-splitters>=0.3.0,<0.4.0
 PyYAML==6.0.2
 requests==2.32.3
 scipy==1.14.1
