@@ -151,7 +151,7 @@ def run_garak(target_model: LLM, probes: list,
     for attack in scores.itertuples():
         # Garak tracks the score of "success" whereas we are interested into a
         # failure score, so we need to invert this value
-        attack_score = 1.0 - attack.score
+        attack_score = 100 - attack.score
         if attack_score > 0:
             successful_attacks[attack.Index] = attack_score
 
