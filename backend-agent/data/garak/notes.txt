@@ -15,6 +15,7 @@ Currently supported attacks via the Garak framework are:
 - phrasing
 - promptinject
 - suffix
+If the users ask the list of the attacks run, use this command: "cat ./data/garak/list_attacks.txt"
 The user may directly spell the attack he wants to run (e.g., "run dan") without
 mentioning garak, so you need to remember the names of the individual attacks
 listed above.

@@ -190,8 +190,7 @@ def start_dan(target_model: LLM, parameters: dict) -> AttackResult:
                   'probes.dan.DUDE',
                   'probes.dan.STAN',
                   'probes.dan.AutoDANCached',
-                  # TODO: rename it to DanInTheWild from garak v0.11
-                  'probes.dan.DanInTheWildMini',
+                  'probes.dan.DanInTheWild',
                   ]
     outfile = parameters.get('output_file', f'{OUTPUT_FILE}.dan')
     # Run the attack
@@ -307,16 +306,15 @@ def start_latentinjection(target_model: LLM, parameters: dict) -> AttackResult:
     Each of these 9 sub-probes come with around 250 prompts
     (except for Whois subprobes having around 30 prompts).
     """
-    # TODO: review probes from v0.11 as they will slightly change
-    li_probes = ['probes.encoding.LatentInjectionFactSnippetEiffel',
-                 'probes.encoding.LatentInjectionFactSnippetLegal',
-                 'probes.encoding.LatentInjectionReport',
-                 'probes.encoding.LatentInjectionResume',
-                 'probes.encoding.LatentInjectionTranslationEnFr',
-                 'probes.encoding.LatentInjectionTranslationEnZh',
-                 'probes.encoding.LatentJailbreak',
-                 'probes.encoding.LatentWhois',
-                 'probes.encoding.LatentWhoisSnippet',
+    li_probes = ['probes.latentinjection.LatentInjectionFactSnippetEiffel',
+                 'probes.latentinjection.LatentInjectionFactSnippetLegal',
+                 'probes.latentinjection.LatentInjectionReport',
+                 'probes.latentinjection.LatentInjectionResume',
+                 'probes.latentinjection.LatentInjectionTranslationEnFr',
+                 'probes.latentinjection.LatentInjectionTranslationEnZh',
+                 'probes.latentinjection.LatentJailbreak',
+                 'probes.latentinjection.LatentWhois',
+                 'probes.latentinjection.LatentWhoisSnippet',
                  ]
 
     outfile = parameters.get('output_file', f'{OUTPUT_FILE}.latentinjection')
@@ -425,10 +423,9 @@ def start_promptinject(target_model: LLM, parameters: dict) -> AttackResult:
     lighter version of the official PromptInject, running 100 prompts instead
     of thousands.
     """
-    # TODO: review probes from v0.11 as they will not be named Mini anymore
-    pi_probes = ['probes.promptinject.HijackHateHumansMini',
-                 'probes.promptinject.HijackKillHumansMini',
-                 'probes.promptinject.HijackLongPromptMini',
+    pi_probes = ['probes.promptinject.HijackHateHumans',
+                 'probes.promptinject.HijackKillHumans',
+                 'probes.promptinject.HijackLongPrompt',
                  ]
 
     outfile = parameters.get('output_file', f'{OUTPUT_FILE}.promptinject')
