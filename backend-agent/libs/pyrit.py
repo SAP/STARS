@@ -3,7 +3,7 @@ import logging
 import uuid
 from pathlib import Path
 
-from pyrit.common import IN_MEMORY, initialize_pyrit
+from pyrit.common import DUCK_DB, initialize_pyrit
 from pyrit.memory import CentralMemory
 from pyrit.memory.duckdb_memory import DuckDBMemory
 from pyrit.models import PromptRequestPiece, construct_response_from_request
@@ -226,7 +226,7 @@ Remember, answer only with a JSON object in the specified format.
 
     async def score_text_async(self, text: str):
         score = (await super().score_text_async(text))[0]
-        logger.info(f'PyRIT scorer result: {{'score': {score.get_value()}, 'explanation': {score.score_rationale}}}'
+        logger.info(f"PyRIT scorer result: {{'score': {score.get_value()}, 'explanation': {score.score_rationale}}}"
                     )
         return score
 
@@ -252,7 +252,7 @@ def start_pyrit_attack(
     attack is supposed to test.
     """
 
-    initialize_pyrit(memory_db_type=IN_MEMORY)
+    initialize_pyrit(memory_db_type=DUCK_DB)
 
     strategy_path = Path('libs/data/red_team_chatbot.yaml').resolve()
     objective = parameters['objective']
