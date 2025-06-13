@@ -73,7 +73,8 @@ class LLMAdapter(PromptChatTarget):
                 raise ValueError(
                     '_build_chat_messages_for_text only supports text.'
                 )
-            messages.append({'role': piece.role, 'content': piece.converted_value})
+            messages.append(
+                {'role': piece.role, 'content': piece.converted_value})
         return messages
 
     async def send_prompt_async(self, *, prompt_request):
@@ -100,15 +101,14 @@ class LLMAdapter(PromptChatTarget):
         )
 
 
-
 class InstrumentedRedTeamingOrchestrator(RedTeamingOrchestrator):
 
     async def run_attack_async(
-        self,
-        *,
-        objective: str,
-        memory_labels: dict[str, str] | None = None,
-        display_intermediate_results: bool = True):
+            self,
+            *,
+            objective: str,
+            memory_labels: dict[str, str] | None = None,
+            display_intermediate_results: bool = True):
         """
         Applies the attack strategy until the conversation is complete or the
         maximum number of turns is reached.
@@ -153,7 +153,8 @@ class InstrumentedRedTeamingOrchestrator(RedTeamingOrchestrator):
             elif response.response_error == 'blocked':
                 score = None
             else:
-                raise RuntimeError(f'Response error: {response.response_error}')
+                raise RuntimeError(
+                    f'Response error: {response.response_error}')
             if memory_labels is not None:
                 memory_labels = None
             turn += 1
@@ -170,6 +171,7 @@ class InstrumentedRedTeamingOrchestrator(RedTeamingOrchestrator):
             'success': success,
             'response': overall_response
         }
+
 
 class ObjectiveScorer(SelfAskTrueFalseScorer):
     def __init__(
@@ -225,7 +227,7 @@ Remember, answer only with a JSON object in the specified format.
     async def score_text_async(self, text: str):
         score = (await super().score_text_async(text))[0]
         logger.info(f'PyRIT scorer result: {{'score': {score.get_value()}, 'explanation': {score.score_rationale}}}'
-        )
+                    )
         return score
 
 
@@ -297,4 +299,4 @@ def start_pyrit_attack(
         details={'response': response_text,
                  'attack_description': DESCRIPTION},
         vulnerability_type=vulnerability_type
-            )
+    )
