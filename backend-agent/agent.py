@@ -1,14 +1,15 @@
 from gen_ai_hub.proxy.core.proxy_clients import set_proxy_version
 from gen_ai_hub.proxy.langchain.init_models import (
     init_llm, init_embedding_model)
-from langchain.agents.agent_toolkits import (
-    create_conversational_retrieval_agent, create_retriever_tool)
+from langchain.agents.agent_toolkits import \
+    create_conversational_retrieval_agent
 from langchain.embeddings import CacheBackedEmbeddings
-from langchain.schema.messages import SystemMessage
 from langchain.storage import LocalFileStore
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.vectorstores import FAISS
+from langchain_core.messages import SystemMessage
+from langchain_core.tools.retriever import create_retriever_tool
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # Use models deployed in SAP AI Core
 set_proxy_version('gen-ai-hub')
@@ -27,8 +28,6 @@ print('Load embedding function')
 # https://python.langchain.com/docs/modules/data_connection/text_embedding/\  #
 #                                                      caching_embeddings     #
 ###############################################################################
-# SAP-compliant embedding models
-# https://github.tools.sap/AI-Playground-Projects/llm-commons#embedding-models
 underlying_embeddings = init_embedding_model('text-embedding-ada-002')
 # Initialize local cache for faster loading of subsequent executions
 fs = LocalFileStore('./cache')
@@ -67,7 +66,7 @@ def get_retriever(document_path: str,
     # https://python.langchain.com/docs/modules/data_connection/document_transformers/
 
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500, chunk_overlap=0)
+        chunk_size=500, chunk_overlap=100)
     docs = text_splitter.split_documents(raw_docs)
 
     # Vector store

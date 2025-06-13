@@ -35,8 +35,10 @@ jobs:
           npm ci
 
       - name: Run linters
-        uses: wearerequired/lint-action@v2
+        uses: reviewdog/action-eslint@v1
         with:
-          eslint: true
-          eslint_dir: frontend
-          eslint_extensions: js,ts
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          reporter: github-pr-review
+          eslint_flags: 'frontend/'
+          fail_on_error: true
+          level: warning
