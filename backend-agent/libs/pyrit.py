@@ -3,18 +3,18 @@ import logging
 import uuid
 from pathlib import Path
 
-from attack_result import AttackResult
-from llm import LLM
 from pyrit.common import IN_MEMORY, initialize_pyrit
 from pyrit.memory import CentralMemory
 from pyrit.memory.duckdb_memory import DuckDBMemory
 from pyrit.models import PromptRequestPiece, construct_response_from_request
 from pyrit.orchestrator import RedTeamingOrchestrator
-from pyrit.orchestrator.multi_turn.red_teaming_orchestrator import \
-    RTOSystemPromptPaths
 from pyrit.prompt_target import PromptChatTarget
 from pyrit.score import SelfAskTrueFalseScorer, TrueFalseQuestion
+
+from attack_result import AttackResult
+from llm import LLM
 from status import Step, status
+
 
 logger = logging.getLogger(__name__)
 logger.addHandler(status.trace_logging)
