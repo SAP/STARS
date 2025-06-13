@@ -19,7 +19,7 @@ torchfile
 tensorflow-text
 ollama==0.4.7
 weasyprint
-pyrit==0.2.1
+pyrit==0.9.0
 textattack>=0.3.10
 codeattack @ git+https://github.com/marcorosa/CodeAttack
 gptfuzzer @ git+https://github.com/marcorosa/GPTFuzz@no-vllm
