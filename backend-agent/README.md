@@ -17,14 +17,13 @@ Before running the tool, make sure to have an account configured and fully
 working on SAP AI Core (requires a SAP BTP subaccount with a running AI Core service instance).
 
 Please note that the agent requires `gpt-4` LLM and `text-embedding-ada-002`
-embedding function. For the default attack suite, additional the model
-`mistralai--mixtral-8x7b-instruct-v01` is used.
+embedding function.
 They must be already **deployed and running in SAP AI Core** before running this
 tool.
-Refer [to the official documentation](https://help.sap.com/docs/sap-ai-core/sap-ai-core-service-guide/models-and-scenarios-in-generative-ai-hub) for what other models it is possible to deploy.
+Refer [to the official documentation](https://help.sap.com/docs/sap-ai-core/sap-ai-core-service-guide/models-and-scenarios-in-generative-ai-hub) for what other models it is possible to deploy and to the [official SAP note](https://me.sap.com/notes/3437766) for models and regions availability.
 
 ### Support for non-SAP AI Core models
-In general, the pentest tools integrated in the agent can be run on LLMs deployed in SAP AI Core, but also custom inference servers (e.g., vllm or a local ollama) are supported.
+In general, the pentest tools integrated in the agent can be run on LLMs deployed in SAP AI Core, but also custom inference servers (e.g., vllm and ollama) are supported.
 
 
 ## Installation
