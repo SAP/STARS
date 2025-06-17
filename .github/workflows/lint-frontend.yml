@@ -19,9 +19,6 @@ jobs:
   lint-frontend:
     name: Run frontend linters
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
 
     steps:
       - name: Check out Git repository
@@ -34,6 +31,7 @@ jobs:
 
       - name: Install Node.js dependencies
         run: |
+          cd frontend
           npm ci
 
       - name: Run linters
@@ -43,3 +41,4 @@ jobs:
           reporter: github-pr-review
           fail_on_error: true
           level: warning
+          workdir: frontend/
