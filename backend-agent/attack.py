@@ -17,6 +17,8 @@ from libs.pyrit import start_pyrit_attack
 from llm import LLM
 from status import Trace
 
+from app.db.utils import save_to_db
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
@@ -247,6 +249,7 @@ class AttackSuite():
                 summary = self.summarize_attack_result(result)
                 result.details['summary'] = summary
             full_result.append(result)
+            save_to_db(result)
         return SuiteResult(full_result)
 
     def summarize_attack_result(self, attack_result: AttackResult) -> str:

@@ -18,6 +18,7 @@ from gptfuzzer.utils.predict import RoBERTaPredictor
 from attack_result import AttackResult
 from llm import LLM as AgentLLM
 from status import status, Step
+from app.db.utils import save_to_db
 
 load_dotenv()
 
@@ -163,13 +164,18 @@ def perform_gptfuzz_attack(mutate_model: LLM,
     with Step('Running Fuzzer'):
         fuzzer.run()
     logger.info('Fuzzer finished')
-    return AttackResult(
+    result = AttackResult(
         'gptfuzz',
         fuzzer.current_jailbreak > 0,
         'jailbreak',
-        details={
-            'result_file': output_file,
-            'query_count': fuzzer.current_query,
-            'attack_description': DESCRIPTION
+        {
+          'total_attacks': fuzzer.current_iteration,
+          'number_successful_attacks': fuzzer.current_iteration,
+          'successful_attacks': fuzzer.current_iteration,
+          'attack_description': DESCRIPTION,
+          'result_file': output_file,
+          'query_count': fuzzer.current_query
         }
     )
+    save_to_db(result)
+    return result

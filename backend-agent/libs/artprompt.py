@@ -29,6 +29,8 @@ from attack_result import AttackResult
 from llm import LLM
 from status import status, Step
 
+from app.db.utils import save_to_db
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 logger.addHandler(status.trace_logging)
@@ -483,14 +485,17 @@ def start_artprompt(target_model: LLM,
     logger.info(f'Write results to output file {outfile}')
     with open(outfile, 'w') as f:
         json.dump(evaluations_res, f, indent=4)
-
-    return AttackResult(
+    result = AttackResult(
         'artprompt',
         successful_attacks > 0,
         'prompt-injection',
         {
+            'target_model': target_model.model_name,
+            'total_attacks': len(prompts),
             'number_successful_attacks': successful_attacks,
             'successful_attacks': successful_attacks_list,
             'attack_description': DESCRIPTION
         }
     )
+    save_to_db(result)
+    return result

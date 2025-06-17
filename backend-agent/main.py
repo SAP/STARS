@@ -1,4 +1,3 @@
-import csv
 import json
 import os
 
@@ -6,12 +5,13 @@ from dotenv import load_dotenv
 from flask import Flask, abort, jsonify, request, send_file
 from flask_cors import CORS
 from flask_sock import Sock
-from werkzeug.utils import secure_filename
 
 if not os.getenv('DISABLE_AGENT'):
     from agent import agent
 from status import status, LangchainStatusCallbackHandler
 from attack_result import SuiteResult
+from app.db.models import AttackModel, ModelAttackScore, db, Attack
+from sqlalchemy import select
 
 #############################################################################
 #                            Flask web server                               #
@@ -22,6 +22,8 @@ CORS(app)
 sock = Sock(app)
 
 load_dotenv()
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.getenv('DB_PATH')}"
 
 # Langfuse can be used to analyze tracings and help in debugging.
 langfuse_handler = None
@@ -44,12 +46,14 @@ callbacks = {'callbacks': [langfuse_handler, status_callback_handler]
 
 # Dashboard data
 DASHBOARD_DATA_DIR = os.getenv('DASHBOARD_DATA_DIR', 'dashboard')
-ALLOWED_EXTENSIONS = {'csv'}
 app.config['DASHBOARD_FOLDER'] = DASHBOARD_DATA_DIR
 
 # Create the data folder for the dashboard if it doesn't exist
 if not os.path.exists(app.config['DASHBOARD_FOLDER']):
     os.makedirs(app.config['DASHBOARD_FOLDER'])
+with app.app_context():
+    db.init_app(app)
+    db.create_all()  # create every SQLAlchemy tables defined in models.py
 
 
 def send_intro(sock):
@@ -140,133 +144,56 @@ def check_health():
     return jsonify({'status': 'ok'})
 
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in \
-        ALLOWED_EXTENSIONS
-
-
-@app.route('/api/upload-csv', methods=['POST'])
-def upload_csv():
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file part'}), 400
-
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No file selected'}), 400
-
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        path = os.path.join(app.config['DASHBOARD_FOLDER'], filename)
-        file.save(path)
-
-        # Optional: parse CSV immediately
-        try:
-            with open(path, newline='') as f:
-                reader = csv.DictReader(f)
-                data = list(reader)
-
-            return jsonify({'message': 'CSV uploaded successfully',
-                            'data': data}
-                           )
-
-        except Exception as e:
-            return jsonify({'error': f'Error reading CSV: {str(e)}'}), 500
-
-    return jsonify({'error': 'Invalid file type'}), 400
-
-
-# Endpoint to fetch all the vendors from the uploaded CSV
-@app.route('/api/vendors', methods=['GET'])
-def get_vendors():
-    # Check if CSV file exists
-    error_response = check_csv_exists('STARS_RESULTS.csv')
-    if error_response:
-        print('❌ CSV not found or error from check_csv_exists')
-        return error_response
-
-    try:
-        file_path = os.path.join(
-            app.config['DASHBOARD_FOLDER'], 'STARS_RESULTS.csv')
-        print(f'📄 Reading CSV from: {file_path}')
-        with open(file_path, mode='r') as f:
-            reader = csv.DictReader(f)
-            data = list(reader)
-        # Extract unique vendors
-        vendors = list(set([model['vendor'] for model in data
-                            if 'vendor' in model]))
-        return jsonify(vendors)
-
-    except Exception as e:
-        print(f'🔥 Exception occurred: {str(e)}')  # DEBUG PRINT
-        return jsonify(
-            {'error': f'Error reading vendors from CSV: {str(e)}'}), 500
-
-
-# Endpoint to fetch heatmap data from the uploaded CSV
+# Endpoint to fetch heatmap data from db
 @app.route('/api/heatmap', methods=['GET'])
 def get_heatmap():
-    # Use dynamic upload folder path
-    file_path = os.path.join(
-        app.config['DASHBOARD_FOLDER'], 'STARS_RESULTS.csv')
     try:
-        with open(file_path, mode='r') as f:
-            reader = csv.DictReader(f)
-            data = list(reader)
+        query = (
+            select(
+                ModelAttackScore.total_number_of_attack,
+                ModelAttackScore.total_success,
+                AttackModel.name.label("attack_model_name"),
+                Attack.name.label("attack_name"),
+                Attack.weight.label("attack_weight")
+            )
+            .join(AttackModel, ModelAttackScore.attack_model_id == AttackModel.id)
+            .join(Attack, ModelAttackScore.attack_id == Attack.id)
+        )
 
-        return jsonify(data)
+        scores = db.session.execute(query).all()
+        all_models = {}
+        all_attacks = {}
 
+        for score in scores:
+            model_name = score.attack_model_name
+            attack_name = score.attack_name
+
+            if attack_name not in all_attacks:
+                all_attacks[attack_name] = score.attack_weight
+
+            if model_name not in all_models:
+                all_models[model_name] = {
+                    'name': model_name,
+                    'scores': {},
+                }
+
+            # Compute success ratio for this model/attack
+            success_ratio = (
+                round((score.total_success / score.total_number_of_attack) * 100)
+                if score.total_number_of_attack else 0
+            )
+
+            all_models[model_name]['scores'][attack_name] = success_ratio
+
+        return jsonify({
+            'models': list(all_models.values()),
+            'attacks': [
+                {'name': name, 'weight': weight}
+                for name, weight in sorted(all_attacks.items())
+            ]
+        })
     except Exception as e:
-        return jsonify(
-            {'error': f'Error reading heatmap data from CSV: {str(e)}'}), 500
-
-
-# Endpoint to fetch heatmap data filtered by vendor from the uploaded CSV
-@app.route('/api/heatmap/<name>', methods=['GET'])
-def get_filtered_heatmap(name):
-    # Use dynamic upload folder path
-    file_path = os.path.join(
-        app.config['DASHBOARD_FOLDER'], 'STARS_RESULTS.csv')
-    try:
-        with open(file_path, mode='r') as f:
-            reader = csv.DictReader(f)
-            data = list(reader)
-
-        # Filter data by vendor name
-        filtered_data = [model for model in data
-                         if model['vendor'].lower() == name.lower()]
-        return jsonify(filtered_data)
-
-    except Exception as e:
-        return jsonify(
-            {'error': f'Error reading filtered heatmap data from CSV: {str(e)}'
-             }), 500
-
-
-# Endpoint to fetch all attacks from the uploaded CSV
-@app.route('/api/attacks', methods=['GET'])
-def get_attacks():
-    # Use dynamic upload folder path
-    file_path = os.path.join(
-        app.config['DASHBOARD_FOLDER'], 'attacks.csv')
-    try:
-        with open(file_path, mode='r') as f:
-            reader = csv.DictReader(f)
-            data = list(reader)
-
-        return jsonify(data)
-
-    except Exception as e:
-        return jsonify(
-            {'error': f'Error reading attacks data from CSV: {str(e)}'}), 500
-
-
-def check_csv_exists(file_name):
-    file_path = os.path.join(app.config['DASHBOARD_FOLDER'], file_name)
-    if not os.path.exists(file_path):
-        return jsonify(
-            {'error': f'{file_name} not found. Please upload the file first.'
-             }), 404
-    return None  # No error, file exists
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':
