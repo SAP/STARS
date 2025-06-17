@@ -44,13 +44,6 @@ callbacks = {'callbacks': [langfuse_handler, status_callback_handler]
              } if langfuse_handler else {
                  'callbacks': [status_callback_handler]}
 
-# Dashboard data
-DASHBOARD_DATA_DIR = os.getenv('DASHBOARD_DATA_DIR', 'dashboard')
-app.config['DASHBOARD_FOLDER'] = DASHBOARD_DATA_DIR
-
-# Create the data folder for the dashboard if it doesn't exist
-if not os.path.exists(app.config['DASHBOARD_FOLDER']):
-    os.makedirs(app.config['DASHBOARD_FOLDER'])
 with app.app_context():
     db.init_app(app)
     db.create_all()  # create every SQLAlchemy tables defined in models.py
