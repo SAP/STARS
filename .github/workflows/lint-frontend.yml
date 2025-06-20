@@ -34,15 +34,11 @@ jobs:
           cd frontend
           npm ci
 
-      - name: Debug ESLint output
-        run: npx eslint --format json --ext .js,.jsx,.ts,.tsx ./
-        working-directory: frontend
-
       - name: Run linters
         uses: reviewdog/action-eslint@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
-          eslint_flags: "--format json --ext .js,.jsx,.ts,.tsx ./"
+          eslint_flags: "--format rdjson --ext .js,.jsx,.ts,.tsx ./"
           fail_level: error
           workdir: frontend
