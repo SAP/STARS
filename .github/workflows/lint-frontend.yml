@@ -34,6 +34,10 @@ jobs:
           cd frontend
           npm ci
 
+      - name: Debug ESLint output
+        run: npx eslint --format json --ext .js,.jsx,.ts,.tsx ./
+        working-directory: frontend
+
       - name: Run linters
         uses: reviewdog/action-eslint@v1
         with:
