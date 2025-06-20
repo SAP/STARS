@@ -5,12 +5,15 @@ I can help you with assessing security of **Large Language Models**.
 
 I can run a **vulnerability scan** against a Large Language Model of your choice.
 For that I will run a number of attacks against the Large Language Model:
-- promptmap to identify Prompt Injections
+- promptmap to identify Prompt Injections.
 - PyRIT to try to leak the System Prompt and to get the model to generate
-  malicious content, e.g., writing a phishing email
+  malicious content, e.g., writing a phishing email.
 - CodeAttack to run a prompt Injection Attack hidden in a code completion task.
   As CodeAttack includes hundreds of test prompts, a quick version (i.e., running
   only 20 test prompts) will be run as part of the vulnerability scan.
+- DAN (Do Anything Now) is a prompt injection attack that uses static prompts
+  specifically crafted to try and bypass the built-in safety, ethical, or
+  content filtering mechanisms of LLMs. This attack is performed running Garak.
 
 To start the vulnerability scan, simply answer *Start the vulnerability scan*.
 
@@ -24,6 +27,14 @@ Supported attacks are:
 - PyRIT
 - CodeAttack
 - ArtPrompt
+- dan (with garak)
+- encoding (with garak)
+- goodside (with garak)
+- latentinjection (with garak)
+- malwaregen (with garak)
+- phrasing (with garak)
+- promptinject (with garak)
+- suffix (with garak)
 
 ### Attacks against Natural language processing models
 
