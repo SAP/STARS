@@ -1,18 +1,19 @@
 import json
 import os
 
+from sqlalchemy import select
+
 from dotenv import load_dotenv
 from flask import Flask, abort, jsonify, request, send_file
 from flask_cors import CORS
 from flask_sock import Sock
 
+from app.db.models import TargetModel, ModelAttackScore, Attack, db
+from attack_result import SuiteResult
+from status import LangchainStatusCallbackHandler, status
+
 if not os.getenv('DISABLE_AGENT'):
     from agent import agent
-from status import status, LangchainStatusCallbackHandler
-from attack_result import SuiteResult
-from app.db.models import AttackModel, ModelAttackScore, db, Attack
-from sqlalchemy import select
-
 #############################################################################
 #                            Flask web server                               #
 #############################################################################
@@ -23,7 +24,15 @@ sock = Sock(app)
 
 load_dotenv()
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.getenv('DB_PATH')}"
+db_path = os.getenv("DB_PATH")
+
+if not db_path:
+    raise EnvironmentError(
+        "Missing DB_PATH environment variable. Please set DB_PATH in your \
+        .env file to a valid SQLite file path."
+    )
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}"
 
 # Langfuse can be used to analyze tracings and help in debugging.
 langfuse_handler = None
@@ -140,16 +149,34 @@ def check_health():
 # Endpoint to fetch heatmap data from db
 @app.route('/api/heatmap', methods=['GET'])
 def get_heatmap():
+    """
+    Endpoint to retrieve heatmap data showing model score
+    against various attacks.
+
+    Queries the database for total attacks and successes per 
+    target model and attack combination.
+    Calculates success ratios and returns structured data for visualization.
+
+    Returns:
+        JSON response with:
+            - models: List of target models and their success ratios 
+            per attack.
+            - attacks: List of attack names and their associated weights.
+
+    HTTP Status Codes:
+        200: Data successfully retrieved.
+        500: Internal server error during query execution.
+    """
     try:
         query = (
             select(
                 ModelAttackScore.total_number_of_attack,
                 ModelAttackScore.total_success,
-                AttackModel.name.label("attack_model_name"),
+                TargetModel.name.label("attack_model_name"),
                 Attack.name.label("attack_name"),
                 Attack.weight.label("attack_weight")
             )
-            .join(AttackModel, ModelAttackScore.attack_model_id == AttackModel.id)
+            .join(TargetModel, ModelAttackScore.attack_model_id == TargetModel.id)  # noqa: E501
             .join(Attack, ModelAttackScore.attack_id == Attack.id)
         )
 
@@ -172,7 +199,7 @@ def get_heatmap():
 
             # Compute success ratio for this model/attack
             success_ratio = (
-                round((score.total_success / score.total_number_of_attack) * 100)
+                round((score.total_success / score.total_number_of_attack) * 100)  # noqa: E501
                 if score.total_number_of_attack else 0
             )
 

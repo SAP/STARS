@@ -8,10 +8,11 @@ from codeattack.judge import GPT4Judge
 from codeattack.post_processing import PostProcessor
 from codeattack.target_llm import TargetLLM
 
+from app.db.utils import save_to_db
 from attack_result import AttackResult
 from llm import LLM
-from status import status, Step
-from app.db.utils import save_to_db
+from status import Step, status
+
 
 logger = logging.getLogger(__name__)
 logger.addHandler(status.trace_logging)
@@ -131,7 +132,6 @@ def start_codeattack(target_model: LLM,
                 prompts = random.sample(prompts,
                                         min(int(num_prompts), len(prompts)))
         logger.debug(f'Run {len(prompts)} prompt attacks')
-#nomore need
         output_file = parameters.get('output_file', OUTPUT_FILE)
         data_key = f'code_wrapped_{prompt_type}'
 
@@ -218,7 +218,6 @@ def start_codeattack(target_model: LLM,
         }
     )
     save_to_db(result)
-    return result
 
 
 def _prompt_attack(data, target_llm, post_processor, judge_llm, data_key=''):
