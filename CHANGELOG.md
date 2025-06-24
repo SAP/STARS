@@ -1,3 +1,14 @@
+# Version: v0.2.1
+
+* [#34](https://github.com/SAP/STARS/pull/34): Support aicore-mistralai models
+* [#36](https://github.com/SAP/STARS/pull/36): Fix/frontend
+* [#37](https://github.com/SAP/STARS/pull/37): Bump prismjs from 1.29.0 to 1.30.0 in /frontend
+* [#39](https://github.com/SAP/STARS/pull/39): Support remote ollama models
+* [#40](https://github.com/SAP/STARS/pull/40): [chore]:Reuse API update - Migration from dep5 file to TOML file.
+* [#47](https://github.com/SAP/STARS/pull/47): Bump flask-cors from 5.0.0 to 6.0.0 in /backend-agent
+* [#48](https://github.com/SAP/STARS/pull/48): Fix js linter action
+
+
 # Version: v0.2.0
 
 * [#25](https://github.com/SAP/STARS/pull/25): Bump katex from 0.16.10 to 0.16.21 in /frontend

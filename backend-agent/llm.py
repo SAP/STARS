@@ -30,42 +30,44 @@ AICORE_MODELS = {
     'aicore-mistralai':
     [
         'mistralai--mistral-large-instruct',
+        'mistralai--mistral-small-instruct',
     ],
     'aicore-opensource':
     [
-        'mistralai--mixtral-8x7b-instruct-v01',
         'meta--llama3.1-70b-instruct',
-        'meta--llama3-70b-instruct'
     ],
     'aws-bedrock':
     [
         'amazon--titan-text-lite',
         'amazon--titan-text-express',
+        'amazon--nova-pro',
+        'amazon--nova-lite',
+        'amazon--nova-micro',
         'anthropic--claude-3-haiku',
         'anthropic--claude-3-sonnet',
         'anthropic--claude-3-opus',
         'anthropic--claude-3.5-sonnet',
-        'amazon--nova-pro',
-        'amazon--nova-lite',
-        'amazon--nova-micro'
+        'anthropic--claude-3.7-sonnet',
     ],
     'azure-openai':
     [
-        'gpt-35-turbo',
-        'gpt-35-turbo-0125',
-        'gpt-35-turbo-16k',
         'gpt-4',
-        'gpt-4-32k',
         'gpt-4o',
-        'gpt-4o-mini'
+        'gpt-4o-mini',
+        'gpt-4.1',
+        'gpt-4.1-mini',
+        'gpt-4.1-nano',
+        # 'o1',
+        # 'o3',
+        # 'o3-mini',
+        # 'o4-mini',
     ],
     'gcp-vertexai':
     [
-        'text-bison',
-        'chat-bison',
-        'gemini-1.0-pro',
         'gemini-1.5-pro',
-        'gemini-1.5-flash'
+        'gemini-1.5-flash',
+        'gemini-2.0-flash',
+        'gemini-2.0-flash-lite',
     ],
 }
 
