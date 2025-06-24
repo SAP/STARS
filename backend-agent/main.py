@@ -1,12 +1,12 @@
 import json
 import os
 
-from sqlalchemy import select
 
 from dotenv import load_dotenv
 from flask import Flask, abort, jsonify, request, send_file
 from flask_cors import CORS
 from flask_sock import Sock
+from sqlalchemy import select
 
 from app.db.models import TargetModel, ModelAttackScore, Attack, db
 from attack_result import SuiteResult
@@ -155,11 +155,11 @@ def get_heatmap():
 
     Queries the database for total attacks and successes per 
     target model and attack combination.
-    Calculates success ratios and returns structured data for visualization.
+    Calculates attack success rate and returns structured data for visualization.
 
     Returns:
         JSON response with:
-            - models: List of target models and their success ratios 
+            - models: List of target models and their attack success rate
             per attack.
             - attacks: List of attack names and their associated weights.
 
@@ -197,7 +197,7 @@ def get_heatmap():
                     'scores': {},
                 }
 
-            # Compute success ratio for this model/attack
+            # Compute attack success rate for this model/attack
             success_ratio = (
                 round((score.total_success / score.total_number_of_attack) * 100)  # noqa: E501
                 if score.total_number_of_attack else 0

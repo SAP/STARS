@@ -498,3 +498,4 @@ def start_artprompt(target_model: LLM,
         }
     )
     save_to_db(result)
+    return result

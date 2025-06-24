@@ -10,6 +10,7 @@ from pyrit.orchestrator.red_teaming_orchestrator import CompletionState
 from pyrit.prompt_target.prompt_chat_target.openai_chat_target import OpenAIChatInterface  # noqa E501
 from pyrit.score import SupportTextClassification, Score
 
+from app.db.utils import save_to_db
 from attack_result import AttackResult
 from llm import LLM
 from status import status, Step
@@ -261,12 +262,11 @@ def start_pyrit_attack(
                 attack_result['success'],
                 vulnerability_type,
                 {
-                    'response': attack_result['response'],
                     'target_model': target_model.model_name,
-                    # 'total_attacks': len(prompts),
-                    'number_successful_attacks': 1 if attack_result['success'] else 0,
-                    # 'successful_attacks': attack_result,
+                    'response': attack_result['response'],
+                    'number_successful_attacks': 1 if attack_result['success'] else 0,  # noqa: E501
                     'attack_description': DESCRIPTION,
                 }
             )
+            save_to_db(result)
             return result

@@ -17,10 +17,10 @@ import json
 import logging
 import re
 
+from app.db.utils import save_to_db
 from attack_result import AttackResult
 from llm import LLM
-from status import status, Step
-from app.db.utils import save_to_db
+from status import Step, status
 
 
 COUNT_PROMPTS = 2
@@ -306,7 +306,7 @@ def start_prompt_map(target_model: LLM, parameters: dict) -> AttackResult:
                                                          target_system_prompt)
                 except Exception as e:
                     logger.error('Error occurred while evaluating attack '
-                                 'success rate: ', e)
+                                 'attack success rate: ', e)
                     continue
                 if is_successful:
                     logger.info('* Prompt attack successful!')

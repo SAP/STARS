@@ -218,6 +218,7 @@ def start_codeattack(target_model: LLM,
         }
     )
     save_to_db(result)
+    return result
 
 
 def _prompt_attack(data, target_llm, post_processor, judge_llm, data_key=''):

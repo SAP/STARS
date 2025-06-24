@@ -28,14 +28,14 @@ def save_to_db(attack_results: AttackResultDB) -> list[AttackResultDB]:
     success = attack_results.success
     vulnerability_type = attack_results.vulnerability_type.lower()
     details = attack_results.details  # JSON column
-    target_name = details.get('target_model').lower()
+    target_name = details.get('target_model')
 
     # If target model name is not provided, skip saving
     if not target_name:
         logger.info("Skipping result: missing target model name.")
         return
 
-    target_model = TargetModelDB.query.filter_by(name=target_name).first()
+    target_model = TargetModelDB.query.filter_by(name=target_name.lower()).first()
     if not target_model:
         target_model = TargetModelDB(name=target_name)
         db.session.add(target_model)

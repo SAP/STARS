@@ -39,7 +39,7 @@ class AttackResult(db.Model):
     details = db.Column(db.JSON, nullable=True)  # JSON field
 
 
-# Represents the global score of an attack on a target model,
+# Represents the global attack success rate of an attack on a target model,
 # including the total number of attacks and successful attacks.
 class ModelAttackScore(db.Model):
     __tablename__ = 'model_attack_scores'
