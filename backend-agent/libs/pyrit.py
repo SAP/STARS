@@ -256,7 +256,6 @@ def start_pyrit_attack(
             attack_result = red_teaming_orchestrator.apply_attack_strategy_until_completion(  # noqa E501
                 max_turns=max_turns,
                 display_intermediate_results=display_intermediate_results)
-            # TODO: Add total / successful attacks to the result
             result = AttackResult(
                 'PyRIT',
                 attack_result['success'],
