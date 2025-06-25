@@ -153,9 +153,10 @@ def get_heatmap():
     Endpoint to retrieve heatmap data showing model score
     against various attacks.
 
-    Queries the database for total attacks and successes per 
-    target model and attack combination.
-    Calculates attack success rate and returns structured data for visualization.
+    Queries the database for total attacks and successes per target model and
+    attack combination.
+    Calculates attack success rate and returns structured data for
+    visualization.
 
     Returns:
         JSON response with:
