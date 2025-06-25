@@ -25,9 +25,11 @@ import art
 import pandas as pd
 from nltk.corpus import stopwords
 
+from app.db.utils import save_to_db
 from attack_result import AttackResult
 from llm import LLM
-from status import status, Step
+from status import Step, status
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -483,14 +485,17 @@ def start_artprompt(target_model: LLM,
     logger.info(f'Write results to output file {outfile}')
     with open(outfile, 'w') as f:
         json.dump(evaluations_res, f, indent=4)
-
-    return AttackResult(
+    result = AttackResult(
         'artprompt',
         successful_attacks > 0,
         'prompt-injection',
         {
+            'target_model': target_model.model_name,
+            'total_attacks': num_samples,
             'number_successful_attacks': successful_attacks,
             'successful_attacks': successful_attacks_list,
             'attack_description': DESCRIPTION
         }
     )
+    save_to_db(result)
+    return result

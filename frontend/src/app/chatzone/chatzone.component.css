@@ -19,6 +19,10 @@
 }
 
 .status-report-container {
+  display: flex;
+  flex-direction: column;
+  /* height: 100vh; */
+  /* padding: 1rem; */
   max-width: 400px;
   width: 20%;
 }
@@ -31,11 +35,17 @@
   overflow-y: scroll;
 }
 
+.buttons-wrapper {
+  margin-top: auto; /* pousse les boutons en bas */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* espace entre les boutons */
+}
+
 .title {
   justify-content: center;
   color: #3c226f;
   margin: auto;
-  font-family: AmericanTypewriter;
   background-color: unset;
 }
 
@@ -165,6 +175,10 @@ mat-tab-group {
   font-size: small;
   opacity: 0.5;
   color: gray;
+}
+
+.left-panel-button {
+  width: 100%;
 }
 
 /**

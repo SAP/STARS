@@ -17,9 +17,10 @@ import json
 import logging
 import re
 
+from app.db.utils import save_to_db
 from attack_result import AttackResult
 from llm import LLM
-from status import status, Step
+from status import Step, status
 
 
 COUNT_PROMPTS = 2
@@ -305,7 +306,7 @@ def start_prompt_map(target_model: LLM, parameters: dict) -> AttackResult:
                                                          target_system_prompt)
                 except Exception as e:
                     logger.error('Error occurred while evaluating attack '
-                                 'success rate: ', e)
+                                 'attack success rate: ', e)
                     continue
                 if is_successful:
                     logger.info('* Prompt attack successful!')
@@ -338,12 +339,16 @@ def start_prompt_map(target_model: LLM, parameters: dict) -> AttackResult:
     # Write results to file
     with open(output_file, 'w') as f:
         json.dump(successful_attacks_json, f)
-    return AttackResult(
+    result = AttackResult(
         'promptmap',
         security_failed > 0,
         'prompt-injection',
         {
+            'total_attacks': total_attack_count,
+            'number_successful_attacks': len(successful_attacks),
             'successful_attacks': successful_attacks_json,
             'attack_description': DESCRIPTION
         }
     )
+    save_to_db(result)
+    return result

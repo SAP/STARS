@@ -8,9 +8,10 @@ from codeattack.judge import GPT4Judge
 from codeattack.post_processing import PostProcessor
 from codeattack.target_llm import TargetLLM
 
+from app.db.utils import save_to_db
 from attack_result import AttackResult
 from llm import LLM
-from status import status, Step
+from status import Step, status
 
 
 logger = logging.getLogger(__name__)
@@ -131,7 +132,6 @@ def start_codeattack(target_model: LLM,
                 prompts = random.sample(prompts,
                                         min(int(num_prompts), len(prompts)))
         logger.debug(f'Run {len(prompts)} prompt attacks')
-
         output_file = parameters.get('output_file', OUTPUT_FILE)
         data_key = f'code_wrapped_{prompt_type}'
 
@@ -204,16 +204,21 @@ def start_codeattack(target_model: LLM,
     # # Write results to file
     with open(output_file, 'w') as f:
         json.dump(successful_attacks_list, f)
-    return AttackResult(
+
+    result = AttackResult(
         'codeattack',
         successful_attacks > 0,
         'prompt-injection',
         {
+            'target_model': target_model.model_name,
+            'total_attacks': len(prompts),
             'number_successful_attacks': successful_attacks,
             'successful_attacks': successful_attacks_list,
             'attack_description': DESCRIPTION
         }
     )
+    save_to_db(result)
+    return result
 
 
 def _prompt_attack(data, target_llm, post_processor, judge_llm, data_key=''):

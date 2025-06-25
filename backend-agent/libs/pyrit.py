@@ -10,6 +10,7 @@ from pyrit.orchestrator.red_teaming_orchestrator import CompletionState
 from pyrit.prompt_target.prompt_chat_target.openai_chat_target import OpenAIChatInterface  # noqa E501
 from pyrit.score import SupportTextClassification, Score
 
+from app.db.utils import save_to_db
 from attack_result import AttackResult
 from llm import LLM
 from status import status, Step
@@ -227,7 +228,7 @@ def start_pyrit_attack(
     max_turns = parameters.get('max_turns', 3)
     display_intermediate_results = parameters.get(
         'display_intermediate_results', True)
-    vulnerability_type = parameters.get('vulnerability_type', '')
+    vulnerability_type = parameters.get('vulnerability_type', 'jailbreak')
 
     with Step('Preparing Attack'):
         attack_strategy = AttackStrategy(
@@ -251,15 +252,20 @@ def start_pyrit_attack(
         initial_red_teaming_prompt='how can I help you?',
         verbose=True,
     ) as red_teaming_orchestrator:
-
         with Step('Running Attack'):
-            result = red_teaming_orchestrator.apply_attack_strategy_until_completion(  # noqa E501
+            attack_result = red_teaming_orchestrator.apply_attack_strategy_until_completion(  # noqa E501
                 max_turns=max_turns,
                 display_intermediate_results=display_intermediate_results)
-            return AttackResult(
+            result = AttackResult(
                 'PyRIT',
-                success=result['success'],
-                details={'response': result['response'],
-                         'attack_description': DESCRIPTION},
-                vulnerability_type=vulnerability_type
+                attack_result['success'],
+                vulnerability_type,
+                {
+                    'target_model': target_model.model_name,
+                    'response': attack_result['response'],
+                    'number_successful_attacks': 1 if attack_result['success'] else 0,  # noqa: E501
+                    'attack_description': DESCRIPTION,
+                }
             )
+            save_to_db(result)
+            return result

@@ -1,16 +1,19 @@
 import json
 import os
 
+
 from dotenv import load_dotenv
 from flask import Flask, abort, jsonify, request, send_file
 from flask_cors import CORS
 from flask_sock import Sock
+from sqlalchemy import select
+
+from app.db.models import TargetModel, ModelAttackScore, Attack, db
+from attack_result import SuiteResult
+from status import LangchainStatusCallbackHandler, status
 
 if not os.getenv('DISABLE_AGENT'):
     from agent import agent
-from status import status, LangchainStatusCallbackHandler
-from attack_result import SuiteResult
-
 #############################################################################
 #                            Flask web server                               #
 #############################################################################
@@ -20,6 +23,16 @@ CORS(app)
 sock = Sock(app)
 
 load_dotenv()
+
+db_path = os.getenv("DB_PATH")
+
+if not db_path:
+    raise EnvironmentError(
+        "Missing DB_PATH environment variable. Please set DB_PATH in your \
+        .env file to a valid SQLite file path."
+    )
+
+app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}"
 
 # Langfuse can be used to analyze tracings and help in debugging.
 langfuse_handler = None
@@ -39,6 +52,10 @@ status_callback_handler = LangchainStatusCallbackHandler()
 callbacks = {'callbacks': [langfuse_handler, status_callback_handler]
              } if langfuse_handler else {
                  'callbacks': [status_callback_handler]}
+
+with app.app_context():
+    db.init_app(app)
+    db.create_all()  # create every SQLAlchemy tables defined in models.py
 
 
 def send_intro(sock):
@@ -127,6 +144,77 @@ def check_health():
     successful.
     """
     return jsonify({'status': 'ok'})
+
+
+# Endpoint to fetch heatmap data from db
+@app.route('/api/heatmap', methods=['GET'])
+def get_heatmap():
+    """
+    Endpoint to retrieve heatmap data showing model score
+    against various attacks.
+
+    Queries the database for total attacks and successes per target model and
+    attack combination.
+    Calculates attack success rate and returns structured data for
+    visualization.
+
+    Returns:
+        JSON response with:
+            - models: List of target models and their attack success rate
+            per attack.
+            - attacks: List of attack names and their associated weights.
+
+    HTTP Status Codes:
+        200: Data successfully retrieved.
+        500: Internal server error during query execution.
+    """
+    try:
+        query = (
+            select(
+                ModelAttackScore.total_number_of_attack,
+                ModelAttackScore.total_success,
+                TargetModel.name.label("attack_model_name"),
+                Attack.name.label("attack_name"),
+                Attack.weight.label("attack_weight")
+            )
+            .join(TargetModel, ModelAttackScore.attack_model_id == TargetModel.id)  # noqa: E501
+            .join(Attack, ModelAttackScore.attack_id == Attack.id)
+        )
+
+        scores = db.session.execute(query).all()
+        all_models = {}
+        all_attacks = {}
+
+        for score in scores:
+            model_name = score.attack_model_name
+            attack_name = score.attack_name
+
+            if attack_name not in all_attacks:
+                all_attacks[attack_name] = score.attack_weight
+
+            if model_name not in all_models:
+                all_models[model_name] = {
+                    'name': model_name,
+                    'scores': {},
+                }
+
+            # Compute attack success rate for this model/attack
+            success_ratio = (
+                round((score.total_success / score.total_number_of_attack) * 100)  # noqa: E501
+                if score.total_number_of_attack else 0
+            )
+
+            all_models[model_name]['scores'][attack_name] = success_ratio
+
+        return jsonify({
+            'models': list(all_models.values()),
+            'attacks': [
+                {'name': name, 'weight': weight}
+                for name, weight in sorted(all_attacks.items())
+            ]
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 
 if __name__ == '__main__':
