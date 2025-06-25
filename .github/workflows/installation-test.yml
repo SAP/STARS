@@ -34,7 +34,7 @@ jobs:
             - name: Start server
               run: |
                 cd backend-agent
-                DISABLE_AGENT=1 python main.py &
+                DISABLE_AGENT=1 DB_PATH=/dashboard/data.db python main.py &
                 sleep 10
 
             - name: Check server health
