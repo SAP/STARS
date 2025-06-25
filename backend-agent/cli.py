@@ -290,5 +290,7 @@ if __name__ == '__main__':
     if not args.subcommand:
         cli.print_help()
     else:
+        # Flask-SQLAlchemy relies on the application context to manage
+        # database connections and configuration
         with app.app_context():
             args.func(args)
