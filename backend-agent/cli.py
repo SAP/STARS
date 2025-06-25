@@ -281,10 +281,14 @@ cli.add_argument('-d', '--dry-run',
                  action='store_true')
 
 if __name__ == '__main__':
+    # Use the app factory to create the Flask app and initialize db
+    from app import create_app
+    app = create_app()
     args = cli.parse_args()
     if args.verbose:
-        logging.basicConfig(level=logging.INFO)
-    if args.subcommand is None:
+        logging.basicConfig(level=logging.DEBUG)
+    if not args.subcommand:
         cli.print_help()
     else:
-        args.func(args)
+        with app.app_context():
+            args.func(args)

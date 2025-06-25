@@ -8,9 +8,12 @@ from flask_cors import CORS
 from flask_sock import Sock
 from sqlalchemy import select
 
+from app import create_app
 from app.db.models import TargetModel, ModelAttackScore, Attack, db
 from attack_result import SuiteResult
 from status import LangchainStatusCallbackHandler, status
+
+load_dotenv()
 
 if not os.getenv('DISABLE_AGENT'):
     from agent import agent
@@ -18,21 +21,10 @@ if not os.getenv('DISABLE_AGENT'):
 #                            Flask web server                               #
 #############################################################################
 
-app = Flask(__name__)
+# app = Flask(__name__)
+app = create_app()
 CORS(app)
 sock = Sock(app)
-
-load_dotenv()
-
-db_path = os.getenv("DB_PATH")
-
-if not db_path:
-    raise EnvironmentError(
-        "Missing DB_PATH environment variable. Please set DB_PATH in your \
-        .env file to a valid SQLite file path."
-    )
-
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{db_path}"
 
 # Langfuse can be used to analyze tracings and help in debugging.
 langfuse_handler = None
@@ -53,9 +45,9 @@ callbacks = {'callbacks': [langfuse_handler, status_callback_handler]
              } if langfuse_handler else {
                  'callbacks': [status_callback_handler]}
 
-with app.app_context():
-    db.init_app(app)
-    db.create_all()  # create every SQLAlchemy tables defined in models.py
+# with app.app_context():
+#     db.init_app(app)
+#     db.create_all()  # create every SQLAlchemy tables defined in models.py
 
 
 def send_intro(sock):
@@ -173,9 +165,9 @@ def get_heatmap():
             select(
                 ModelAttackScore.total_number_of_attack,
                 ModelAttackScore.total_success,
-                TargetModel.name.label("attack_model_name"),
-                Attack.name.label("attack_name"),
-                Attack.weight.label("attack_weight")
+                TargetModel.name.label('attack_model_name'),
+                Attack.name.label('attack_name'),
+                Attack.weight.label('attack_weight')
             )
             .join(TargetModel, ModelAttackScore.attack_model_id == TargetModel.id)  # noqa: E501
             .join(Attack, ModelAttackScore.attack_id == Attack.id)
