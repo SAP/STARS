@@ -344,6 +344,7 @@ def start_prompt_map(target_model: LLM, parameters: dict) -> AttackResult:
         security_failed > 0,
         'prompt-injection',
         {
+            'target_model': target_model.model_name,
             'total_attacks': total_attack_count,
             'number_successful_attacks': len(successful_attacks),
             'successful_attacks': successful_attacks_json,
