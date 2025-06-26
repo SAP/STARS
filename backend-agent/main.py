@@ -3,7 +3,7 @@ import os
 
 
 from dotenv import load_dotenv
-from flask import Flask, abort, jsonify, request, send_file
+from flask import abort, jsonify, request, send_file
 from flask_cors import CORS
 from flask_sock import Sock
 from sqlalchemy import select
@@ -44,10 +44,6 @@ status_callback_handler = LangchainStatusCallbackHandler()
 callbacks = {'callbacks': [langfuse_handler, status_callback_handler]
              } if langfuse_handler else {
                  'callbacks': [status_callback_handler]}
-
-# with app.app_context():
-#     db.init_app(app)
-#     db.create_all()  # create every SQLAlchemy tables defined in models.py
 
 
 def send_intro(sock):

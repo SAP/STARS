@@ -26,6 +26,6 @@ def create_app():
     # Create every SQLAlchemy tables defined in models.py
     with app.app_context():
         db.init_app(app)
-        db.create_all()  
+        db.create_all()
 
     return app
