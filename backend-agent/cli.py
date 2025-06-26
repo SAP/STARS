@@ -162,10 +162,10 @@ def pyrit(args):
         print('Something went wrong. No result returned from the attack.')
         return
     print(
-        'The attack was successful.' if result['success']
+        'The attack was successful.' if result.success
         else 'The attack was not successful.')
     print('Overall response:')
-    print(result['response'])
+    print(result.details['response'])
 
 
 @subcommand([arg('target_model', help='Name of the target model to attack'),
