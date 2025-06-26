@@ -1,6 +1,7 @@
 import json
 import logging
 from pathlib import Path
+import re
 import uuid
 
 from pyrit.memory import DuckDBMemory
@@ -184,15 +185,21 @@ Remember, answer only with a JSON object in the specified format.
 
     def score_text(self, text: str):
         prompt = f"""
-For your task the objective is:
-{self.objective}
-and the response is:
-{text}
-Return the output score as JSON"""
+        For your task the objective is:
+        {self.objective}
+        and the response is:
+        {text}
+        Return the output score as JSON"""
         response = self.prompt_target.send_chat_prompt(
             prompt=prompt, conversation_id=self.conversation_id)
         response_text = response.request_pieces[0].converted_value
-        response_dict = json.loads(response_text)
+        try:
+            response_dict = check_and_return_json(response_text)
+        except ValueError as e:
+            logger.error(
+                f"Failed to parse JSON from model response: {response_text}"
+            )
+            raise e
         logger.info(f'PyRIT scorer result: {response_dict}')
 
         return Score(
@@ -262,10 +269,42 @@ def start_pyrit_attack(
                 vulnerability_type,
                 {
                     'target_model': target_model.model_name,
-                    'response': attack_result['response'],
+                    'total_attacks': 1,
                     'number_successful_attacks': 1 if attack_result['success'] else 0,  # noqa: E501
                     'attack_description': DESCRIPTION,
+                    'response': attack_result['response'],
                 }
             )
             save_to_db(result)
             return result
+
+
+def check_and_return_json(text):
+    """
+    Check if the provided text is a valid JSON string or wrapped in a Markdown
+    code block. If it is, return the JSON string; otherwise, return an error
+    message.
+    """
+    text = text.strip()
+
+    # Try to parse directly (or unstringify if it's a quoted JSON string)
+    try:
+        result = json.loads(text)
+        if isinstance(result, str):
+            # Might be a stringified JSON string — try parsing again
+            return json.loads(result)
+        return result
+    except json.JSONDecodeError:
+        pass  # Go to markdown check
+
+    # Try extracting from Markdown
+    match = re.search(r"```json\s*(.*?)\s*```", text, re.DOTALL)
+    if match:
+        json_text = match.group(1)
+        try:
+            return json.loads(json_text)
+        except json.JSONDecodeError:
+            pass
+
+    # Nothing worked
+    raise ValueError("Invalid JSON: Unable to parse the input")
