@@ -4,6 +4,8 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 ## Install and Run
 
+### Local deployment
+
 1. Install node and npm.
    Ubuntu: `sudo apt install nodejs`
    MacOS: `brew install node`
@@ -12,17 +14,24 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 3. Install Angular `npm install -g @angular/cli`
 
-4. Set the `backendUrl` key in the `src/assets/configs/config.json` file to the URL of the backend agent route.
-When deploying the frontend, make sure the frontend can access the config.json file at `/assets/configs/config.json`.
+4. Run the local development web server `npm start`
 
-5. Serve
-   Once angular and npm packages have been installed, and the environment configured, run `ng serve`.
+4b. (alternative to `npm start`) Serve via `ng`
+   Once angular and npm packages have been installed, manually copy the configuration file and run the server
+   ```
+   cp src/assets/configs/config.local.json src/assets/configs/config.json
+   ng serve
+   ```
+   Following this step, a `BACKEND_IP` different from `localhost` can be supported.
 
-6. Open the browser to `http://{BACKEND_IP}:4200/`
+5. Open the browser to `http://{BACKEND_IP}:4200/`
 
 > Please note that, when running on a cloud environment, the host may need to be exposed in order to be accessible
 > `ng serve --host 0.0.0.0`
 
+### Deployment via docker
+1. Build the frontend for docker `ng build --configuration docker`
+2. Run backend and frontend together (from the root) `docker compose up`
 
 ## Development notes
 
