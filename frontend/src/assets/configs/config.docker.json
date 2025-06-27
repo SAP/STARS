@@ -1,0 +1,4 @@
+
+{
+    "backendUrl": "ws://backend:8080/agent"
+}
