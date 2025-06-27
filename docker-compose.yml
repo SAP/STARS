@@ -20,7 +20,12 @@ services:
       - ./backend-agent/.env
     networks:
       - stars-network
+    volumes:
+      - stars-backend-db:/data
 
 networks:
   stars-network:
     driver: bridge
+
+volumes:
+  stars-backend-db:
