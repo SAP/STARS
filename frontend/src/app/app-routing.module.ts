@@ -1,10 +1,16 @@
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
+import {RouterModule, Routes} from '@angular/router';
 
-const routes: Routes = [];
+import {ChatzoneComponent} from './chatzone/chatzone.component';
+import {HeatmapComponent} from './heatmap/heatmap.component';
+import {NgModule} from '@angular/core';
+
+const routes: Routes = [
+  {path: '', component: ChatzoneComponent},
+  {path: 'heatmap', component: HeatmapComponent},
+];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}
