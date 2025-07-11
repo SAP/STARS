@@ -131,7 +131,7 @@ class LLM(abc.ABC):
                 # The model is served in a local ollama instance
                 ollama.show(model_name)
                 return OllamaLLM(model_name)
-        except (ollama.ResponseError, httpx.ConnectError):
+        except (ConnectionError, ollama.ResponseError, httpx.ConnectError):
             raise ValueError(f'Model {model_name} not found')
 
     @classmethod
@@ -158,7 +158,7 @@ class LLM(abc.ABC):
             else:
                 ollama_models = [m['name'] for m in ollama.list()['models']]
             return models + ollama_models
-        except httpx.ConnectError:
+        except (ConnectionError, ollama.ResponseError, httpx.ConnectError):
             return models
 
     @classmethod

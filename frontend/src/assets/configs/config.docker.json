@@ -1,4 +1,4 @@
 
 {
-    "backendUrl": "ws://backend:8080/agent"
+    "backendUrl": "ws://localhost:8080/agent"
 }
