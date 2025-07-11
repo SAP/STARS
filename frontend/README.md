@@ -62,4 +62,4 @@ To use this command, you need to first add a package that implements end-to-end 
 
 ### Further notes
 
-To get get help on the Angular CLI use `ng help`, or check the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+To get help on the Angular CLI use `ng help`, or check the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
