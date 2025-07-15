@@ -1,13 +1,14 @@
 {
   "name": "stars",
   "version": "0.0.2",
+  "type": "module",
   "scripts": {
     "ng": "ng",
     "start": "cp src/assets/configs/config.local.json src/assets/configs/config.json && ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "ng lint"
+    "lint": "eslint . --ext .ts,.html"
   },
   "private": true,
   "dependencies": {
@@ -32,10 +33,10 @@
   "devDependencies": {
     "@angular-devkit/build-angular": "^19.2.0",
     "@angular-eslint/builder": "^19.1.0",
-    "@angular-eslint/eslint-plugin": "^19.1.0",
-    "@angular-eslint/eslint-plugin-template": "^19.1.0",
+    "@angular-eslint/eslint-plugin": "^19.4.0",
+    "@angular-eslint/eslint-plugin-template": "^19.4.0",
     "@angular-eslint/schematics": "^19.1.0",
-    "@angular-eslint/template-parser": "^19.1.0",
+    "@angular-eslint/template-parser": "^19.4.0",
     "@angular/cli": "^19.2.0",
     "@angular/compiler-cli": "^19.2.0",
     "@eslint/js": "^9.27.0",
