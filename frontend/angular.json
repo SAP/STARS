@@ -67,6 +67,15 @@
                 }
               ],
               "outputHashing": "all"
+            },
+            "k8s": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.k8s.ts"
+                }
+              ],
+              "outputHashing": "all"
             }
           },
           "defaultConfiguration": "production"
@@ -82,6 +91,9 @@
             },
             "docker": {
               "buildTarget": "stars:build:docker"
+            },
+            "k8s": {
+              "buildTarget": "stars:build:k8s"
             }
           },
           "defaultConfiguration": "development"

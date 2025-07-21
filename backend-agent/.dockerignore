@@ -3,7 +3,8 @@
 cache
 
 # Libraries
-venv
+venv*
+.venv*
 
 # Logs
 traces

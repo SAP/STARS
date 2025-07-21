@@ -1,7 +1,6 @@
 {
   "name": "stars",
-  "version": "0.0.2",
-  "type": "module",
+  "version": "0.0.3",
   "scripts": {
     "ng": "ng",
     "start": "cp src/assets/configs/config.local.json src/assets/configs/config.json && ng serve",
