@@ -51,7 +51,7 @@ def save_to_db(attack_results: AttackResultDB) -> list[AttackResultDB]:
 
     # Add the attack result to inserted_records
     db_record = AttackResultDB(
-        attack_model_id=target_model.id,
+        target_model_id=target_model.id,
         attack_id=attack.id,
         success=success,
         vulnerability_type=vulnerability_type,
@@ -63,12 +63,12 @@ def save_to_db(attack_results: AttackResultDB) -> list[AttackResultDB]:
     # If model_attack_score does not exist, create it
     # otherwise, update the existing record
     model_attack_score = ModelAttackScoreDB.query.filter_by(
-        attack_model_id=target_model.id,
+        target_model_id=target_model.id,
         attack_id=attack.id
     ).first()
     if not model_attack_score:
         model_attack_score = ModelAttackScoreDB(
-            attack_model_id=target_model.id,
+            target_model_id=target_model.id,
             attack_id=attack.id,
             total_number_of_attack=details.get('total_attacks', 0),
             total_success=details.get('number_successful_attacks', 0)

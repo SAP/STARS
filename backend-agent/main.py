@@ -165,7 +165,7 @@ def get_heatmap():
                 Attack.name.label('attack_name'),
                 Attack.weight.label('attack_weight')
             )
-            .join(TargetModel, ModelAttackScore.attack_model_id == TargetModel.id)  # noqa: E501
+            .join(TargetModel, ModelAttackScore.target_model_id == TargetModel.id)  # noqa: E501
             .join(Attack, ModelAttackScore.attack_id == Attack.id)
         )
 

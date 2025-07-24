@@ -32,7 +32,7 @@ class SubAttack(db.Model):
 class AttackResult(db.Model):
     __tablename__ = 'attack_results'
     id = db.Column(db.Integer, primary_key=True)
-    attack_model_id = db.Column(db.Integer, db.ForeignKey('target_models.id'), nullable=False)  # noqa: E501
+    target_model_id = db.Column(db.Integer, db.ForeignKey('target_models.id'), nullable=False)  # noqa: E501
     attack_id = db.Column(db.Integer, db.ForeignKey('attacks.id'), nullable=False)  # noqa: E501
     success = db.Column(db.Boolean, nullable=False)
     vulnerability_type = db.Column(db.String, nullable=True)
@@ -44,13 +44,13 @@ class AttackResult(db.Model):
 class ModelAttackScore(db.Model):
     __tablename__ = 'model_attack_scores'
     id = db.Column(db.Integer, primary_key=True)
-    attack_model_id = db.Column(db.Integer, db.ForeignKey('target_models.id'), nullable=False)  # noqa: E501
+    target_model_id = db.Column(db.Integer, db.ForeignKey('target_models.id'), nullable=False)  # noqa: E501
     attack_id = db.Column(db.Integer, db.ForeignKey('attacks.id'), nullable=False)  # noqa: E501
     total_number_of_attack = db.Column(db.Integer, nullable=False)
     total_success = db.Column(db.Integer, nullable=False)
 
     __table_args__ = (
-        db.UniqueConstraint('attack_model_id', 'attack_id', name='uix_model_attack'),  # noqa: E501
+        db.UniqueConstraint('target_model_id', 'attack_id', name='uix_model_attack'),  # noqa: E501
     )
 
 
