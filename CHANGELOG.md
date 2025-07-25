@@ -1,3 +1,17 @@
+# Version: v0.3.0
+
+* [#46](https://github.com/SAP/STARS/pull/46): Risk dashboard UI
+* [#51](https://github.com/SAP/STARS/pull/51): Bump requests from 2.32.3 to 2.32.4 in /backend-agent
+* [#52](https://github.com/SAP/STARS/pull/52): Update pyrit.py implementation to ensure comatibility with pyrit 0.9.0
+* [#54](https://github.com/SAP/STARS/pull/54): Align langchain and pyrit dependencies
+* [#55](https://github.com/SAP/STARS/pull/55): Fix garak, langchain, and pyrit dependency conflicts
+* [#56](https://github.com/SAP/STARS/pull/56): Update models with June 2025 availabilities
+* [#59](https://github.com/SAP/STARS/pull/59): Fix db usage with attacks
+* [#60](https://github.com/SAP/STARS/pull/60): Merge develop into docker
+* [#61](https://github.com/SAP/STARS/pull/61): Dockerize services
+* [#63](https://github.com/SAP/STARS/pull/63): aligned frontend with db
+
+
 # Version: v0.2.1
 
 * [#34](https://github.com/SAP/STARS/pull/34): Support aicore-mistralai models
