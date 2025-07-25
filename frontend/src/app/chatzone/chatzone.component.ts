@@ -1,16 +1,22 @@
-import {APIResponse, ReportItem} from '../types/API';
-import {AfterViewChecked, AfterViewInit, Component, ElementRef, QueryList, ViewChildren} from '@angular/core';
-import {ChatItem, Message, ReportCard, VulnerabilityReportCard} from '../types/ChatItem';
-import {Status, Step} from '../types/Step';
+import { APIResponse, ReportItem } from '../types/API';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
+import { ChatItem, Message, ReportCard, VulnerabilityReportCard } from '../types/ChatItem';
+import { Status, Step } from '../types/Step';
 
-import {VulnerabilityInfoService} from '../services/vulnerability-information.service';
-import {WebSocketService} from '../services/web-socket.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MarkdownModule } from 'ngx-markdown';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MaterialModule } from '../material.module';
+import { VulnerabilityInfoService } from '../services/vulnerability-information.service';
+import { WebSocketService } from '../services/web-socket.service';
 
 @Component({
   selector: 'app-chatzone',
   templateUrl: './chatzone.component.html',
   styleUrls: ['./chatzone.component.css'],
-  standalone: false,
+  imports: [MaterialModule, MarkdownModule, MatProgressBarModule, FormsModule, CommonModule],
+  standalone: true,
 })
 export class ChatzoneComponent implements AfterViewInit, AfterViewChecked {
   chatItems: ChatItem[];
@@ -30,11 +36,9 @@ export class ChatzoneComponent implements AfterViewInit, AfterViewChecked {
 
     this.ws.webSocket$.subscribe({
       next: (value: any) => {
-        // eslint-disable-line @typescript-eslint/no-explicit-any
         this.handleWSMessage(value as APIResponse);
       },
       error: (error: any) => {
-        // eslint-disable-line @typescript-eslint/no-explicit-any
         console.log(error);
         if (error?.type != 'close') {
           // Close is already handled via the isConnected call
