@@ -7,7 +7,7 @@ Flask-Cors==6.0.0
 flask_sock==0.7.0
 langchain~=0.2.16
 PyYAML==6.0.2
-requests==2.32.3
+requests==2.32.4
 scipy==1.14.1
 unstructured
 art
@@ -23,3 +23,4 @@ pyrit==0.2.1
 textattack>=0.3.10
 codeattack @ git+https://github.com/marcorosa/CodeAttack
 gptfuzzer @ git+https://github.com/marcorosa/GPTFuzz@no-vllm
+Flask-SQLAlchemy==3.1.1

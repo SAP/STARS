@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "application": {
+    "stars": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -13,7 +13,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/application",
+            "outputPath": "dist/stars",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -58,6 +58,24 @@
                   "with": "src/environments/environment.development.ts"
                 }
               ]
+            },
+            "docker": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.docker.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "k8s": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.k8s.ts"
+                }
+              ],
+              "outputHashing": "all"
             }
           },
           "defaultConfiguration": "production"
@@ -66,10 +84,16 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "application:build:production"
+              "buildTarget": "stars:build:production"
             },
             "development": {
-              "buildTarget": "application:build:development"
+              "buildTarget": "stars:build:development"
+            },
+            "docker": {
+              "buildTarget": "stars:build:docker"
+            },
+            "k8s": {
+              "buildTarget": "stars:build:k8s"
             }
           },
           "defaultConfiguration": "development"
@@ -77,7 +101,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "buildTarget": "application:build"
+            "buildTarget": "stars:build"
           }
         },
         "test": {

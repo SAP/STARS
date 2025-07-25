@@ -19,8 +19,14 @@
         </mat-list>
       </mat-card-content>
     </mat-card>
-    <div class="padding-top">
-      <button mat-raised-button (click)="promptForAPIKey()">Set API Key</button>
+    <div class="buttons-wrapper">
+      <div class="padding-top">
+        <button mat-raised-button class="left-panel-button" (click)="promptForAPIKey()">Set API Key</button>
+      </div>
+      <div class="padding-top">
+        <!-- <button mat-raised-button (click)="openDashboard()">Open Risk Dashboard</button> -->
+        <button mat-raised-button (click)="openDashboard()" class="left-panel-button">Risk Dashboard</button>
+      </div>
     </div>
   </div>
   <div class="main-container container">

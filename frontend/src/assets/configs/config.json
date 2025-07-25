@@ -1,3 +1,4 @@
 {
-    "backendUrl": "ws://localhost:8080/agent"
+    "backendUrl": "__BACKEND_URL__"
 }
+// This file will be overwritten by the build/start process.
