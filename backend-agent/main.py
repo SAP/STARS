@@ -23,7 +23,15 @@ if not os.getenv('DISABLE_AGENT'):
 
 # app = Flask(__name__)
 app = create_app()
-CORS(app)
+
+# Configure CORS with allowed origins, if any
+allowed_origins = os.getenv('ALLOWED_ORIGINS', '').split(',')
+# Configure CORS
+if allowed_origins:
+    CORS(app, resources={r"/*": {"origins": allowed_origins}})
+else:
+    CORS(app)
+
 sock = Sock(app)
 
 # Langfuse can be used to analyze tracings and help in debugging.
