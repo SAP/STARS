@@ -1,0 +1,10 @@
+FROM nginxinc/nginx-unprivileged
+
+# Use default Nginx config (listens on port 8080)
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+
+COPY ./dist/stars /usr/share/nginx/html
+COPY ./src/assets/configs/config.local.json /usr/share/nginx/html/assets/configs/config.json
+
+EXPOSE 8080
+CMD ["nginx", "-g", "daemon off;"]
