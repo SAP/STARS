@@ -11,10 +11,6 @@ h1 {
   margin: 10px auto;
 }
 
-* {
-  font-family: Helvetica, Arial, sans-serif;
-}
-
 #vendorChoice {
   padding: 20px 0;
   width: 500px;
@@ -35,11 +31,6 @@ h1 {
   padding: 25px;
 }
 
-/* .card-header {
-  font-size: 2rem;
-  font-weight: bold;
-} */
-
 #overview {
   font-size: medium;
 }
@@ -51,7 +42,7 @@ h1 {
 .card-header {
   display: flex;
   align-items: center; 
-  gap: 10px; 
+  justify-content: space-between;
   font-size: 2rem; 
   font-weight: bold;
   justify-content: center;
@@ -59,11 +50,6 @@ h1 {
 
 .header-icon {
   width: 45px;
-}
-
-.title {
-  display: flex;
-  align-items: center; 
 }
 
 .buttons-wrapper {
@@ -78,3 +64,17 @@ h1 {
   justify-content: center;
   align-items: center;
 }
+
+.left,
+.right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.center {
+  flex: 2;
+  text-align: center;
+}
+

@@ -1,5 +1,14 @@
-  <div class="card-header">
-    <span class="title">STARS Results Heatmap</span>
+<div class="card-header">
+  <div class="left">
+    <button mat-raised-button (click)="closeAndReturn()" id="return-to-agent-button">
+      <mat-icon>arrow_back</mat-icon>
+      Return to Agent
+    </button>
   </div>
-  <div id="heatmapChart"></div>
+  <div class="center">
+    <span>STARS Results Heatmap</span>
+  </div>
+  <div class="right"></div>
+</div>
+<div id="heatmapChart"></div>
 

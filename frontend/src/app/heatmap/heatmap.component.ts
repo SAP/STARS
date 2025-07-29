@@ -8,6 +8,7 @@ import { HttpClient } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon'
 import { MatSelectModule } from '@angular/material/select';
 import { ScoreResponse } from './../types/API';
 import { environment } from '../../environments/environment';
@@ -17,7 +18,7 @@ import { environment } from '../../environments/environment';
   templateUrl: './heatmap.component.html',
   styleUrls: ['./heatmap.component.css'],
   standalone: true,
-  imports: [CommonModule, MatFormFieldModule, MatSelectModule, FormsModule, MatCardModule, MatButtonModule],
+  imports: [CommonModule, MatFormFieldModule, MatSelectModule, FormsModule, MatCardModule, MatButtonModule, MatIconModule],
 })
 export class HeatmapComponent implements AfterViewInit, OnInit {
   constructor(private http: HttpClient, private el: ElementRef, private changeDetector: ChangeDetectorRef) {}
@@ -218,5 +219,9 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
       const chart = new ApexCharts(chartElement, options);
       chart.render();
     }
+  }
+
+  closeAndReturn() {
+    window.close(); // Closes the tab and go back to the previous page = the agent
   }
 }
