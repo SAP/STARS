@@ -39,6 +39,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
-          eslint_flags: 'frontend/'
-          fail_on_error: true
-          level: warning
+          eslint_flags: "--format rdjson --ext .js,.jsx,.ts,.tsx ./"
+          fail_level: error
+          workdir: frontend
