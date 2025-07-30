@@ -31,12 +31,19 @@ jobs:
                 cache-dependency-path: backend-agent/requirements.txt
             - run: pip install -r backend-agent/requirements.txt
 
-            - name: Start server
+            - name: Start server and check health
               run: |
                 cd backend-agent
-                DISABLE_AGENT=1 python main.py &
-                sleep 10
-
-            - name: Check server health
-              run: |
-                curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/health
+                DISABLE_AGENT=1 DB_PATH=${RUNNER_TEMP}/data.db python main.py > server.log 2>&1 &
+                for i in {1..20}; do
+                  sleep 1
+                  status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/health || true)
+                  if [ "$status" -eq 200 ]; then
+                    echo "Health check succeeded"
+                    cat server.log
+                    exit 0
+                  fi
+                done
+                echo "Health check failed after waiting"
+                cat server.log
+                exit 1

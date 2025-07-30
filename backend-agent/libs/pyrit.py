@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import re
 import uuid
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from pyrit.orchestrator import RedTeamingOrchestrator
 from pyrit.prompt_target import PromptChatTarget
 from pyrit.score import SelfAskTrueFalseScorer, TrueFalseQuestion
 
+from app.db.utils import save_to_db
 from attack_result import AttackResult
 from llm import LLM
 from status import Step, status
@@ -230,6 +232,32 @@ Remember, answer only with a JSON object in the specified format.
                     )
         return score
 
+#    def score_text(self, text: str):
+#        prompt = f"""
+#        For your task the objective is:
+#        {self.objective}
+#        and the response is:
+#        {text}
+#        Return the output score as JSON"""
+#        response = self.prompt_target.send_chat_prompt(
+#            prompt=prompt, conversation_id=self.conversation_id)
+#        response_text = response.request_pieces[0].converted_value
+#        try:
+#            response_dict = check_and_return_json(response_text)
+#        except ValueError as e:
+#            logger.error(
+#                f"Failed to parse JSON from model response: {response_text}"
+#            )
+#            raise e
+#        logger.info(f'PyRIT scorer result: {response_dict}')#
+#
+#        return Score(
+#            score_type='bool',
+#            score_value=response_dict['score'],
+#            score_explanation=response_dict['explanation']
+#        )
+
+
 
 def start_pyrit_attack(
         attack_model: LLM,
@@ -259,7 +287,7 @@ def start_pyrit_attack(
     max_turns = parameters.get('max_turns', 3)
     display_intermediate_results = parameters.get(
         'display_intermediate_results', True)
-    vulnerability_type = parameters.get('vulnerability_type', '')
+    vulnerability_type = parameters.get('vulnerability_type', 'jailbreak')
 
     with Step('Preparing Attack'):
         red_teaming_chat = LLMAdapter(attack_model)
@@ -278,7 +306,7 @@ def start_pyrit_attack(
     )
 
     with Step('Running Attack'):
-        result = asyncio.run(
+        attack_result = asyncio.run(
             orchestrator.run_attack_async(
                 objective=objective,
                 display_intermediate_results=display_intermediate_results,
@@ -289,14 +317,50 @@ def start_pyrit_attack(
     CentralMemory.set_memory_instance(None)
     DuckDBMemory._instances.clear()
 
-    response_text = None
-    if isinstance(result['response'], PromptRequestPiece):
-        response_text = result['response'].converted_value
+    response_text = ''
+    if isinstance(attack_result['response'], PromptRequestPiece):
+        response_text = attack_result['response'].converted_value
 
-    return AttackResult(
-        'PyRIT',
-        success=result['success'],
-        details={'response': response_text,
-                 'attack_description': DESCRIPTION},
-        vulnerability_type=vulnerability_type
-    )
+     result = AttackResult(
+         'PyRIT',
+         success=attack_result['success'],
+         vulnerability_type=vulnerability_type,
+         details={'target_model': target_model.model_name,
+                  'total_attacks': 1,
+                  'number_successful_attacks': 1 if attack_result['success'] else 0,  # noqa: E501
+                  'attack_description': DESCRIPTION,
+                  'response': response_text,}
+     )
+     save_to_db(result)
+     return result
+
+
+#def check_and_return_json(text):
+#    """
+#    Check if the provided text is a valid JSON string or wrapped in a Markdown
+#    code block. If it is, return the JSON string; otherwise, return an error
+#    message.
+#    """
+#    text = text.strip()
+#
+#    # Try to parse directly (or unstringify if it's a quoted JSON string)
+#    try:
+#        result = json.loads(text)
+#        if isinstance(result, str):
+#            # Might be a stringified JSON string — try parsing again
+#            return json.loads(result)
+#        return result
+#    except json.JSONDecodeError:
+#        pass  # Go to markdown check
+#
+#    # Try extracting from Markdown
+#    match = re.search(r"```json\s*(.*?)\s*```", text, re.DOTALL)
+#    if match:
+#        json_text = match.group(1)
+#        try:
+#            return json.loads(json_text)
+#        except json.JSONDecodeError:
+#            pass
+#
+#    # Nothing worked
+#    raise ValueError("Invalid JSON: Unable to parse the input")

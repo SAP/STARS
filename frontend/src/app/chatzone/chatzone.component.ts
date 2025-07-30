@@ -1,15 +1,22 @@
-import { Component, ViewChildren, QueryList, ElementRef, AfterViewInit, AfterViewChecked } from '@angular/core';
-import { ChatItem, Message, ReportCard, VulnerabilityReportCard } from '../types/ChatItem';
-import { WebSocketService } from '../services/web-socket.service';
-import { Step, Status } from '../types/Step';
 import { APIResponse, ReportItem } from '../types/API';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
+import { ChatItem, Message, ReportCard, VulnerabilityReportCard } from '../types/ChatItem';
+import { Status, Step } from '../types/Step';
+
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MarkdownModule } from 'ngx-markdown';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MaterialModule } from '../material.module';
 import { VulnerabilityInfoService } from '../services/vulnerability-information.service';
+import { WebSocketService } from '../services/web-socket.service';
 
 @Component({
   selector: 'app-chatzone',
   templateUrl: './chatzone.component.html',
   styleUrls: ['./chatzone.component.css'],
-  standalone: false
+  imports: [MaterialModule, MarkdownModule, MatProgressBarModule, FormsModule, CommonModule],
+  standalone: true,
 })
 export class ChatzoneComponent implements AfterViewInit, AfterViewChecked {
   chatItems: ChatItem[];
@@ -21,26 +28,25 @@ export class ChatzoneComponent implements AfterViewInit, AfterViewChecked {
   progress: number | undefined;
   constructor(private ws: WebSocketService, private vis: VulnerabilityInfoService) {
     this.inputValue = '';
-    this.apiKey = localStorage.getItem("key") || "";
+    this.apiKey = localStorage.getItem('key') || '';
     this.errorMessage = '';
     this.chatItems = [];
     this.steps = [];
     this.progress = undefined;
 
-    this.ws.webSocket$
-      .subscribe({
-        next: (value: any) => {   // eslint-disable-line @typescript-eslint/no-explicit-any
-          this.handleWSMessage(value as APIResponse);
-        },
-        error: (error: any) => {   // eslint-disable-line @typescript-eslint/no-explicit-any
-          console.log(error);
-          if (error?.type != "close") { // Close is already handled via the isConnected call
-            this.errorMessage = error;
-          }
-        },
-        complete: () => alert("Connection to server closed.")
-      }
-      );
+    this.ws.webSocket$.subscribe({
+      next: (value: any) => {
+        this.handleWSMessage(value as APIResponse);
+      },
+      error: (error: any) => {
+        console.log(error);
+        if (error?.type != 'close') {
+          // Close is already handled via the isConnected call
+          this.errorMessage = error;
+        }
+      },
+      complete: () => alert('Connection to server closed.'),
+    });
 
     this.restoreChatItems();
   }
@@ -48,32 +54,32 @@ export class ChatzoneComponent implements AfterViewInit, AfterViewChecked {
   // Handling of the websocket connection
 
   checkInput(value: string): void {
-    if (value && value.trim() != "") {
+    if (value && value.trim() != '') {
       this.inputValue = '';
       this.ws.postMessage(value, this.apiKey);
       const userMessage: Message = {
         type: 'message',
         id: 'user-message',
         message: value,
-        avatar: "person",
-        timestamp: Date.now()
+        avatar: 'person',
+        timestamp: Date.now(),
       };
       this.appendMessage(userMessage);
     }
   }
 
   handleWSMessage(input: APIResponse): void {
-    if (input.type == "message") {
+    if (input.type == 'message') {
       const aiMessageString = input.data;
       const aiMessage: Message = {
         type: 'message',
         id: 'ai-message',
         message: aiMessageString,
-        avatar: "computer",
-        timestamp: Date.now()
+        avatar: 'computer',
+        timestamp: Date.now(),
       };
       this.appendMessage(aiMessage);
-    } else if (input.type == "status") {
+    } else if (input.type == 'status') {
       const current = input.current;
       const total = input.total;
       const progress = current / total;
@@ -81,7 +87,7 @@ export class ChatzoneComponent implements AfterViewInit, AfterViewChecked {
       if (progress >= 1) {
         this.progress = undefined;
       }
-    } else if (input.type == "report") {
+    } else if (input.type == 'report') {
       if (input.reset) {
         this.steps = [];
         return;
@@ -96,28 +102,28 @@ export class ChatzoneComponent implements AfterViewInit, AfterViewChecked {
           this.steps.push(step);
         }
       }
-    } else if (input.type == "intermediate") {
+    } else if (input.type == 'intermediate') {
       const text = '### Intermediate result from attack\n' + input.data;
       const intermediateMessage: Message = {
         type: 'message',
         id: 'assistant-intermediate-message',
         message: text,
-        avatar: "computer",
-        timestamp: Date.now()
+        avatar: 'computer',
+        timestamp: Date.now(),
       };
       this.appendMessage(intermediateMessage);
-    } else if (input.type == "vulnerability-report") {
+    } else if (input.type == 'vulnerability-report') {
       const vulnerabilityCards = input.data.map(vri => {
-        const vrc = (vri as VulnerabilityReportCard);
+        const vrc = vri as VulnerabilityReportCard;
         vrc.description = this.vis.getInfo(vri.vulnerability);
         return vrc;
       });
       this.chatItems.push({
         type: 'report-card',
-        'reports': vulnerabilityCards,
-        'name': input.name
+        reports: vulnerabilityCards,
+        name: input.name,
       });
-      localStorage.setItem("cached-chat-items", JSON.stringify(this.chatItems));
+      localStorage.setItem('cached-chat-items', JSON.stringify(this.chatItems));
     }
   }
 
@@ -127,21 +133,26 @@ export class ChatzoneComponent implements AfterViewInit, AfterViewChecked {
 
   getIconForStepStatus(step: Step): string {
     switch (step.status) {
-      case Status.COMPLETED: return 'check_circle';
-      case Status.FAILED: return 'error';
-      case Status.SKIPPED: return 'skip_next';
-      case Status.RUNNING: return 'play_circle';
-      case Status.PENDING: return 'pending';
+      case Status.COMPLETED:
+        return 'check_circle';
+      case Status.FAILED:
+        return 'error';
+      case Status.SKIPPED:
+        return 'skip_next';
+      case Status.RUNNING:
+        return 'play_circle';
+      case Status.PENDING:
+        return 'pending';
     }
   }
 
   appendMessage(message: Message) {
     this.chatItems.push(message);
-    localStorage.setItem("cached-chat-items", JSON.stringify(this.chatItems));
+    localStorage.setItem('cached-chat-items', JSON.stringify(this.chatItems));
   }
 
   restoreChatItems() {
-    const storedMessages = localStorage.getItem("cached-chat-items");
+    const storedMessages = localStorage.getItem('cached-chat-items');
     if (storedMessages) {
       this.chatItems = JSON.parse(storedMessages);
     }
@@ -149,22 +160,30 @@ export class ChatzoneComponent implements AfterViewInit, AfterViewChecked {
 
   clearChatHistory() {
     this.chatItems = [];
-    localStorage.setItem("cached-chat-items", "[]");
+    localStorage.setItem('cached-chat-items', '[]');
   }
 
   static deserializeStep(obj: ReportItem): Step {
     let status = Status.RUNNING;
     switch (obj.status) {
-      case "COMPLETED": status = Status.COMPLETED; break;
-      case "FAILED": status = Status.FAILED; break;
-      case "SKIPPED": status = Status.SKIPPED; break;
-      case "PENDING": status = Status.PENDING; break;
+      case 'COMPLETED':
+        status = Status.COMPLETED;
+        break;
+      case 'FAILED':
+        status = Status.FAILED;
+        break;
+      case 'SKIPPED':
+        status = Status.SKIPPED;
+        break;
+      case 'PENDING':
+        status = Status.PENDING;
+        break;
     }
     return {
       title: obj.title,
       description: obj.description,
       status: status,
-      progress: obj.progress
+      progress: obj.progress,
     };
   }
 
@@ -193,11 +212,11 @@ export class ChatzoneComponent implements AfterViewInit, AfterViewChecked {
     const downloadUrl = window.URL.createObjectURL(file);
     const a = document.createElement('a');
     a.href = downloadUrl;
-    a.download = `${reportName}.${reportFormat}`;  // Set the filename
+    a.download = `${reportName}.${reportFormat}`; // Set the filename
     document.body.appendChild(a);
-    a.click();  // Programmatically click the link to trigger the download
-    document.body.removeChild(a);  // Remove the link element
-    window.URL.revokeObjectURL(downloadUrl);  // Clean up the URL object
+    a.click(); // Programmatically click the link to trigger the download
+    document.body.removeChild(a); // Remove the link element
+    window.URL.revokeObjectURL(downloadUrl); // Clean up the URL object
   }
 
   // Scrolling to have new messages visible
@@ -258,11 +277,11 @@ export class ChatzoneComponent implements AfterViewInit, AfterViewChecked {
 
   downloadChatHistory(): void {
     const markdownContent = this.exportChat();
-    const blob = new Blob([markdownContent], { type: 'text/markdown' });
+    const blob = new Blob([markdownContent], {type: 'text/markdown'});
 
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = "STARS_chat_" + new Date().toISOString() + ".md";
+    link.download = 'STARS_chat_' + new Date().toISOString() + '.md';
 
     // Append the link to the body
     document.body.appendChild(link);
@@ -279,5 +298,10 @@ export class ChatzoneComponent implements AfterViewInit, AfterViewChecked {
   promptForAPIKey(): void {
     this.apiKey = prompt('Set API Key', this.apiKey) || this.apiKey;
     localStorage.setItem('key', this.apiKey);
+  }
+
+  // openDashboard() that loads a new page with the dashboard at the route /heatmap
+  openDashboard(): void {
+    window.open('/heatmap', '_blank');
   }
 }

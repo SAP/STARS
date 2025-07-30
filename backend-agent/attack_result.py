@@ -68,7 +68,7 @@ class SuiteResult():
 
         return content
 
-    def get_mime_type(format: str) -> str:
+    def get_mime_type(self, format: str) -> str:
         match format:
             case 'pdf':
                 return 'application/pdf'
@@ -171,7 +171,7 @@ class SuiteResult():
         )
         return name
 
-    def load_from_name(name: str) -> 'SuiteResult':
+    def load_from_name(self, name: str) -> 'SuiteResult':
         """
         Load a report from the default directory using the report name / id.
         """
