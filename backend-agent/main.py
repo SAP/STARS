@@ -27,7 +27,8 @@ app = create_app()
 # Configure CORS with allowed origins, if any
 allowed_origins = os.getenv('ALLOWED_ORIGINS', '').split(',')
 # Clean up empty strings from allowed_origins
-allowed_origins = [origin.strip() for origin in allowed_origins if origin.strip()]
+allowed_origins = [origin.strip() for origin in allowed_origins
+                   if origin.strip()]
 # Configure CORS
 if allowed_origins:
     CORS(app, resources={r"/*": {"origins": allowed_origins}})
