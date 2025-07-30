@@ -1,3 +1,15 @@
+# Version: v0.3.1
+
+* [#50](https://github.com/SAP/STARS/pull/50): Bump webpack-dev-server and @angular-devkit/build-angular in /frontend
+* [#57](https://github.com/SAP/STARS/pull/57): Bump requests from 2.32.3 to 2.32.4 in /backend-agent
+* [#62](https://github.com/SAP/STARS/pull/62): Bump on-headers and compression in /frontend
+* [#65](https://github.com/SAP/STARS/pull/65): Bump brace-expansion from 1.1.11 to 1.1.12 in /frontend
+* [#66](https://github.com/SAP/STARS/pull/66): Fix docker configuration
+* [#67](https://github.com/SAP/STARS/pull/67): Fix lint-frontend action
+* [#68](https://github.com/SAP/STARS/pull/68): Update pyrit
+* [#69](https://github.com/SAP/STARS/pull/69): Fix artprompt missing english stopwords bug
+
+
 # Version: v0.3.0
 
 * [#46](https://github.com/SAP/STARS/pull/46): Risk dashboard UI
