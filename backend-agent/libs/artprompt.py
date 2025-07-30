@@ -45,6 +45,18 @@ ArtPrompt malicious prompts are a subset of the AdvBench Harmful Behavior
 dataset, and relies on a LLM to judge whether the attack was successful.
 """
 
+# Ensure NLTK stopwords data is available, download if necessary
+try:
+    # Try to access stopwords to see if data exists
+    stopwords.words('english')
+except LookupError:
+    # Data doesn't exist, download it
+    logger.warning('Downloading NLTK (missing) stopwords data...')
+    import nltk
+    nltk.download('stopwords', quiet=True)
+    logger.debug('NLTK stopwords data downloaded successfully.')
+
+
 ##############################################################################
 # Content for cloaked prompt generation
 # ASCII letters generated with GPT
