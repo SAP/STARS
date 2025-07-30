@@ -105,6 +105,17 @@ class LLMAdapter(PromptChatTarget):
 
 class InstrumentedRedTeamingOrchestrator(RedTeamingOrchestrator):
 
+    def _extract_displayable_content(self, response: PromptRequestPiece) -> str:
+        """
+        Extract displayable content from PyRIT response objects
+        """
+        if hasattr(response, 'converted_value'):
+            return response.converted_value
+        elif hasattr(response, 'request_pieces') and response.request_pieces:
+            return response.request_pieces[0].converted_value
+        else:
+            return str(response)
+
     async def run_attack_async(
             self,
             *,
@@ -137,7 +148,8 @@ class InstrumentedRedTeamingOrchestrator(RedTeamingOrchestrator):
             )
             overall_response = response if response else overall_response
             if display_intermediate_results:
-                status.display_intermediate_result(response)
+                status.display_intermediate_result(
+                    self._extract_displayable_content(response))
             # If the conversation is complete without a target response in the
             # current iteration then the overall response is the last
             # iteration's response.
@@ -321,18 +333,18 @@ def start_pyrit_attack(
     if isinstance(attack_result['response'], PromptRequestPiece):
         response_text = attack_result['response'].converted_value
 
-     result = AttackResult(
-         'PyRIT',
-         success=attack_result['success'],
-         vulnerability_type=vulnerability_type,
-         details={'target_model': target_model.model_name,
-                  'total_attacks': 1,
-                  'number_successful_attacks': 1 if attack_result['success'] else 0,  # noqa: E501
-                  'attack_description': DESCRIPTION,
-                  'response': response_text,}
-     )
-     save_to_db(result)
-     return result
+    result = AttackResult(
+        'PyRIT',
+        success=attack_result['success'],
+        vulnerability_type=vulnerability_type,
+        details={'target_model': target_model.model_name,
+                 'total_attacks': 1,
+                 'number_successful_attacks': 1 if attack_result['success'] else 0,  # noqa: E501
+                 'attack_description': DESCRIPTION,
+                 'response': response_text,
+                 })
+    save_to_db(result)
+    return result
 
 
 #def check_and_return_json(text):
