@@ -1,0 +1,52 @@
+.dialog-container {
+  padding: 15px;
+}
+
+.dialog-title {
+  text-align: center;
+  margin-bottom: 16px;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 1.5rem;
+  }
+
+  mat-icon {
+    font-size: 24px;
+    vertical-align: middle;
+  }
+}
+
+.input-container {
+  width: 60%;
+  margin: auto;
+}
+
+.mat-mdc-form-field {
+  width: 100% !important;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 12px;
+
+  button {
+    min-width: 100px;
+  }
+}
+
+.save-button {
+  background-color: #4CAF50 !important;
+  color: white !important;
+  font-weight: 500;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: #507652 !important;
+  }
+}

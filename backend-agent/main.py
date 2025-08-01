@@ -205,6 +205,47 @@ def get_heatmap():
         return jsonify({'error': str(e)}), 500
 
 
+@app.route('/api/attacks', methods=['GET'])
+def get_attacks():
+    """
+    Endpoint to retrieve all attacks with their weights.
+    Returns a JSON object with attack names and their weights.
+    """
+    try:
+        attacks = db.session.query(Attack).all()
+        attack_list = [{'name': attack.name, 'weight': attack.weight}
+                       for attack in attacks]
+        return jsonify(attack_list), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/attacks', methods=['PUT'])
+def update_attack_weights():
+    """
+    Update weights for multiple attacks.
+    Expects a JSON object like: {"artPrompt": 2, "codeAttack": 1, ...}
+    """
+    try:
+        weights = request.get_json()
+        if not isinstance(weights, dict):
+            return jsonify({'error': 'Invalid payload format'}), 400
+
+        for name, weight in weights.items():
+            attack = db.session.query(Attack).filter_by(name=name).first()
+            if attack:
+                attack.weight = float(weight)
+            else:
+                return jsonify({'error': f'Attack not found: {name}'}), 404
+
+        db.session.commit()
+        return jsonify({'message': 'Weights updated successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
 if __name__ == '__main__':
     if not os.getenv('API_KEY'):
         print('No API key is set! Access is unrestricted.')

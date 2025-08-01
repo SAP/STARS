@@ -73,3 +73,10 @@ mat-select {
 .apexcharts-legend {
   translate: 50px;
 }
+
+.apexcharts-legend::before {
+  content: 'Score Legend';
+  display: block;
+  font-size: 13px;
+  translate: -10px;
+}
