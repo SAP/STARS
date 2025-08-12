@@ -60,6 +60,20 @@ def send_intro(sock):
         sock.send(json.dumps({'type': 'message', 'data': intro}))
 
 
+def verify_api_key():
+    """
+    Verifies the API key from the request headers against the env variable.
+    If the API key is not set or does not match, it aborts the request
+    with a 403 status code.
+    """
+    if os.getenv('API_KEY'):
+        provided_key = request.headers.get('X-API-Key')
+        if provided_key != os.getenv('API_KEY'):
+            abort(403)
+    else:
+        abort(403)
+
+
 @sock.route('/agent')
 def query_agent(sock):
     """
@@ -105,10 +119,6 @@ def download_report():
     This route allows to download attack suite reports by specifying
     their name.
     """
-    if os.getenv('API_KEY'):
-        provided_key = request.headers.get('X-API-Key')
-        if provided_key != os.getenv('API_KEY'):
-            abort(403)
     name = request.args.get('name')
     format = request.args.get('format', 'md')
 
@@ -226,6 +236,7 @@ def update_attack_weights():
     Update weights for multiple attacks.
     Expects a JSON object like: {"artPrompt": 2, "codeAttack": 1, ...}
     """
+    verify_api_key()
     try:
         weights = request.get_json()
         if not isinstance(weights, dict):
