@@ -17,7 +17,7 @@ jobs:
     name: Build changelog
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Run Changelog CI
         uses: saadmk11/changelog-ci@v1.2.0
