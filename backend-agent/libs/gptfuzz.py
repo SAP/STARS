@@ -4,6 +4,7 @@ import os
 
 import pandas as pd
 from dotenv import load_dotenv
+
 from gptfuzzer.fuzzer.core import GPTFuzzer
 from gptfuzzer.fuzzer.mutator import (MutateRandomSinglePolicy,
                                       OpenAIMutatorCrossOver,
@@ -15,9 +16,10 @@ from gptfuzzer.fuzzer.selection import MCTSExploreSelectPolicy
 from gptfuzzer.llm import LLM, OpenAILLM
 from gptfuzzer.utils.predict import RoBERTaPredictor
 
+from app.db.utils import save_to_db
 from attack_result import AttackResult
 from llm import LLM as AgentLLM
-from status import status, Step
+from status import Step, status
 
 load_dotenv()
 
@@ -163,13 +165,16 @@ def perform_gptfuzz_attack(mutate_model: LLM,
     with Step('Running Fuzzer'):
         fuzzer.run()
     logger.info('Fuzzer finished')
-    return AttackResult(
+    result = AttackResult(
         'gptfuzz',
         fuzzer.current_jailbreak > 0,
         'jailbreak',
-        details={
-            'result_file': output_file,
-            'query_count': fuzzer.current_query,
-            'attack_description': DESCRIPTION
+        {
+            'target_model': target_model.llm.model_name,
+            'total_attacks': fuzzer.current_query,
+            'number_successful_attacks': fuzzer.current_jailbreak,
+            'attack_description': DESCRIPTION,
         }
     )
+    save_to_db(result)
+    return result

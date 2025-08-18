@@ -89,6 +89,11 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+venv310
+cache
+
+# Frontend Environments
+frontend/src/environments/environment.ts
 
 # Spyder project settings
 .spyderproject
@@ -147,6 +152,3 @@ artprompt_success.json
 *.report.jsonl
 *.hitlog.jsonl
 *.report.html
-
-# Frontend Environments
-frontend/src/environments

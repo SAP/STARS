@@ -1,0 +1,80 @@
+h1 {
+  width: 500px;
+  margin: auto;
+  text-align: center;
+}
+
+#heatmapChart {
+  /* max-width: 600px;
+  max-height: 400px; */
+  display: block;
+  margin: 10px auto;
+}
+
+* {
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+#vendorChoice {
+  padding: 20px 0;
+  width: 500px;
+  margin: auto;
+  text-align: center;
+}
+
+.title-card {
+  width: 700px;
+  margin: auto;
+  height: 100px;
+  padding: 25px;
+}
+ .heatmap-card {
+  width: 700px;
+  margin: auto;
+  height: 1000px;
+  padding: 25px;
+}
+
+/* .card-header {
+  font-size: 2rem;
+  font-weight: bold;
+} */
+
+#overview {
+  font-size: medium;
+}
+
+/* .header-icon {
+  width: 50px;
+} */
+
+.card-header {
+  display: flex;
+  align-items: center; 
+  gap: 10px; 
+  font-size: 2rem; 
+  font-weight: bold;
+  justify-content: center;
+}
+
+.header-icon {
+  width: 45px;
+}
+
+.title {
+  display: flex;
+  align-items: center; 
+}
+
+.buttons-wrapper {
+  /* margin-top: auto; pousse les boutons en bas */
+  display: flex;
+  flex-direction: column;
+  gap: 1rem; /* espace entre les boutons */
+}
+
+.centered-button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

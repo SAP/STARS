@@ -25,9 +25,11 @@ import art
 import pandas as pd
 from nltk.corpus import stopwords
 
+from app.db.utils import save_to_db
 from attack_result import AttackResult
 from llm import LLM
-from status import status, Step
+from status import Step, status
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -42,6 +44,18 @@ art representation, and queries the LLM to run a jailbreak attack.
 ArtPrompt malicious prompts are a subset of the AdvBench Harmful Behavior
 dataset, and relies on a LLM to judge whether the attack was successful.
 """
+
+# Ensure NLTK stopwords data is available, download if necessary
+try:
+    # Try to access stopwords to see if data exists
+    stopwords.words('english')
+except LookupError:
+    # Data doesn't exist, download it
+    logger.warning('Downloading NLTK (missing) stopwords data...')
+    import nltk
+    nltk.download('stopwords', quiet=True)
+    logger.debug('NLTK stopwords data downloaded successfully.')
+
 
 ##############################################################################
 # Content for cloaked prompt generation
@@ -483,14 +497,17 @@ def start_artprompt(target_model: LLM,
     logger.info(f'Write results to output file {outfile}')
     with open(outfile, 'w') as f:
         json.dump(evaluations_res, f, indent=4)
-
-    return AttackResult(
+    result = AttackResult(
         'artprompt',
         successful_attacks > 0,
         'prompt-injection',
         {
+            'target_model': target_model.model_name,
+            'total_attacks': num_samples,
             'number_successful_attacks': successful_attacks,
             'successful_attacks': successful_attacks_list,
             'attack_description': DESCRIPTION
         }
     )
+    save_to_db(result)
+    return result

@@ -1,3 +1,6 @@
+import os
+
+from dotenv import load_dotenv
 from gen_ai_hub.proxy.core.proxy_clients import set_proxy_version
 from gen_ai_hub.proxy.langchain.init_models import (
     init_llm, init_embedding_model)
@@ -11,6 +14,11 @@ from langchain_core.messages import SystemMessage
 from langchain_core.tools.retriever import create_retriever_tool
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 
+
+# load env variables
+load_dotenv()
+AGENT_MODEL = os.environ.get('AGENT_MODEL', 'gpt-4')
+EMBEDDING_MODEL = os.environ.get('EMBEDDING_MODEL', 'text-embedding-ada-002')
 # Use models deployed in SAP AI Core
 set_proxy_version('gen-ai-hub')
 
@@ -28,7 +36,9 @@ print('Load embedding function')
 # https://python.langchain.com/docs/modules/data_connection/text_embedding/\  #
 #                                                      caching_embeddings     #
 ###############################################################################
-underlying_embeddings = init_embedding_model('text-embedding-ada-002')
+# SAP-compliant embedding models
+# https://github.tools.sap/AI-Playground-Projects/llm-commons#embedding-models
+underlying_embeddings = init_embedding_model(EMBEDDING_MODEL)
 # Initialize local cache for faster loading of subsequent executions
 fs = LocalFileStore('./cache')
 # Link the embedding and the local cache system, and define a namespace
@@ -130,7 +140,7 @@ print('Load LLM')
 
 # Initialize the LLM model to use, among the ones provided by SAP
 # The max token count needs to be increased so that responses are not cut off.
-llm = init_llm(model_name='gpt-4', max_tokens=1024)
+llm = init_llm(model_name=AGENT_MODEL, max_tokens=4096)
 
 # Chain
 # https://python.langchain.com/docs/modules/chains

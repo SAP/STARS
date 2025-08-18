@@ -1,0 +1,31 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:8080"
+    depends_on:
+      - backend
+    networks:
+      - stars-network
+
+  backend:
+    build:
+      context: ./backend-agent
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./backend-agent/.env
+    networks:
+      - stars-network
+    volumes:
+      - stars-backend-db:/data
+
+networks:
+  stars-network:
+    driver: bridge
+
+volumes:
+  stars-backend-db:

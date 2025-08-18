@@ -1,27 +1,38 @@
+import json
+import logging
+import os
 from argparse import Namespace
 from dataclasses import asdict
-import json
-import os
-import logging
 
+from app.db.utils import save_to_db
 from attack_result import AttackResult, SuiteResult
-from libs.artprompt import start_artprompt, \
-    OUTPUT_FILE as artprompt_out_file
-from libs.codeattack import start_codeattack, \
-    OUTPUT_FILE as codeattack_out_file
-from libs.garak import start_dan, \
-    start_encoding, \
-    start_goodside, \
-    start_latentinjection, \
-    start_malwaregen, \
-    start_phrasing, \
-    start_promptinject, \
-    start_suffix, \
-    OUTPUT_FILE as garak_output_file
-from libs.gptfuzz import perform_gptfuzz_attack, \
-    OUTPUT_FILE as gptfuzz_out_file
-from libs.promptmap import start_prompt_map, \
-    OUTPUT_FILE as prompt_map_out_file
+from libs.artprompt import (
+    OUTPUT_FILE as artprompt_out_file,
+    start_artprompt,
+)
+from libs.codeattack import (
+    OUTPUT_FILE as codeattack_out_file,
+    start_codeattack,
+)
+from libs.garak import (
+    OUTPUT_FILE as garak_output_file,
+    start_dan,
+    start_encoding,
+    start_goodside,
+    start_latentinjection,
+    start_malwaregen,
+    start_phrasing,
+    start_promptinject,
+    start_suffix,
+)
+from libs.gptfuzz import (
+    OUTPUT_FILE as gptfuzz_out_file,
+    perform_gptfuzz_attack,
+)
+from libs.promptmap import (
+    OUTPUT_FILE as prompt_map_out_file,
+    start_prompt_map,
+)
 from libs.pyrit import start_pyrit_attack
 from llm import LLM
 from status import Trace
@@ -303,6 +314,7 @@ class AttackSuite():
                 summary = self.summarize_attack_result(result)
                 result.details['summary'] = summary
             full_result.append(result)
+            save_to_db(result)
         return SuiteResult(full_result)
 
     def summarize_attack_result(self, attack_result: AttackResult) -> str:

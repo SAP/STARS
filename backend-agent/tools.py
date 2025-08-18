@@ -42,7 +42,7 @@ def run_prompt_attack(model_name: str,
     appears on SAP AI Core. You cannot run this tool without
     this information.
     system_prompt: The system prompt given to the model that is attacked.
-    Leave as None when not specified.
+    Leave as empty string when not specified.
     """
 
     return str(AttackSpecification.create(

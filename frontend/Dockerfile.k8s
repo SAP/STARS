@@ -4,7 +4,7 @@ FROM nginxinc/nginx-unprivileged
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY ./dist/stars /usr/share/nginx/html
-COPY ./src/assets/configs/config.local.json /usr/share/nginx/html/assets/configs/config.json
+COPY ./src/assets/configs/config.k8s.json /usr/share/nginx/html/assets/configs/config.json
 
 EXPOSE 8080
 CMD ["nginx", "-g", "daemon off;"]

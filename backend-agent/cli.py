@@ -162,10 +162,10 @@ def pyrit(args):
         print('Something went wrong. No result returned from the attack.')
         return
     print(
-        'The attack was successful.' if result['success']
+        'The attack was successful.' if result.success
         else 'The attack was not successful.')
     print('Overall response:')
-    print(result['response'])
+    print(result.details['response'])
 
 
 @subcommand([arg('target_model', help='Name of the target model to attack'),
@@ -369,10 +369,16 @@ cli.add_argument('-d', '--dry-run',
                  action='store_true')
 
 if __name__ == '__main__':
+    # Use the app factory to create the Flask app and initialize db
+    from app import create_app
+    app = create_app()
     args = cli.parse_args()
     if args.verbose:
-        logging.basicConfig(level=logging.INFO)
-    if args.subcommand is None:
+        logging.basicConfig(level=logging.DEBUG)
+    if not args.subcommand:
         cli.print_help()
     else:
-        args.func(args)
+        # Flask-SQLAlchemy relies on the application context to manage
+        # database connections and configuration
+        with app.app_context():
+            args.func(args)
