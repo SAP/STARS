@@ -1,5 +1,5 @@
 generative-ai-hub-sdk[all]>=3.1.1
-Deprecated==1.2.15
+Deprecated==1.2.18
 python-dotenv==1.0.1
 faiss-cpu~=1.9.0
 Flask==2.3.3
