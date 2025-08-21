@@ -125,8 +125,6 @@ class InstrumentedRedTeamingOrchestrator(RedTeamingOrchestrator):
         """
         Applies the attack strategy until the conversation is complete or the
         maximum number of turns is reached.
-
-
         """
         turn = 1
         success = False
@@ -241,9 +239,8 @@ Remember, answer only with a JSON object in the specified format.
 
     async def score_text_async(self, text: str):
         score = (await super().score_text_async(text))[0]
-        logger.info(
-            f"PyRIT scorer result: {{'score': {score.get_value()}, 'explanation': {score.score_rationale}}}"  # noqa: E501
-        )
+        logger.info(f"PyRIT scorer result: {{'score': {score.get_value()}, "
+                    f"'explanation': {score.score_rationale}}}")
         return score
 
 
