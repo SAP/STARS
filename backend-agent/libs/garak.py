@@ -206,7 +206,7 @@ def start_dan(target_model: LLM, parameters: dict) -> AttackResult:
         {
             'target_model': target_model.model_name,
             'total_attacks': len(dan_probes),
-            'number_of_successful_attacks': len(results),
+            'number_successful_attacks': len(results),
             'successful_attacks': results,
             'attack_description': dan_description
         }
@@ -257,7 +257,7 @@ def start_encoding(target_model: LLM, parameters: dict) -> AttackResult:
         {
             'target_model': target_model.model_name,
             'total_attacks': len(encoding_probes),
-            'number_of_successful_attacks': len(results),
+            'number_successful_attacks': len(results),
             'successful_attacks': results,
             'attack_description': encoding_description
         }
@@ -297,7 +297,7 @@ def start_goodside(target_model: LLM, parameters: dict) -> AttackResult:
         {
             'target_model': target_model.model_name,
             'total_attacks': len(goodside_probes),
-            'number_of_successful_attacks': len(results),
+            'number_successful_attacks': len(results),
             'successful_attacks': results,
             'attack_description': goodside_description,
         }
@@ -346,7 +346,7 @@ def start_latentinjection(target_model: LLM, parameters: dict) -> AttackResult:
         {
             'target_model': target_model.model_name,
             'total_attacks': len(li_probes),
-            'number_of_successful_attacks': len(results),
+            'number_successful_attacks': len(results),
             'successful_attacks': results,
             'attack_description': li_description
         }
@@ -389,7 +389,7 @@ def start_malwaregen(target_model: LLM, parameters: dict) -> AttackResult:
         {
             'target_model': target_model.model_name,
             'total_attacks': len(malwaregen_probes),
-            'number_of_successful_attacks': len(results),
+            'number_successful_attacks': len(results),
             'successful_attacks': results,
             'attack_description': malwaregen_description
         }
@@ -427,7 +427,7 @@ def start_phrasing(target_model: LLM, parameters: dict) -> AttackResult:
         {
             'target_model': target_model.model_name,
             'total_attacks': len(phrasing_probes),
-            'number_of_successful_attacks': len(results),
+            'number_successful_attacks': len(results),
             'successful_attacks': results,
             'attack_description': phrasing_description
         }
@@ -472,7 +472,7 @@ def start_promptinject(target_model: LLM, parameters: dict) -> AttackResult:
         {
             'target_model': target_model.model_name,
             'total_attacks': len(pi_probes),
-            'number_of_successful_attacks': len(results),
+            'number_successful_attacks': len(results),
             'successful_attacks': results,
             'attack_description': pi_description
         }
@@ -511,7 +511,7 @@ def start_suffix(target_model: LLM, parameters: dict) -> AttackResult:
         {
             'target_model': target_model.model_name,
             'total_attacks': len(suffix_probes),
-            'number_of_successful_attacks': len(results),
+            'number_successful_attacks': len(results),
             'successful_attacks': results,
             'attack_description': suffix_description
         }
