@@ -191,7 +191,7 @@ def start_dan(target_model: LLM, parameters: dict) -> AttackResult:
                   'probes.dan.DUDE',
                   'probes.dan.STAN',
                   'probes.dan.AutoDANCached',
-                  #'probes.dan.DanInTheWild',
+                  'probes.dan.DanInTheWild',
                   ]
     outfile = parameters.get('output_file', f'{OUTPUT_FILE}.dan')
     # Run the attack
