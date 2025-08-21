@@ -11,6 +11,7 @@ from garak.evaluators import ThresholdEvaluator
 from garak.generators import Generator
 from garak.report import Report
 
+from app.db.utils import save_to_db
 from attack_result import AttackResult
 from llm import LLM
 from status import status, Step
@@ -124,7 +125,7 @@ def run_garak(target_model: LLM, probes: list,
         # Create an evaluator using the default evaluation threshold
         evaluator = ThresholdEvaluator(_config.run.eval_threshold)
 
-    with Step('Run prompt attacks'):
+    with Step('Run attacks'):
         # Signal the start of the run
         command.start_run()
         logger.debug('Reporting output to '
@@ -190,7 +191,7 @@ def start_dan(target_model: LLM, parameters: dict) -> AttackResult:
                   'probes.dan.DUDE',
                   'probes.dan.STAN',
                   'probes.dan.AutoDANCached',
-                  'probes.dan.DanInTheWild',
+                  #'probes.dan.DanInTheWild',
                   ]
     outfile = parameters.get('output_file', f'{OUTPUT_FILE}.dan')
     # Run the attack
@@ -198,15 +199,20 @@ def start_dan(target_model: LLM, parameters: dict) -> AttackResult:
                         probes=dan_probes,
                         output_filename=outfile)
 
-    return AttackResult(
+    result = AttackResult(
         'dan',
         len(results) > 0,
         'prompt-injection',
         {
+            'target_model': target_model.model_name,
+            'total_attacks': len(dan_probes),
+            'number_of_successful_attacks': len(results),
             'successful_attacks': results,
             'attack_description': dan_description
         }
     )
+    save_to_db(result)
+    return result
 
 
 def start_encoding(target_model: LLM, parameters: dict) -> AttackResult:
@@ -244,15 +250,20 @@ def start_encoding(target_model: LLM, parameters: dict) -> AttackResult:
                         probes=encoding_probes,
                         output_filename=outfile)
 
-    return AttackResult(
+    result = AttackResult(
         'encoding',
         len(results) > 0,
         'prompt-injection',
         {
+            'target_model': target_model.model_name,
+            'total_attacks': len(encoding_probes),
+            'number_of_successful_attacks': len(results),
             'successful_attacks': results,
             'attack_description': encoding_description
         }
     )
+    save_to_db(result)
+    return result
 
 
 def start_goodside(target_model: LLM, parameters: dict) -> AttackResult:
@@ -279,15 +290,20 @@ def start_goodside(target_model: LLM, parameters: dict) -> AttackResult:
                         probes=goodside_probes,
                         output_filename=outfile)
 
-    return AttackResult(
+    result = AttackResult(
         'goodside',
         len(results) > 0,
         'prompt-injection',
         {
+            'target_model': target_model.model_name,
+            'total_attacks': len(goodside_probes),
+            'number_of_successful_attacks': len(results),
             'successful_attacks': results,
-            'attack_description': goodside_description
+            'attack_description': goodside_description,
         }
     )
+    save_to_db(result)
+    return result
 
 
 def start_latentinjection(target_model: LLM, parameters: dict) -> AttackResult:
@@ -323,15 +339,20 @@ def start_latentinjection(target_model: LLM, parameters: dict) -> AttackResult:
                         probes=li_probes,
                         output_filename=outfile)
 
-    return AttackResult(
+    result = AttackResult(
         'latentinjection',
         len(results) > 0,
         'prompt-injection',
         {
+            'target_model': target_model.model_name,
+            'total_attacks': len(li_probes),
+            'number_of_successful_attacks': len(results),
             'successful_attacks': results,
             'attack_description': li_description
         }
     )
+    save_to_db(result)
+    return result
 
 
 def start_malwaregen(target_model: LLM, parameters: dict) -> AttackResult:
@@ -361,15 +382,20 @@ def start_malwaregen(target_model: LLM, parameters: dict) -> AttackResult:
                         probes=malwaregen_probes,
                         output_filename=outfile)
 
-    return AttackResult(
+    result = AttackResult(
         'malwaregen',
         len(results) > 0,
         'insecure-code-generation',
         {
+            'target_model': target_model.model_name,
+            'total_attacks': len(malwaregen_probes),
+            'number_of_successful_attacks': len(results),
             'successful_attacks': results,
             'attack_description': malwaregen_description
         }
     )
+    save_to_db(result)
+    return result
 
 
 def start_phrasing(target_model: LLM, parameters: dict) -> AttackResult:
@@ -394,15 +420,20 @@ def start_phrasing(target_model: LLM, parameters: dict) -> AttackResult:
                         probes=phrasing_probes,
                         output_filename=outfile)
 
-    return AttackResult(
+    result = AttackResult(
         'phrasing',
         len(results) > 0,
         'jailbreak',
         {
+            'target_model': target_model.model_name,
+            'total_attacks': len(phrasing_probes),
+            'number_of_successful_attacks': len(results),
             'successful_attacks': results,
             'attack_description': phrasing_description
         }
     )
+    save_to_db(result)
+    return result
 
 
 def start_promptinject(target_model: LLM, parameters: dict) -> AttackResult:
@@ -434,15 +465,20 @@ def start_promptinject(target_model: LLM, parameters: dict) -> AttackResult:
                         probes=pi_probes,
                         output_filename=outfile)
 
-    return AttackResult(
-        'PromptInject',
+    result = AttackResult(
+        'promptinject',
         len(results) > 0,
         'prompt-injection',
         {
+            'target_model': target_model.model_name,
+            'total_attacks': len(pi_probes),
+            'number_of_successful_attacks': len(results),
             'successful_attacks': results,
             'attack_description': pi_description
         }
     )
+    save_to_db(result)
+    return result
 
 
 def start_suffix(target_model: LLM, parameters: dict) -> AttackResult:
@@ -468,12 +504,17 @@ def start_suffix(target_model: LLM, parameters: dict) -> AttackResult:
                         probes=suffix_probes,
                         output_filename=outfile)
 
-    return AttackResult(
+    result = AttackResult(
         'suffix',
         len(results) > 0,
         'jailbreak',
         {
+            'target_model': target_model.model_name,
+            'total_attacks': len(suffix_probes),
+            'number_of_successful_attacks': len(results),
             'successful_attacks': results,
             'attack_description': suffix_description
         }
     )
+    save_to_db(result)
+    return result
