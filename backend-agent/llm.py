@@ -95,10 +95,6 @@ class LLM(abc.ABC):
         """
         # Foundation-models scenarios in AI Core
         if model_name in AICORE_MODELS['azure-openai']:
-            # The agent sometimes autocorrects gpt-35-turbo to gpt-3.5-turbo,
-            # so we handle this behavior here.
-            if model_name == 'gpt-3.5-turbo':
-                model_name = 'gpt-35-turbo'
             return AICoreOpenAILLM(model_name)
         if model_name in AICORE_MODELS['aicore-ibm']:
             # IBM models are compatible with OpenAI completion API
@@ -199,11 +195,11 @@ class LLM(abc.ABC):
         Generate completions using the LLM for a list of messages
         in OpenAI-API style (dictionaries with keys role and content).
 
-        n determines the number of different responses/ trials to generate.
+        Other parameters will be directly passed to the client and are
+        consistent to OpenAI's style.
 
-        Other parameters will be directly passed to the client.
-
-        Implementation is responsibility of subclasses.
+        Implementation is responsibility of subclasses, as well as the handling
+        of possible parameters not supported in non-OpenAI models.
         """
         raise NotImplementedError
 
@@ -219,9 +215,11 @@ class LLM(abc.ABC):
 
 
 class AICoreOpenAILLM(LLM):
-    """
-    This class implements an interface to query LLMs using the Generative AI
-    hub (AI Core) OpenAI proxy client.
+    """This class implements an interface to query LLMs using the Generative AI
+    Hub (AI Core) OpenAI proxy client.
+
+    All models in AI Core that are compatible with the OpenAI API can be
+    queries using this class.
     """
 
     def __init__(self,
@@ -256,10 +254,10 @@ class AICoreOpenAILLM(LLM):
                     system_prompt = ''
                 messages = [
                     {'role': 'user',
-                        'content': f'{system_prompt}{prompt}'},
+                        'content': f'{system_prompt}\n{prompt}'},
                 ]
         return self.generate_completions_for_messages(
-            messages, kwargs
+            messages, **kwargs
         )
 
     def generate_completions_for_messages(self,
@@ -269,8 +267,9 @@ class AICoreOpenAILLM(LLM):
             if not self.uses_system_prompt:
                 if messages[0]['role'] == 'system':
                     system_message = messages.pop(0)
-                    messages[0]['content'] = \
-                        f'{system_message["content"]}{messages[0]["content"]}'
+                    messages[0]['content'] = (
+                        f'{system_message["content"]}\n'
+                        f'{messages[0]["content"]}')
             response = self.client.chat.completions.create(
                 model_name=self.model_name,
                 messages=messages,
