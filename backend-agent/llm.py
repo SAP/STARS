@@ -41,7 +41,7 @@ AICORE_MODELS = {
         'amazon--nova-lite',
         'amazon--nova-micro',
         'amazon--nova-pro',
-        'amazon--nova-premier',  # new
+        'amazon--nova-premier',
         'amazon--titan-text-lite',  # deprecated
         'amazon--titan-text-express',  # deprecated
         'anthropic--claude-3-haiku',
@@ -49,8 +49,8 @@ AICORE_MODELS = {
         'anthropic--claude-3-opus',
         'anthropic--claude-3.5-sonnet',
         'anthropic--claude-3.7-sonnet',
-        'anthropic--claude-4-sonnet',  # new
-        'anthropic--claude-4-opus',  # new
+        'anthropic--claude-4-sonnet',
+        'anthropic--claude-4-opus',
     ],
     'azure-openai':
     [
@@ -60,9 +60,9 @@ AICORE_MODELS = {
         'gpt-4.1',
         'gpt-4.1-mini',
         'gpt-4.1-nano',
-        # 'gpt-5',  # gpt5 models seem broken in sap lib
-        # 'gpt-5-mini',
-        # 'gpt-5-nano',
+        'gpt-5',
+        'gpt-5-mini',
+        'gpt-5-nano',
         'o1',
         'o3',
         'o3-mini',
@@ -75,7 +75,7 @@ AICORE_MODELS = {
         'gemini-2.0-flash',
         'gemini-2.0-flash-lite',
         'gemini-2.5-flash',
-        # 'gemini-2.5-pro',  # seems broken in sap lib
+        'gemini-2.5-pro',
     ],
 }
 
@@ -85,7 +85,7 @@ class LLM(abc.ABC):
     This is the abstract class used to create and access LLMs for pentesting.
     """
 
-    _supported_models = []
+    _supported_models: list[str] = []
 
     @classmethod
     def from_model_name(cls, model_name: str) -> 'LLM':
@@ -300,8 +300,8 @@ class LocalOpenAILLM(AICoreOpenAILLM):
 
     def __init__(self,
                  model_name: str,
-                 api_key: str = None,
-                 base_url: str = None,
+                 api_key: str = '',
+                 base_url: str = '',
                  supports_openai_style_system_messages=True):
         self.client = OfficialOpenAI(api_key=api_key, base_url=base_url)
         self.model_name = model_name
@@ -310,12 +310,7 @@ class LocalOpenAILLM(AICoreOpenAILLM):
 
     def generate_completions_for_messages(self,
                                           messages: list,
-                                          temperature: float,
-                                          max_tokens: int,
-                                          top_p: int = 1,
-                                          frequency_penalty: float = 0.5,
-                                          presence_penalty: float = 0.5,
-                                          n: int = 1):
+                                          **kwargs) -> LLMResponse:
         if not self.uses_system_prompt:
             if messages[0]['role'] == 'system':
                 logger.debug(
@@ -328,14 +323,10 @@ class LocalOpenAILLM(AICoreOpenAILLM):
             response = self.client.chat.completions.create(
                 model=self.model_name,
                 messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                n=n,
-                top_p=top_p,
-                frequency_penalty=frequency_penalty,
-                presence_penalty=presence_penalty)
+                **kwargs)
             responses = [
-                response.choices[i].message.content for i in range(n)]
+                response.choices[i].message.content for i in
+                range(kwargs.get('n', 1))]
             return self._trace_llm_call(messages, Success(responses))
         except Exception as e:
             return self._trace_llm_call(messages, Error(str(e)))
@@ -352,7 +343,7 @@ class OllamaLLM(LLM):
     def generate(self,
                  system_prompt: str,
                  prompt: str,
-                 **kwargs: dict) -> list[str]:  # TODO:check
+                 **kwargs) -> list[str]:  # TODO:check
         try:
             messages = [
                 {'role': 'system', 'content': system_prompt},
@@ -373,23 +364,15 @@ class OllamaLLM(LLM):
     def generate_completions_for_messages(
             self,
             messages: list,
-            temperature: float,
-            max_tokens: int,
-            top_p: int = 1,
-            frequency_penalty: float = 0.5,
-            presence_penalty: float = 0.5,
-            n: int = 1) -> list[str]:
+            **kwargs) -> list[str]:  # TODO:check
         try:
             generations = [
                 self.client.chat(
                     self.model_name,
                     messages,
-                    options={'temperature': temperature,
-                             'top_p': top_p,
-                             'frequency_penalty': frequency_penalty,
-                             'presence_penalty': presence_penalty}
+                    options=kwargs
                 )['message']['content']
-                for _ in range(n)
+                for _ in range(kwargs.get('n', 1))
             ]
             return self._trace_llm_call(messages, Success(generations))
         except Exception as e:
