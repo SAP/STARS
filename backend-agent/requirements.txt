@@ -2,7 +2,7 @@ sap-ai-sdk-gen[all]>=5.4.5
 Deprecated==1.2.18
 python-dotenv==1.1.1
 faiss-cpu~=1.12.0
-Flask==3.1.1
+Flask==3.1.2
 Flask-Cors==6.0.0
 flask_sock==0.7.0
 Flask-SQLAlchemy==3.1.1
