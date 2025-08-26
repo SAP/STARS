@@ -1,4 +1,4 @@
-generative-ai-hub-sdk[all]>=3.1.1
+sap-ai-sdk-gen[all]>=5.4.5
 Deprecated==1.2.18
 python-dotenv==1.1.1
 faiss-cpu~=1.12.0
