@@ -42,8 +42,6 @@ AICORE_MODELS = {
         'amazon--nova-micro',
         'amazon--nova-pro',
         'amazon--nova-premier',
-        'amazon--titan-text-lite',  # deprecated
-        'amazon--titan-text-express',  # deprecated
         'anthropic--claude-3-haiku',
         'anthropic--claude-3-sonnet',
         'anthropic--claude-3-opus',
@@ -54,7 +52,6 @@ AICORE_MODELS = {
     ],
     'azure-openai':
     [
-        'gpt-4',  # deprecated
         'gpt-4o',
         'gpt-4o-mini',
         'gpt-4.1',
@@ -70,8 +67,6 @@ AICORE_MODELS = {
     ],
     'gcp-vertexai':
     [
-        'gemini-1.5-pro',  # deprecated
-        'gemini-1.5-flash'  # deprecated,
         'gemini-2.0-flash',
         'gemini-2.0-flash-lite',
         'gemini-2.5-flash',
