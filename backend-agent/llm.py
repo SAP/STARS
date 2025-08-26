@@ -38,36 +38,39 @@ AICORE_MODELS = {
     ],
     'aws-bedrock':
     [
-        'amazon--titan-text-lite',
-        'amazon--titan-text-express',
-        'amazon--nova-pro',
         'amazon--nova-lite',
         'amazon--nova-micro',
+        'amazon--nova-pro',
+        'amazon--nova-premier',
         'anthropic--claude-3-haiku',
         'anthropic--claude-3-sonnet',
         'anthropic--claude-3-opus',
         'anthropic--claude-3.5-sonnet',
         'anthropic--claude-3.7-sonnet',
+        'anthropic--claude-4-sonnet',
+        'anthropic--claude-4-opus',
     ],
     'azure-openai':
     [
-        'gpt-4',
         'gpt-4o',
         'gpt-4o-mini',
         'gpt-4.1',
         'gpt-4.1-mini',
         'gpt-4.1-nano',
-        # 'o1',
-        # 'o3',
-        # 'o3-mini',
-        # 'o4-mini',
+        'gpt-5',
+        'gpt-5-mini',
+        'gpt-5-nano',
+        'o1',
+        'o3',
+        'o3-mini',
+        'o4-mini',
     ],
     'gcp-vertexai':
     [
-        'gemini-1.5-pro',
-        'gemini-1.5-flash',
         'gemini-2.0-flash',
         'gemini-2.0-flash-lite',
+        'gemini-2.5-flash',
+        'gemini-2.5-pro',
     ],
 }
 
@@ -77,7 +80,7 @@ class LLM(abc.ABC):
     This is the abstract class used to create and access LLMs for pentesting.
     """
 
-    _supported_models = []
+    _supported_models: list[str] = []
 
     @classmethod
     def from_model_name(cls, model_name: str) -> 'LLM':
@@ -87,10 +90,6 @@ class LLM(abc.ABC):
         """
         # Foundation-models scenarios in AI Core
         if model_name in AICORE_MODELS['azure-openai']:
-            # The agent sometimes autocorrects gpt-35-turbo to gpt-3.5-turbo,
-            # so we handle this behavior here.
-            if model_name == 'gpt-3.5-turbo':
-                model_name = 'gpt-35-turbo'
             return AICoreOpenAILLM(model_name)
         if model_name in AICORE_MODELS['aicore-ibm']:
             # IBM models are compatible with OpenAI completion API
@@ -176,9 +175,7 @@ class LLM(abc.ABC):
     def generate(self,
                  system_prompt: str,
                  prompt: str,
-                 temperature: float,
-                 max_tokens: int,
-                 n: int) -> LLMResponse:
+                 **kwargs: dict) -> LLMResponse:
         """
         Generate completions using the LLM for a single message.
         Implementation is responsibility of subclasses.
@@ -186,24 +183,18 @@ class LLM(abc.ABC):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def generate_completions_for_messages(
-            self,
-            messages: list,
-            temperature: float,
-            max_tokens: int,
-            top_p: int = 1,
-            frequency_penalty: float = 0.5,
-            presence_penalty: float = 0.5,
-            n: int = 1) -> LLMResponse:
+    def generate_completions_for_messages(self,
+                                          messages: list,
+                                          **kwargs: dict) -> LLMResponse:
         """
         Generate completions using the LLM for a list of messages
         in OpenAI-API style (dictionaries with keys role and content).
 
-        n determines the number of different responses/ trials to generate.
+        Other parameters will be directly passed to the client and are
+        consistent to OpenAI's style.
 
-        Other parameters will be directly passed to the client.
-
-        Implementation is responsibility of subclasses.
+        Implementation is responsibility of subclasses, as well as the handling
+        of possible parameters not supported in non-OpenAI models.
         """
         raise NotImplementedError
 
@@ -219,9 +210,11 @@ class LLM(abc.ABC):
 
 
 class AICoreOpenAILLM(LLM):
-    """
-    This class implements an interface to query LLMs using the Generative AI
-    hub (AI Core) OpenAI proxy client.
+    """This class implements an interface to query LLMs using the Generative AI
+    Hub (AI Core) OpenAI proxy client.
+
+    All models in AI Core that are compatible with the OpenAI API can be
+    queries using this class.
     """
 
     def __init__(self,
@@ -237,9 +230,7 @@ class AICoreOpenAILLM(LLM):
     def generate(self,
                  system_prompt: str,
                  prompt: str,
-                 temperature=0,
-                 max_tokens=512,
-                 n=1):
+                 **kwargs) -> LLMResponse:
         if not system_prompt:
             messages = [
                 {'role': 'user', 'content': prompt}
@@ -258,36 +249,28 @@ class AICoreOpenAILLM(LLM):
                     system_prompt = ''
                 messages = [
                     {'role': 'user',
-                        'content': f'{system_prompt}{prompt}'},
+                        'content': f'{system_prompt}\n{prompt}'},
                 ]
         return self.generate_completions_for_messages(
-            messages, temperature, max_tokens, n=n
+            messages, **kwargs
         )
 
     def generate_completions_for_messages(self,
                                           messages: list,
-                                          temperature: float,
-                                          max_tokens: int,
-                                          top_p: int = 1,
-                                          frequency_penalty: float = 0.5,
-                                          presence_penalty: float = 0.5,
-                                          n: int = 1):
+                                          **kwargs) -> LLMResponse:
         try:
             if not self.uses_system_prompt:
                 if messages[0]['role'] == 'system':
                     system_message = messages.pop(0)
-                    messages[0]['content'] = \
-                        f'{system_message["content"]}{messages[0]["content"]}'
+                    messages[0]['content'] = (
+                        f'{system_message["content"]}\n'
+                        f'{messages[0]["content"]}')
             response = self.client.chat.completions.create(
                 model_name=self.model_name,
                 messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                n=n,
-                top_p=top_p,
-                frequency_penalty=frequency_penalty,
-                presence_penalty=presence_penalty)
-            responses = [response.choices[i].message.content for i in range(n)]
+                **kwargs)
+            responses = [response.choices[i].message.content for i in
+                         range(kwargs.get('n', 1))]
         except InternalServerError as e:
             logger.error(f'A HTTP server-side error occurred while calling '
                          f'{self.model_name} model: {e}')
@@ -312,8 +295,8 @@ class LocalOpenAILLM(AICoreOpenAILLM):
 
     def __init__(self,
                  model_name: str,
-                 api_key: str = None,
-                 base_url: str = None,
+                 api_key: str = '',
+                 base_url: str = '',
                  supports_openai_style_system_messages=True):
         self.client = OfficialOpenAI(api_key=api_key, base_url=base_url)
         self.model_name = model_name
@@ -322,12 +305,7 @@ class LocalOpenAILLM(AICoreOpenAILLM):
 
     def generate_completions_for_messages(self,
                                           messages: list,
-                                          temperature: float,
-                                          max_tokens: int,
-                                          top_p: int = 1,
-                                          frequency_penalty: float = 0.5,
-                                          presence_penalty: float = 0.5,
-                                          n: int = 1):
+                                          **kwargs) -> LLMResponse:
         if not self.uses_system_prompt:
             if messages[0]['role'] == 'system':
                 logger.debug(
@@ -340,14 +318,10 @@ class LocalOpenAILLM(AICoreOpenAILLM):
             response = self.client.chat.completions.create(
                 model=self.model_name,
                 messages=messages,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                n=n,
-                top_p=top_p,
-                frequency_penalty=frequency_penalty,
-                presence_penalty=presence_penalty)
+                **kwargs)
             responses = [
-                response.choices[i].message.content for i in range(n)]
+                response.choices[i].message.content for i in
+                range(kwargs.get('n', 1))]
             return self._trace_llm_call(messages, Success(responses))
         except Exception as e:
             return self._trace_llm_call(messages, Error(str(e)))
@@ -364,9 +338,7 @@ class OllamaLLM(LLM):
     def generate(self,
                  system_prompt: str,
                  prompt: str,
-                 max_tokens: int = 4096,
-                 temperature: float = 0.3,
-                 n: int = 1,) -> list[str]:
+                 **kwargs) -> list[str]:  # TODO:check
         try:
             messages = [
                 {'role': 'system', 'content': system_prompt},
@@ -376,9 +348,10 @@ class OllamaLLM(LLM):
                 self.client.generate(model=self.model_name,
                                      prompt=prompt,
                                      system=system_prompt,
-                                     options={'temperature': temperature}
+                                     options={'temperature':
+                                              kwargs.get('temperature')}
                                      )['response']
-                for _ in range(n)]
+                for _ in range(kwargs.get('n', 1))]
             return self._trace_llm_call(messages, Success(generations))
         except Exception as e:
             return self._trace_llm_call(messages, Error(e))
@@ -386,23 +359,15 @@ class OllamaLLM(LLM):
     def generate_completions_for_messages(
             self,
             messages: list,
-            temperature: float,
-            max_tokens: int,
-            top_p: int = 1,
-            frequency_penalty: float = 0.5,
-            presence_penalty: float = 0.5,
-            n: int = 1) -> list[str]:
+            **kwargs) -> list[str]:  # TODO:check
         try:
             generations = [
                 self.client.chat(
                     self.model_name,
                     messages,
-                    options={'temperature': temperature,
-                             'top_p': top_p,
-                             'frequency_penalty': frequency_penalty,
-                             'presence_penalty': presence_penalty}
+                    options=kwargs
                 )['message']['content']
-                for _ in range(n)
+                for _ in range(kwargs.get('n', 1))
             ]
             return self._trace_llm_call(messages, Success(generations))
         except Exception as e:
@@ -422,12 +387,36 @@ class AICoreGoogleVertexLLM(LLM):
     def __str__(self) -> str:
         return f'{self.model_name}/Google Vertex AI'
 
+    def _send_request(self, messages: list, **kwargs) -> LLMResponse:
+        # Convert the max_tokens or max_completion_tokens parameter
+        if 'max_tokens' in kwargs:
+            kwargs['max_output_tokens'] = kwargs.pop('max_tokens')
+        if 'max_completion_tokens' in kwargs:
+            kwargs['max_output_tokens'] = kwargs.pop('max_completion_tokens')
+        # Frequency penalty and Presence penalty are not supported
+        # by the client.
+        # Even though they are supported in https://cloud.google.com/vertex-ai/docs/reference/rest/v1/GenerationConfig   # noqa: E501
+        kwargs.pop('frequency_penalty', None)
+        kwargs.pop('presence_penalty', None)
+
+        n = kwargs.pop('n', 1)
+        # Send request
+        try:
+            responses = [self.model.generate_content(
+                messages,
+                generation_config=kwargs
+            ).text for _ in range(n)]
+            if not all(responses):
+                return Filtered(
+                    'One of the generations resulted in an empty response')
+            return Success(responses)
+        except ValueError as v:
+            return Error(str(v))
+
     def generate(self,
                  system_prompt: str,
                  prompt: str,
-                 temperature: float = 1,
-                 max_tokens: int = 1024,
-                 n: int = 1) -> LLMResponse:
+                 **kwargs) -> LLMResponse:
         contents = []
         if system_prompt:
             # System prompts are only supported at creation of the model.
@@ -449,30 +438,12 @@ class AICoreGoogleVertexLLM(LLM):
                 }]
             }
         )
-        try:
-            responses = [self.model.generate_content(
-                contents,
-                generation_config={
-                    'temperature': temperature,
-                    'max_output_tokens': max_tokens
-                }
-            ).text for _ in range(n)]
-            if not all(responses):
-                return Filtered(
-                    'One of the generations resulted in an empty response')
-            return Success(responses)
-        except ValueError as v:
-            return Error(str(v))
+        return self._send_request(contents, **kwargs)
 
     def generate_completions_for_messages(
             self,
             messages: list,
-            temperature: float = 1,
-            max_tokens: int = 1024,
-            top_p: int = 1,
-            frequency_penalty: float = 0.5,
-            presence_penalty: float = 0.5,
-            n: int = 1) -> LLMResponse:
+            **kwargs: dict) -> LLMResponse:
         contents = []
         for message in messages:
             contents.append(
@@ -481,25 +452,7 @@ class AICoreGoogleVertexLLM(LLM):
                     'parts': [{'text': message['content']}]
                 }
             )
-        try:
-            responses = [self.model.generate_content(
-                contents,
-                generation_config={
-                    'temperature': temperature,
-                    'max_output_tokens': max_tokens,
-                    'top_p': top_p
-                    # Frequency penalty and Presence penalty are not supported
-                    # by the client.
-                    # Even though it is supported in https://cloud.google.com/vertex-ai/docs/reference/rest/v1/GenerationConfig   # noqa: E501
-                    # 'frequency_penalty': frequency_penalty,
-                    # 'presence_penalty': presence_penalty,
-                }).text for _ in range(n)]
-            if not all(responses):
-                return Filtered(
-                    'One of the generations resulted in an empty response')
-            return Success(responses)
-        except ValueError as v:
-            return Error(str(v))
+        return self._send_request(contents, **kwargs)
 
 
 class AICoreAmazonBedrockLLM(LLM):
@@ -516,44 +469,35 @@ class AICoreAmazonBedrockLLM(LLM):
     def __str__(self) -> str:
         return f'{self.model_name}/Amazon Bedrock'
 
-    def generate(self,
-                 system_prompt: str,
-                 prompt: str,
-                 temperature: float = 1,
-                 max_tokens: int = 1024,
-                 n: int = 1) -> LLMResponse:
+    def _send_request(self, messages: list, **kwargs) -> LLMResponse:
+        # Build inference configuration from kwargs
+        # Supported parameters are: maxTokens, temperature, topP, stopSequences
+        temperature = kwargs.get('temperature')
+        max_tokens = kwargs.get('max_tokens') or \
+            kwargs.get('max_completion_tokens')
+        top_p = kwargs.get('top_p')
+        inference_configs = {}
+        if temperature:
+            inference_configs['temperature'] = temperature
+        if max_tokens:
+            inference_configs['maxTokens'] = max_tokens
+        if top_p:
+            inference_configs['topP'] = top_p
+        # TODO: We ignore stopSequences for now
 
-        # Declare types for messages and kwargs to avoid mypy errors
-        messages: List[Dict[str, Any]] = []
-        kwargs: Dict[str, Any] = {
-            'inferenceConfig': {
-                'temperature': temperature,
-                'maxTokens': max_tokens
-            }
-        }
-        if not system_prompt:
-            messages.append(
-                {'role': 'user', 'content': [{'text': prompt}]}
-            )
-        else:
-            if self.uses_system_prompt:
-                messages.append(
-                    {'role': 'user', 'content': [{'text': prompt}]}
-                )
-                kwargs['system'] = [{'text': system_prompt}]
-            else:
-                # Similarly to the Mistral model, also among Bedrock models
-                # there are some that do not support system prompt (e.g., titan
-                # models).
-                messages.append(
-                    {'role': 'user',
-                     'content': [{'text': f'{system_prompt}{prompt}'}]},
-                )
+        # Manage possible system prompt
+        system_configs = []
+        if kwargs.get('system_prompt'):
+            system_configs = [{'text': kwargs.get('system_prompt')}]
+
+        # Send request
         try:
             responses = [self.model.converse(
                 messages=messages,
-                **kwargs  # arguments supported by converse API
-            )['output']['message']['content'][0]['text'] for _ in range(n)]
+                inferenceConfig=inference_configs,
+                system=system_configs
+            )['output']['message']['content'][0]['text'] for _ in
+                range(kwargs.get('n', 1))]
             if not all(responses):
                 return Filtered(
                     'One of the generations resulted in an empty response')
@@ -561,40 +505,56 @@ class AICoreAmazonBedrockLLM(LLM):
         except ValueError as v:
             return Error(str(v))
 
+    def generate(self,
+                 system_prompt: str,
+                 prompt: str,
+                 **kwargs: dict) -> LLMResponse:
+
+        # Declare types for messages and kwargs to avoid mypy errors
+        messages: List[Dict[str, Any]] = []
+
+        # Build messages
+        if not system_prompt:
+            messages.append(
+                {'role': 'user', 'content': [{'text': prompt}]}
+            )
+        else:
+            # System prompt handling (the role "system" is not supported in
+            # bedrock messages)
+            if self.uses_system_prompt:
+                # Pass the system prompt in kwargs and delegate its
+                # handling to _send_request
+                kwargs['system_prompt'] = system_prompt
+                messages.append(
+                    {'role': 'user', 'content': [{'text': prompt}]}
+                )
+            else:
+                # Similarly to some Mistral models, also among Bedrock models
+                # there are some that do not support system prompt (e.g., titan
+                # models).
+                messages.append(
+                    {'role': 'user',
+                     'content': [{'text': f'{system_prompt}\n{prompt}'}]},
+                )
+        return self._send_request(messages, **kwargs)
+
     def generate_completions_for_messages(
             self,
             messages: list,
-            temperature: float = 1,
-            max_tokens: int = 1024,
-            top_p: int = 1,
-            frequency_penalty: float = 0.5,
-            presence_penalty: float = 0.5,
-            n: int = 1) -> LLMResponse:
+            **kwargs: dict) -> LLMResponse:
         contents = []
-        # TODO: manage system prompt
+        # Translate openai-style messages to bedrock-style messages
         for message in messages:
+            if message.get('role') == 'system' and \
+                    self.uses_system_prompt:
+                # This message will be passed in kwargs and handled in
+                # _send_request as system prompt
+                kwargs['system_prompt'] = message['content']
+                continue
             contents.append(
                 {
                     'role': 'user',
                     'content': [{'text': message['content']}]
                 }
             )
-        try:
-            responses = [self.model.converse(
-                messages=contents,
-                inferenceConfig={
-                    'temperature': temperature,
-                    'maxTokens': max_tokens,
-                    'topP': top_p
-                    # Frequency penalty and Presence penalty are not supported
-                    # by Amazon.
-                    # 'frequency_penalty': frequency_penalty,
-                    # 'presence_penalty': presence_penalty,
-                })['output']['message']['content'][0]['text']
-                for _ in range(n)]
-            if not all(responses):
-                return Filtered(
-                    'One of the generations resulted in an empty response')
-            return Success(responses)
-        except ValueError as v:
-            return Error(str(v))
+        return self._send_request(contents, **kwargs)

@@ -340,7 +340,7 @@ class AttackSuite():
     """
         if not self.llm:
             self.llm = LLM.from_model_name(
-                os.getenv('RESULT_SUMMARIZE_MODEL', 'gpt-4'))
+                os.getenv('RESULT_SUMMARIZE_MODEL', 'gpt-4o'))
         result = json.dumps(asdict(attack_result))
         return self.llm.generate(system_prompt=system_prompt, prompt=result)\
             .unwrap_first()

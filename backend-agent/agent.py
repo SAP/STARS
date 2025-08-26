@@ -17,7 +17,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 # load env variables
 load_dotenv()
-AGENT_MODEL = os.environ.get('AGENT_MODEL', 'gpt-4')
+AGENT_MODEL = os.environ.get('AGENT_MODEL', 'gpt-4o')
 EMBEDDING_MODEL = os.environ.get('EMBEDDING_MODEL', 'text-embedding-ada-002')
 # Use models deployed in SAP AI Core
 set_proxy_version('gen-ai-hub')
