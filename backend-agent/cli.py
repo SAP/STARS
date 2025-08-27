@@ -147,6 +147,9 @@ def textattack(args):
              arg('objective', help='What is the attack trying to achieve. This\
                    should be a string that outlines the objective, for example\
                    something that the target LLM should not be doing.'),
+             arg('orchestrator_type', help='The type of orchestrator to use for the attack. This\
+                   should be a string that specifies the orchestrator type, for example\
+                   "red_teaming", "crescendo", or "pair".'),
              arg('--max-turns', '-t',
                  type=int,
                  help='Number of turns (=prompts to the target) to take before quitting.',  # noqa: E501
