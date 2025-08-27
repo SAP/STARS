@@ -86,6 +86,7 @@ def run_pyrit(
     objective: str,
     attack_model: str,
     target_model: str,
+    orchestrator_type: str,
     max_turns: int = 3
 ) -> str:
     """"You should use this tool to start attacks using the PyRIT framework.
@@ -102,6 +103,8 @@ def run_pyrit(
     target_model: The name of the model that should be attacked as it appears
     on SAP AI Core. You cannot run this tool without
     this information.
+    orchestrator_type: The type of orchestrator to use for the attack.
+    It can be one of the following: "red_teaming", "crescendo", "pair"
     max_turns: Determines how often the attack model is queried. 3 is a
     sensible default.
     """
@@ -111,6 +114,7 @@ def run_pyrit(
         target_model,
         attack_model,
         params={'objective': objective,
+                'orchestrator_type': orchestrator_type,
                 'max_turns': max_turns}
     ).start())
 
