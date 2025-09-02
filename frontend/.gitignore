@@ -22,7 +22,9 @@ launch.json
 /node_modules
 
 # config
+src/assets/configs/config.json
 src/environments/environment.ts
+src/environments/environment.k8s.ts
 
 # System Files
 .DS_Store

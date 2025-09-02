@@ -1,0 +1,24 @@
+name: AI-assisted
+on:
+  pull_request:
+    types: [ready_for_review]
+
+jobs:
+  summary:
+    name: PR Summary
+    runs-on: [ubuntu-latest]
+    steps:
+      - uses: SAP/ai-assisted-github-actions/pr-summary@v3
+        with:
+          aicore-service-key: ${{ secrets.AICORE_SERVICE_KEY }}
+          model: gpt-4o
+          exclude-files: package-lock.json
+  review:
+    name: PR Review
+    runs-on: [ubuntu-latest]
+    steps:
+      - uses: SAP/ai-assisted-github-actions/pr-review@v3
+        with:
+          aicore-service-key: ${{ secrets.AICORE_SERVICE_KEY }}
+          model: anthropic--claude-4-sonnet
+          exclude-files: package-lock.json

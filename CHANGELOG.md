@@ -1,3 +1,42 @@
+# Version: v0.4.0
+
+* [#44](https://github.com/SAP/STARS/pull/44): Add Garak tool
+* [#72](https://github.com/SAP/STARS/pull/72): Bump deprecated from 1.2.15 to 1.2.18 in /backend-agent
+* [#73](https://github.com/SAP/STARS/pull/73): Bump python-dotenv from 1.0.1 to 1.1.1 in /backend-agent
+* [#74](https://github.com/SAP/STARS/pull/74): Bump flask from 2.3.3 to 3.1.1 in /backend-agent
+* [#77](https://github.com/SAP/STARS/pull/77): Bump ollama from 0.4.7 to 0.5.3 in /backend-agent
+* [#78](https://github.com/SAP/STARS/pull/78): Bump the js-dependencies group across 1 directory with 25 updates
+* [#79](https://github.com/SAP/STARS/pull/79): Update faiss-cpu requirement from ~=1.9.0 to ~=1.12.0 in /backend-agent
+* [#80](https://github.com/SAP/STARS/pull/80): Bump actions/checkout from 4 to 5
+* [#81](https://github.com/SAP/STARS/pull/81): Bump mermaid from 11.4.1 to 11.10.0 in /frontend
+
+
+# Version: v0.3.1
+
+* [#50](https://github.com/SAP/STARS/pull/50): Bump webpack-dev-server and @angular-devkit/build-angular in /frontend
+* [#57](https://github.com/SAP/STARS/pull/57): Bump requests from 2.32.3 to 2.32.4 in /backend-agent
+* [#62](https://github.com/SAP/STARS/pull/62): Bump on-headers and compression in /frontend
+* [#65](https://github.com/SAP/STARS/pull/65): Bump brace-expansion from 1.1.11 to 1.1.12 in /frontend
+* [#66](https://github.com/SAP/STARS/pull/66): Fix docker configuration
+* [#67](https://github.com/SAP/STARS/pull/67): Fix lint-frontend action
+* [#68](https://github.com/SAP/STARS/pull/68): Update pyrit
+* [#69](https://github.com/SAP/STARS/pull/69): Fix artprompt missing english stopwords bug
+
+
+# Version: v0.3.0
+
+* [#46](https://github.com/SAP/STARS/pull/46): Risk dashboard UI
+* [#51](https://github.com/SAP/STARS/pull/51): Bump requests from 2.32.3 to 2.32.4 in /backend-agent
+* [#52](https://github.com/SAP/STARS/pull/52): Update pyrit.py implementation to ensure comatibility with pyrit 0.9.0
+* [#54](https://github.com/SAP/STARS/pull/54): Align langchain and pyrit dependencies
+* [#55](https://github.com/SAP/STARS/pull/55): Fix garak, langchain, and pyrit dependency conflicts
+* [#56](https://github.com/SAP/STARS/pull/56): Update models with June 2025 availabilities
+* [#59](https://github.com/SAP/STARS/pull/59): Fix db usage with attacks
+* [#60](https://github.com/SAP/STARS/pull/60): Merge develop into docker
+* [#61](https://github.com/SAP/STARS/pull/61): Dockerize services
+* [#63](https://github.com/SAP/STARS/pull/63): aligned frontend with db
+
+
 # Version: v0.2.1
 
 * [#34](https://github.com/SAP/STARS/pull/34): Support aicore-mistralai models

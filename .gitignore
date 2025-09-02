@@ -135,11 +135,20 @@ data.db.*
 key.txt
 
 # Pentest results
+# textattack
 error.txt
 result_fail.txt
 result_success.txt
 summary.txt
+# promptmap
 prompt_success.txt
+# gptfuzz
 result_gptfuzz.txt
+# codeattack
 codeattack_success.txt
+# artprompt
 artprompt_success.json
+# garak
+*.report.jsonl
+*.hitlog.jsonl
+*.report.html

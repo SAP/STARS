@@ -14,6 +14,17 @@ from libs.codeattack import (
     OUTPUT_FILE as codeattack_out_file,
     start_codeattack,
 )
+from libs.garak import (
+    OUTPUT_FILE as garak_output_file,
+    start_dan,
+    start_encoding,
+    start_goodside,
+    start_latentinjection,
+    start_malwaregen,
+    start_phrasing,
+    start_promptinject,
+    start_suffix,
+)
 from libs.gptfuzz import (
     OUTPUT_FILE as gptfuzz_out_file,
     perform_gptfuzz_attack,
@@ -145,7 +156,7 @@ class AttackSpecification:
         Start the attack as specified with this specification.
         """
         with Trace(self.attack, self.spec) as t:
-            match self.attack:
+            match self.attack.lower():
                 case 'promptmap':
                     return t.trace(start_prompt_map(
                         self.target_model,
@@ -175,12 +186,54 @@ class AttackSpecification:
                         self.eval_model,
                         self.parameters
                     ))
+                case 'dan':
+                    return t.trace(start_dan(
+                        self.target_model,
+                        self.parameters
+                    ))
+                case 'encoding':
+                    return t.trace(start_encoding(
+                        self.target_model,
+                        self.parameters
+                    ))
+                case 'goodside':
+                    return t.trace(start_goodside(
+                        self.target_model,
+                        self.parameters
+                    ))
+                case 'latentinjection':
+                    return t.trace(start_latentinjection(
+                        self.target_model,
+                        self.parameters
+                    ))
+                case 'malwaregen':
+                    return t.trace(start_malwaregen(
+                        self.target_model,
+                        self.parameters
+                    ))
+                case 'phrasing':
+                    return t.trace(start_phrasing(
+                        self.target_model,
+                        self.parameters
+                    ))
+                case 'promptinject':
+                    return t.trace(start_promptinject(
+                        self.target_model,
+                        self.parameters
+                    ))
+                case 'suffix':
+                    return t.trace(start_suffix(
+                        self.target_model,
+                        self.parameters
+                    ))
                 case _:
                     raise ValueError(f'Attack {self.attack} is not known.')
 
     @property
     def output_file(self):
         if 'output_file' in self.parameters:
+            # TODO when running attacks from garak, the output_file parameter
+            # appends .report.jsonl at runtime
             return self.parameters
         match self.attack:
             case 'promptmap':
@@ -191,6 +244,11 @@ class AttackSpecification:
                 return codeattack_out_file
             case 'artprompt':
                 return artprompt_out_file
+            case ('dan' | 'encoding' | 'goodside' | 'latentinjection' |
+                  'malwaregen' | 'phrasing' | 'promptinject' | 'suffix'):
+                return garak_output_file if \
+                    garak_output_file.endswith('.report.jsonl') else \
+                    f'{garak_output_file}.report.jsonl'
 
 
 class AttackSuite():
@@ -282,7 +340,7 @@ class AttackSuite():
     """
         if not self.llm:
             self.llm = LLM.from_model_name(
-                os.getenv('RESULT_SUMMARIZE_MODEL', 'gpt-4'))
+                os.getenv('RESULT_SUMMARIZE_MODEL', 'gpt-4o'))
         result = json.dumps(asdict(attack_result))
         return self.llm.generate(system_prompt=system_prompt, prompt=result)\
             .unwrap_first()

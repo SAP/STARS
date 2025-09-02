@@ -16,7 +16,7 @@ For a list of supported custom tools (i.e., the attacks), refer to the project's
 Before running the tool, make sure to have an account configured and fully
 working on SAP AI Core (requires a SAP BTP subaccount with a running AI Core service instance).
 
-Please note that the agent requires `gpt-4` LLM and `text-embedding-ada-002`
+Please note that the agent requires `gpt-4o` LLM and `text-embedding-ada-002`
 embedding function.
 They must be already **deployed and running in SAP AI Core** before running this
 tool.
