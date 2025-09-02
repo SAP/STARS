@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit } from '@angular/core';
 import { capitalizeFirstLetter, splitModelName } from '../utils/utils';
 
 import ApexCharts from 'apexcharts';
@@ -9,7 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon'
+import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { ScoreResponse } from './../types/API';
 import { WeightDialogComponent } from '../weight-dialog/weight-dialog.component';
@@ -74,7 +74,7 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
     const allAttackWeights = Object.fromEntries(
       data.attacks.map(attack => [attack.name, attack.weight ?? 1])
     );
-    let seriesData: any[] = [];
+    const seriesData: any[] = [];
     // Process each model's scores and calculate the exposure score
     data.models.forEach(model => {
       let weightedSum = 0;
@@ -177,7 +177,7 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
               return modelName; // Return as is when it's a number
             }
               const splitName = splitModelName(modelName);
-              return splitName
+              return splitName;
           },
           style: {
             fontSize: '12px',

@@ -1,4 +1,4 @@
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from "@angular/material/dialog";
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogRef } from "@angular/material/dialog";
 
 import { Component, Inject, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
@@ -57,7 +57,7 @@ export class WeightDialogComponent implements OnInit {
             horizontalPosition: 'right',
             verticalPosition: 'top',
           });
-          console.error('Error updating weights, verify your input and try again later.');
+          console.error('Error updating weights, verify your input and try again later.', err);
         }
       });
   }
