@@ -19,6 +19,9 @@ jobs:
   lint-frontend:
     name: Run frontend linters
     runs-on: ubuntu-latest
+    permissions:
+    contents: read
+    pull-requests: write
 
     steps:
       - name: Check out Git repository
