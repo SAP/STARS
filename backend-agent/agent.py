@@ -192,6 +192,9 @@ print('Define tools')
 from tools import run_prompt_attack, \
     run_gptfuzz, \
     run_pyrit, \
+    run_pyrit_red_teaming, \
+    run_pyrit_crescendo, \
+    run_pyrit_pair, \
     run_codeattack, \
     run_artprompt, \
     run_attack_suite, \
@@ -296,6 +299,9 @@ tools = [
     run_gptfuzz,
     pyrit_notes,
     run_pyrit,
+    run_pyrit_red_teaming,
+    run_pyrit_crescendo,
+    run_pyrit_pair,
     codeattack_notes,
     run_codeattack,
     artprompt_notes,
