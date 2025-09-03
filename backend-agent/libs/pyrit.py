@@ -148,9 +148,9 @@ class LLMAdapter(PromptChatTarget):
 
         message_list = self._build_chat_messages_for_text(conversation)
         result = self.llm.generate_completions_for_messages(
-            message_list,
-            self._temperature,
-            self._max_tokens,
+            messages=message_list,
+            temperature=self._temperature,
+            max_completion_tokens=self._max_tokens,
             top_p=self._top_p,
             frequency_penalty=self._frequency_penalty,
             presence_penalty=self._presence_penalty,
