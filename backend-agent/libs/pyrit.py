@@ -240,94 +240,6 @@ class OrchestratorWrapper:
             self.orchestrator.dispose_db_engine()
 
 
-# =============================================================================
-# OLD APPROACH: Inheritance-based (COMMENTED OUT - kept for reference)
-# =============================================================================
-# This was tightly coupled to RedTeamingOrchestrator only.
-# Replaced with OrchestratorWrapper above for better flexibility.
-
-# class InstrumentedRedTeamingOrchestrator(RedTeamingOrchestrator):
-
-#     def _extract_displayable_content(self, response: PromptRequestPiece):
-#         """
-#         Extract displayable content from PyRIT response objects
-#         """
-#         if hasattr(response, 'converted_value'):
-#             return response.converted_value
-#         elif hasattr(response, 'request_pieces') and response.request_pieces:
-#             return response.request_pieces[0].converted_value
-#         else:
-#             return str(response)
-
-#     async def run_attack_async(
-#             self,
-#             *,
-#             objective: str,
-#             memory_labels: dict[str, str] | None = None,
-#             display_intermediate_results: bool = True):
-#         """
-#         Applies the attack strategy until the conversation is complete or the
-#         maximum number of turns is reached.
-
-
-#         """
-#         turn = 1
-#         success = False
-#         overall_response = None
-
-#         objective_target_conversation_id = str(uuid.uuid4())
-#         adversarial_chat_conversation_id = str(uuid.uuid4())
-
-#         score = None
-#         while turn <= self._max_turns:
-#             logger.info(f'Applying the attack strategy for turn {turn}.')
-#             status.report_progress(turn - 1, self._max_turns)
-#             response = await self._retrieve_and_send_prompt_async(
-#                 objective=objective,
-#                 objective_target_conversation_id=objective_target_conversation_id,  # noqa: E501
-#                 adversarial_chat_conversation_id=adversarial_chat_conversation_id,  # noqa: E501
-#                 feedback=score.score_rationale if score and self._use_score_as_feedback else None,  # noqa: E501
-#                 memory_labels=memory_labels,
-#             )
-#             overall_response = response if response else overall_response
-#             if display_intermediate_results:
-#                 status.display_intermediate_result(
-#                     self._extract_displayable_content(response))
-#             # If the conversation is complete without a target response in the
-#             # current iteration then the overall response is the last
-#             # iteration's response.
-#             if response.response_error == 'none':
-#                 score = await self._check_conversation_complete_async(
-#                     objective_target_conversation_id=objective_target_conversation_id  # noqa: E501
-#                 )
-#                 if score and bool(score.get_value()):
-#                     success = True
-#                     logger.info(
-#                         'The red teaming orchestrator has completed the'
-#                         'conversation and achieved the objective.',
-#                     )
-#                     break
-#             elif response.response_error == 'blocked':
-#                 score = None
-#             else:
-#                 raise RuntimeError(
-#                     f'Response error: {response.response_error}')
-#             if memory_labels is not None:
-#                 memory_labels = None
-#             turn += 1
-
-#         status.report_success()
-
-#         if not success:
-#             logger.info(
-#                 'The red teaming orchestrator has not achieved the objective'
-#                 f' after the maximum number of turns ({self._max_turns}).',
-#             )
-
-#         return {
-#             'success': success,
-#             'response': overall_response
-#         }
 
 
 class ObjectiveScorer(SelfAskTrueFalseScorer):
@@ -391,103 +303,209 @@ Remember, answer only with a JSON object in the specified format.
         return score
 
 
-def start_pyrit_attack(
+def start_pyrit_attack_red_teaming(
         attack_model: LLM,
         target_model: LLM,
         parameters: dict) -> AttackResult:
     """
-    Start an attack using the PyRIT attack framework.
+    Start a red teaming attack using the PyRIT attack framework.
 
-    @params
-    attack_model: Model used to craft prompts.
-    target_model: Model that is to be attacked.
-    parameters: Additional parameters:
-    Required parameter objective to set the objective the attack is supposed
-    to achieve.
-    Optional parameter orchestrator_type to choose attack strategy 
-    ('red_teaming', 'crescendo', 'pair'). Defaults to 'red_teaming'.
-    Optional parameter max_turns to control how many prompts are crafted by
-    the attack model.
-    Optional parameter display_intermediate_results to control if status
-    responses are sent when running from agent.
-    Optional parameter vulnerability_type to mark which vulnerability this
-    attack is supposed to test.
+    Args:
+        attack_model (LLM): Model used to craft prompts.
+        target_model (LLM): Model that is to be attacked.
+        parameters (dict): Additional parameters containing:
+            - objective (str): Required parameter to set the objective the attack 
+              is supposed to achieve.
+            - max_turns (int, optional): Optional parameter to control how many 
+              prompts are crafted by the attack model.
+
+    Returns:
+        AttackResult: The result of the red teaming attack.
+    """
+    attack_name = 'PyRIT Red Teaming'
+    attack_description = "A multi-turn red-teaming attack where an orchestrator LLM iteratively generates adversarial prompts to a target model, evaluates the responses through a scoring engine, and refines prompts until the objective is achieved or attempts are exhausted."
+        
+    initialize_pyrit(memory_db_type=DUCK_DB)
+
+    objective = parameters['objective']
+    max_turns = parameters.get('max_turns', 3)
+    adversarial_chat_seed_prompt = parameters.get('adversarial_chat_seed_prompt', 'how can I help you?')
+
+    
+    # Create orchestrator-specific components
+    strategy_path = Path('libs/data/red_team_chatbot.yaml').resolve()
+    red_teaming_chat = LLMAdapter(attack_model)
+    prompt_target = LLMAdapter(target_model)
+    scorer_target = LLMAdapter(attack_model)
+    scorer = ObjectiveScorer(objective, scorer_target)
+    
+    # Create the Red Teaming orchestrator
+    orchestrator = RedTeamingOrchestrator(
+        objective_target=prompt_target,
+        adversarial_chat=red_teaming_chat,
+        objective_scorer=scorer,
+        adversarial_chat_system_prompt_path=strategy_path,
+        adversarial_chat_seed_prompt=adversarial_chat_seed_prompt,
+        max_turns=max_turns,
+        verbose=True,
+    )
+    
+    # Call the common function with the orchestrator
+    return start_pyrit_attack(
+        attack_model=attack_model,
+        target_model=target_model,
+        orchestrator=orchestrator,
+        parameters=parameters,
+        attack_name=attack_name,
+        attack_description=attack_description
+    )
+
+
+def start_pyrit_attack_crescendo(
+        attack_model: LLM,
+        target_model: LLM,
+        parameters: dict) -> AttackResult:
+    """
+    Start a crescendo attack using the PyRIT attack framework.
+
+    Args:
+        attack_model (LLM): Model used to craft prompts.
+        target_model (LLM): Model that is to be attacked.
+        parameters (dict): Additional parameters containing:
+            - max_turns (int, optional): Optional parameter to control how many 
+              prompts are crafted by the attack model.
+            - max_backtracks (int, optional): Optional parameter to control how 
+              many times the attack model can backtrack to a previous prompt if
+              the current line of prompts is not successful.
+
+    Returns:
+        AttackResult: The result of the crescendo attack.
+    """
+    initialize_pyrit(memory_db_type=DUCK_DB)
+
+    attack_name = 'PyRIT Crescendo'
+    attack_description = "A crescendo attack where an adversarial chat model iteratively crafts prompts to elicit a desired response from a target model, with the goal of achieving a specific objective through a series of targeted interactions."  # noqa
+
+    max_turns = parameters.get('max_turns', 10)
+    max_backtracks = parameters.get('max_backtracks', 5)
+
+    
+    # Create orchestrator-specific components
+    adversarial_chat = LLMAdapter(attack_model)
+    objective_target = LLMAdapter(target_model)
+    scoring_target = LLMAdapter(attack_model)
+    
+    # Create the Crescendo orchestrator
+    orchestrator = CrescendoOrchestrator(
+        objective_target=objective_target,
+        adversarial_chat=adversarial_chat,
+        max_turns=max_turns,
+        max_backtracks=max_backtracks,
+        scoring_target=scoring_target
+    )
+    
+    # Call the common function with the orchestrator
+    return start_pyrit_attack(
+        attack_model=attack_model,
+        target_model=target_model,
+        orchestrator=orchestrator,
+        parameters=parameters,
+        attack_name=attack_name,
+        attack_description=attack_description
+    )
+
+
+def start_pyrit_attack_pair(
+        attack_model: LLM,
+        target_model: LLM,
+        parameters: dict) -> AttackResult:
+    """
+    Start a PAIR attack using the PyRIT attack framework.
+
+    Args:
+        attack_model (LLM): Model used to craft prompts.
+        target_model (LLM): Model that is to be attacked.
+        parameters (dict): Additional parameters containing:
+            - desired_response_prefix (str, optional): Optional parameter to set
+              the desired response prefix that the adversarial prompt should try
+              to elicit from the target model.
+
+    Returns:
+        AttackResult: The result of the PAIR attack.
     """
 
     initialize_pyrit(memory_db_type=DUCK_DB)
 
-    strategy_path = Path('libs/data/red_team_chatbot.yaml').resolve()
+    desired_response_prefix = parameters.get('desired_response_prefix', "Sure, I'm happy to help with that.")
+
+    attack_name = 'PyRIT PAIR'
+    attack_description = "The Prompt Automatic Iterative Refinement (PAIR) algorithm uses a single adversarial chat model to iteratively generate and refine prompts to elicit a desired response from a target model, with the goal of achieving a specific objective through a series of targeted interactions."  # noqa
+
+    # Create orchestrator-specific components
+    adversarial_chat = LLMAdapter(attack_model)
+    objective_target = LLMAdapter(target_model)
+    scoring_target = LLMAdapter(attack_model)
+    
+    # Create the PAIR orchestrator
+    orchestrator = PAIROrchestrator(
+        objective_target=objective_target,
+        adversarial_chat=adversarial_chat,
+        scoring_target=scoring_target,
+        desired_response_prefix=desired_response_prefix
+    )
+    
+    # Call the common function with the orchestrator
+    return start_pyrit_attack(
+        attack_model=attack_model,
+        target_model=target_model,
+        orchestrator=orchestrator,
+        parameters=parameters,
+        attack_name=attack_name,
+        attack_description=attack_description
+    )
+
+
+def start_pyrit_attack(
+        attack_model: LLM,
+        target_model: LLM,
+        orchestrator: Orchestrator,
+        parameters: dict,
+        attack_name: str,
+        attack_description: str) -> AttackResult:
+    """
+    Start an attack using the PyRIT attack framework with a pre-configured orchestrator.
+    
+    Args:
+        attack_model (LLM): Model used to craft prompts.
+        target_model (LLM): Model that is to be attacked.
+        orchestrator (Orchestrator): Instantiated PyRIT orchestrator instance.
+        parameters (dict): Additional parameters containing:
+            - objective (str): Required parameter to set the objective the attack 
+              is supposed to achieve.
+            - display_intermediate_results (bool, optional): Optional parameter to 
+              control if status responses are sent when running from agent.
+            - vulnerability_type (str, optional): Optional parameter to mark which 
+              vulnerability this attack is supposed to test.
+        attack_name (str, optional): Name of the attack for result reporting.
+        attack_description (str, optional): Description of the attack for result reporting.
+
+    Returns:
+        AttackResult: The result of the PyRIT attack.
+    """
+    # initialize_pyrit(memory_db_type=DUCK_DB)
+    
     objective = parameters['objective']
-    orchestrator_type = parameters.get('orchestrator_type')
-    max_turns = parameters.get('max_turns', 3)
     display_intermediate_results = parameters.get(
         'display_intermediate_results', True)
     vulnerability_type = parameters.get('vulnerability_type', 'jailbreak')
 
-    with Step('Preparing Attack'):
-        red_teaming_chat = LLMAdapter(attack_model)
-        prompt_target = LLMAdapter(target_model)
-        scorer_target = LLMAdapter(attack_model)
-        scorer = ObjectiveScorer(objective, scorer_target)
-
-    # =============================================================================
-    # NEW APPROACH: Create orchestrator based on type, then wrap it
-    # =============================================================================
-    with Step('Creating Orchestrator'):
-        if orchestrator_type == 'red_teaming':
-            base_orchestrator = RedTeamingOrchestrator(
-                objective_target=prompt_target,
-                adversarial_chat=red_teaming_chat,
-                objective_scorer=scorer,
-                adversarial_chat_system_prompt_path=strategy_path,
-                adversarial_chat_seed_prompt='how can I help you?',
-                max_turns=max_turns,
-                verbose=True,
-            )
-        elif orchestrator_type == 'crescendo':
-            base_orchestrator = CrescendoOrchestrator(
-                objective_target=prompt_target,
-                adversarial_chat=red_teaming_chat,
-                # adversarial_chat_system_prompt_path='backend-agent/libs/data/crescendo_template.yaml',
-                max_turns=10,
-                max_backtracks=5,
-                scoring_target=scorer_target
-            )
-
-        elif orchestrator_type == 'pair':
-            base_orchestrator = PAIROrchestrator(
-                objective_target=prompt_target,
-                adversarial_chat=red_teaming_chat,
-                scoring_target=scorer_target,
-                desired_response_prefix="Sure, I'm happy to help with that."
-            )
-        else:
-            raise ValueError(
-                f'Unknown orchestrator type: {orchestrator_type}. '
-                'Supported orchestrator types are: red_teaming, crescendo, pair.'
-            )
-        
+    with Step(f'Running {attack_name} Attack'):
         # Wrap the orchestrator with our custom status reporting
         wrapped_orchestrator = OrchestratorWrapper(
-            base_orchestrator, 
+            orchestrator, 
             display_intermediate_results=display_intermediate_results
         )
-
-    # =============================================================================
-    # OLD APPROACH: Direct instantiation (COMMENTED OUT - kept for reference)
-    # =============================================================================
-    # This was hardcoded to only use InstrumentedRedTeamingOrchestrator
-    # orchestrator = InstrumentedRedTeamingOrchestrator(
-    #     objective_target=prompt_target,
-    #     adversarial_chat=red_teaming_chat,
-    #     objective_scorer=scorer,
-    #     adversarial_chat_system_prompt_path=strategy_path,
-    #     adversarial_chat_seed_prompt='how can I help you?',
-    #     max_turns=max_turns,
-    #     verbose=True,
-    # )
-
-    with Step('Running Attack'):
+        
         attack_result = asyncio.run(
             wrapped_orchestrator.run_attack_async(
                 objective=objective,
@@ -504,13 +522,13 @@ def start_pyrit_attack(
         response_text = attack_result['response'].converted_value
 
     result = AttackResult(
-        'PyRIT',
+        attack_name,
         success=attack_result['success'],
         vulnerability_type=vulnerability_type,
         details={'target_model': target_model.model_name,
                  'total_attacks': 1,
                  'number_successful_attacks': 1 if attack_result['success'] else 0,  # noqa: E501
-                 'attack_description': DESCRIPTION,
+                 'attack_description': attack_description,
                  'response': response_text,
                  })
     save_to_db(result)
