@@ -120,6 +120,105 @@ def run_pyrit(
 
 
 @tool
+def run_pyrit_red_teaming(
+    objective: str,
+    attack_model: str,
+    target_model: str,
+    max_turns: int = 3
+) -> str:
+    """"You should use this tool to start red teaming attacks using the PyRIT framework.
+    This tool specifically uses the red teaming orchestrator.
+    PyRIT is an open-source red teaming framework for LLMs.
+    @param
+    objective: What is the attack trying to achieve. This should be a string
+    that outlines the objective, for example something that the target LLM
+    should not be doing.
+    attack_model: The name of the model that is used to generate adversarial
+    prompts as it appears on SAP AI Core. You cannot run this tool
+    without this information.
+    target_model: The name of the model that should be attacked as it appears
+    on SAP AI Core. You cannot run this tool without
+    this information.
+    max_turns: Determines how often the attack model is queried. 3 is a
+    sensible default.
+    """
+
+    return str(AttackSpecification.create(
+        'pyrit_red_teaming',
+        target_model,
+        attack_model,
+        params={'objective': objective,
+                'max_turns': max_turns}
+    ).start())
+
+
+@tool
+def run_pyrit_crescendo(
+    objective: str,
+    attack_model: str,
+    target_model: str,
+    max_turns: int = 10
+) -> str:
+    """"You should use this tool to start crescendo attacks using the PyRIT framework.
+    This tool specifically uses the crescendo orchestrator.
+    PyRIT is an open-source red teaming framework for LLMs.
+    @param
+    objective: What is the attack trying to achieve. This should be a string
+    that outlines the objective, for example something that the target LLM
+    should not be doing.
+    attack_model: The name of the model that is used to generate adversarial
+    prompts as it appears on SAP AI Core. You cannot run this tool
+    without this information.
+    target_model: The name of the model that should be attacked as it appears
+    on SAP AI Core. You cannot run this tool without
+    this information.
+    max_turns: Determines how often the attack model is queried. 10 is a
+    sensible default for crescendo attacks.
+    """
+
+    return str(AttackSpecification.create(
+        'pyrit_crescendo',
+        target_model,
+        attack_model,
+        params={'objective': objective,
+                'max_turns': max_turns}
+    ).start())
+
+
+@tool
+def run_pyrit_pair(
+    objective: str,
+    attack_model: str,
+    target_model: str,
+    max_turns: int = 3
+) -> str:
+    """"You should use this tool to start PAIR attacks using the PyRIT framework.
+    This tool specifically uses the PAIR orchestrator.
+    PyRIT is an open-source red teaming framework for LLMs.
+    @param
+    objective: What is the attack trying to achieve. This should be a string
+    that outlines the objective, for example something that the target LLM
+    should not be doing.
+    attack_model: The name of the model that is used to generate adversarial
+    prompts as it appears on SAP AI Core. You cannot run this tool
+    without this information.
+    target_model: The name of the model that should be attacked as it appears
+    on SAP AI Core. You cannot run this tool without
+    this information.
+    max_turns: Determines how often the attack model is queried. 3 is a
+    sensible default.
+    """
+
+    return str(AttackSpecification.create(
+        'pyrit_pair',
+        target_model,
+        attack_model,
+        params={'objective': objective,
+                'max_turns': max_turns}
+    ).start())
+
+
+@tool
 def run_codeattack(target_model_name: str,
                    eval_model_name: str,
                    num_prompts: int | None) -> str:
