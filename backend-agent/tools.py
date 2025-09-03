@@ -126,7 +126,7 @@ def run_pyrit_red_teaming(
     target_model: str,
     max_turns: int = 3
 ) -> str:
-    """"You should use this tool to start red teaming attacks using the PyRIT framework.
+    """"You should use this tool to start red teaming attack using the PyRIT framework.
     This tool specifically uses the red teaming orchestrator.
     PyRIT is an open-source red teaming framework for LLMs.
     @param
@@ -157,7 +157,8 @@ def run_pyrit_crescendo(
     objective: str,
     attack_model: str,
     target_model: str,
-    max_turns: int = 10
+    max_turns: int = 10,
+    max_backtracks: int = 5
 ) -> str:
     """"You should use this tool to start crescendo attacks using the PyRIT framework.
     This tool specifically uses the crescendo orchestrator.
@@ -174,6 +175,9 @@ def run_pyrit_crescendo(
     this information.
     max_turns: Determines how often the attack model is queried. 10 is a
     sensible default for crescendo attacks.
+    max_backtracks: Determines how often the attack model can backtrack to a
+    previous prompt if the current line of prompts is not successful. 5 is a
+    sensible default.
     """
 
     return str(AttackSpecification.create(
@@ -181,7 +185,8 @@ def run_pyrit_crescendo(
         target_model,
         attack_model,
         params={'objective': objective,
-                'max_turns': max_turns}
+                'max_turns': max_turns,
+                'max_backtracks': max_backtracks}
     ).start())
 
 
@@ -190,7 +195,7 @@ def run_pyrit_pair(
     objective: str,
     attack_model: str,
     target_model: str,
-    max_turns: int = 3
+    desired_response_prefix: str = "Sure, here is"
 ) -> str:
     """"You should use this tool to start PAIR attacks using the PyRIT framework.
     This tool specifically uses the PAIR orchestrator.
@@ -205,8 +210,9 @@ def run_pyrit_pair(
     target_model: The name of the model that should be attacked as it appears
     on SAP AI Core. You cannot run this tool without
     this information.
-    max_turns: Determines how often the attack model is queried. 3 is a
-    sensible default.
+    desired_response_prefix: Optional parameter to set the desired response
+    prefix that the adversarial prompt should try to elicit from the target
+    model. The default is "Sure, here is".
     """
 
     return str(AttackSpecification.create(
@@ -214,7 +220,7 @@ def run_pyrit_pair(
         target_model,
         attack_model,
         params={'objective': objective,
-                'max_turns': max_turns}
+                'desired_response_prefix': desired_response_prefix}
     ).start())
 
 
