@@ -147,16 +147,71 @@ def textattack(args):
              arg('objective', help='What is the attack trying to achieve. This\
                    should be a string that outlines the objective, for example\
                    something that the target LLM should not be doing.'),
-             arg('orchestrator_type', help='The type of orchestrator to use for the attack. This\
-                   should be a string that specifies the orchestrator type, for example\
-                   "red_teaming", "crescendo", or "pair".'),
              arg('--max-turns', '-t',
                  type=int,
                  help='Number of turns (=prompts to the target) to take before quitting.',  # noqa: E501
                  default=3)])
-def pyrit(args):
+def pyrit_red_teaming(args):
     spec = AttackSpecification.create(
-        'pyrit',
+        'pyrit_red_teaming',
+        args.target_model,
+        attack_model=args.attack_model,
+        params=vars(args))
+    result = start_spec(spec, args)
+    if not result:
+        print('Something went wrong. No result returned from the attack.')
+        return
+    print(
+        'The attack was successful.' if result.success
+        else 'The attack was not successful.')
+    print('Overall response:')
+    print(result.details['response'])
+
+
+@subcommand([arg('target_model', help='Name of the target model to attack'),
+             arg('attack_model',
+                 help='Name of the model that is used to attack/ mutate prompts'),  # noqa: E501
+             arg('objective', help='What is the attack trying to achieve. This\
+                   should be a string that outlines the objective, for example\
+                   something that the target LLM should not be doing.'),
+             arg('--max-turns', '-t',
+                 type=int,
+                 help='Number of turns (=prompts to the target) to take before quitting.',  # noqa: E501
+                 default=10),
+             arg('--max-backtracks', '-b',
+                     type=int,
+                     help='Number of backtracks to allow during the attack.',
+                     default=5)])
+def pyrit_crescendo(args):
+    spec = AttackSpecification.create(
+        'pyrit_crescendo',
+        args.target_model,
+        attack_model=args.attack_model,
+        params=vars(args))
+    result = start_spec(spec, args)
+    if not result:
+        print('Something went wrong. No result returned from the attack.')
+        return
+    print(
+        'The attack was successful.' if result.success
+        else 'The attack was not successful.')
+    print('Overall response:')
+    print(result.details['response'])
+
+
+@subcommand([arg('target_model', help='Name of the target model to attack'),
+             arg('attack_model',
+                 help='Name of the model that is used to attack/ mutate prompts'),  # noqa: E501
+             arg('objective', help='What is the attack trying to achieve. This\
+                   should be a string that outlines the objective, for example\
+                   something that the target LLM should not be doing.'),
+             arg('--desired-response-prefix', '-p',
+                 type=str,
+                 help='The desired response prefix that the adversarial prompt should try to elicit from the target model.',  # noqa: E501
+                 default="Sure, here is"),])
+def pyrit_pair(args):
+    spec = AttackSpecification.create(
+        'pyrit_pair',
         args.target_model,
         attack_model=args.attack_model,
         params=vars(args))
