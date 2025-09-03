@@ -24,6 +24,7 @@ Hereafter, a list with all the attacks the Agent is able to run, grouped by atta
 - [PyRIT](https://github.com/Azure/PyRIT)
 - [CodeAttack](https://github.com/renqibing/CodeAttack)
 - [ArtPrompt](https://github.com/uw-nsl/ArtPrompt)
+- [Garak](https://github.com/NVIDIA/garak)
 
 
 ## Requirements and Setup

@@ -4,19 +4,20 @@ from dotenv import load_dotenv
 from gen_ai_hub.proxy.core.proxy_clients import set_proxy_version
 from gen_ai_hub.proxy.langchain.init_models import (
     init_llm, init_embedding_model)
-from langchain.agents.agent_toolkits import (
-    create_conversational_retrieval_agent, create_retriever_tool)
+from langchain.agents.agent_toolkits import \
+    create_conversational_retrieval_agent
 from langchain.embeddings import CacheBackedEmbeddings
-from langchain.schema.messages import SystemMessage
 from langchain.storage import LocalFileStore
-from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.vectorstores import FAISS
+from langchain_core.messages import SystemMessage
+from langchain_core.tools.retriever import create_retriever_tool
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 # load env variables
 load_dotenv()
-AGENT_MODEL = os.environ.get('AGENT_MODEL', 'gpt-4')
+AGENT_MODEL = os.environ.get('AGENT_MODEL', 'gpt-4o')
 EMBEDDING_MODEL = os.environ.get('EMBEDDING_MODEL', 'text-embedding-ada-002')
 # Use models deployed in SAP AI Core
 set_proxy_version('gen-ai-hub')
@@ -75,7 +76,7 @@ def get_retriever(document_path: str,
     # https://python.langchain.com/docs/modules/data_connection/document_transformers/
 
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=500, chunk_overlap=0)
+        chunk_size=500, chunk_overlap=100)
     docs = text_splitter.split_documents(raw_docs)
 
     # Vector store
@@ -197,6 +198,7 @@ from tools import run_prompt_attack, \
     run_pyrit_pair, \
     run_codeattack, \
     run_artprompt, \
+    run_garak_attack, \
     run_attack_suite, \
     get_supported_models, \
     use_command, \
@@ -265,6 +267,14 @@ artprompt_notes = get_retriever(
     "artprompt" framework. Use this before using the \
     run_artprompt tool'
 )
+# Retriever that contains notes on how to use Garak
+garak_notes = get_retriever(
+    './data/garak',
+    'garak_how',
+    'Steps to take to run a pentest on a LLM using the \
+    "garak" framework. ALWAYS run this before using the \
+    run_garak_attack tool, because it will explain how to use the tool'
+)
 # Retriever that contains notes on how to run attack suites
 llm_attack_suite_notes = get_retriever(
     './data/suite',
@@ -306,6 +316,8 @@ tools = [
     run_codeattack,
     artprompt_notes,
     run_artprompt,
+    garak_notes,
+    run_garak_attack,
     llm_attack_suite_notes,
     run_attack_suite,
     get_supported_models

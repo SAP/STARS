@@ -197,8 +197,8 @@ class OrchestratorWrapper:
     
     async def run_attack_async(self, **kwargs) -> Dict[str, Any]:
         """
-        Run attack with any orchestrator while adding custom status reporting.
-        Returns simplified result format expected by the application.
+        Applies the attack strategy until the conversation is complete or the
+        maximum number of turns is reached.
         """
         display_intermediate_results = kwargs.pop('display_intermediate_results', self.display_intermediate_results)
         
@@ -297,9 +297,8 @@ Remember, answer only with a JSON object in the specified format.
 
     async def score_text_async(self, text: str):
         score = (await super().score_text_async(text))[0]
-        logger.info(
-            f"PyRIT scorer result: {{'score': {score.get_value()}, 'explanation': {score.score_rationale}}}"  # noqa: E501
-        )
+        logger.info(f"PyRIT scorer result: {{'score': {score.get_value()}, "
+                    f"'explanation': {score.score_rationale}}}")
         return score
 
 
