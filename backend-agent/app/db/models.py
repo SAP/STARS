@@ -16,7 +16,8 @@ class TargetModel(db.Model):
         db.String
     )
 
-    # passive_deletes to let db handle children deletion via ON DELETE CASCADE constraint
+    # passive_deletes:
+    # to let db handle children deletion via ON DELETE CASCADE constraint
     attack_results = db.relationship(
         'AttackResult', backref='target_model',
         cascade='all, delete-orphan', passive_deletes=True
@@ -44,8 +45,9 @@ class Attack(db.Model):
         default=1,
         server_default="1"
     )
-    
-    # passive_deletes to let db handle children deletion via ON DELETE CASCADE constraint
+
+    # passive_deletes:
+    # to let db handle children deletion via ON DELETE CASCADE constraint
     sub_attacks = db.relationship(
         'SubAttack',
         backref='attack',
