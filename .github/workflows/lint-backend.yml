@@ -1,7 +1,7 @@
 name: Lint backend
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - develop
       - main
@@ -11,7 +11,8 @@ on:
 
 permissions:
   checks: write
-  contents: write
+  contents: read
+  pull-requests: write
 
 jobs:
   lint-backend:
@@ -25,8 +26,7 @@ jobs:
       - name: Set up Python environment
         uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
-          token: ${{ secrets.GITHUB_TOKEN }}
+          python-version: "3.11"
           cache: 'pip'
 
       - name: Install Python dependencies
