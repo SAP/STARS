@@ -96,8 +96,9 @@ class LLMAdapter(PromptChatTarget):
         2. Removes markdown JSON end patterns (```, `, etc.)
         3. Validates if the result is valid JSON
         4. If not a JSON string, returns string as it is (e.g. when an LLM just returns a summary string without JSON structure)
-        Args:
-            response_msg (str): The response message to clean and extract JSON from.
+
+        @params
+        response_msg (str): The response message to clean and extract JSON from.
             
         Returns:
             str: The cleaned JSON string if valid JSON is found, otherwise an error message.
@@ -309,14 +310,14 @@ def start_pyrit_attack_red_teaming(
     """
     Start a red teaming attack using the PyRIT attack framework.
 
-    Args:
-        attack_model (LLM): Model used to craft prompts.
-        target_model (LLM): Model that is to be attacked.
-        parameters (dict): Additional parameters containing:
-            - objective (str): Required parameter to set the objective the attack 
-              is supposed to achieve.
-            - max_turns (int, optional): Optional parameter to control how many 
-              prompts are crafted by the attack model.
+    @params
+    attack_model (LLM): Model used to craft prompts.
+    target_model (LLM): Model that is to be attacked.
+    parameters (dict): Additional parameters containing:
+        - objective (str): Required parameter to set the objective the attack 
+            is supposed to achieve.
+        - max_turns (int, optional): Optional parameter to control how many 
+            prompts are crafted by the attack model.
 
     Returns:
         AttackResult: The result of the red teaming attack.
@@ -367,15 +368,15 @@ def start_pyrit_attack_crescendo(
     """
     Start a crescendo attack using the PyRIT attack framework.
 
-    Args:
-        attack_model (LLM): Model used to craft prompts.
-        target_model (LLM): Model that is to be attacked.
-        parameters (dict): Additional parameters containing:
-            - max_turns (int, optional): Optional parameter to control how many 
-              prompts are crafted by the attack model.
-            - max_backtracks (int, optional): Optional parameter to control how 
-              many times the attack model can backtrack to a previous prompt if
-              the current line of prompts is not successful.
+    @params
+    attack_model (LLM): Model used to craft prompts.
+    target_model (LLM): Model that is to be attacked.
+    parameters (dict): Additional parameters containing:
+        - max_turns (int, optional): Optional parameter to control how many 
+            prompts are crafted by the attack model.
+        - max_backtracks (int, optional): Optional parameter to control how 
+            many times the attack model can backtrack to a previous prompt if
+            the current line of prompts is not successful.
 
     Returns:
         AttackResult: The result of the crescendo attack.
@@ -421,13 +422,13 @@ def start_pyrit_attack_pair(
     """
     Start a PAIR attack using the PyRIT attack framework.
 
-    Args:
-        attack_model (LLM): Model used to craft prompts.
-        target_model (LLM): Model that is to be attacked.
-        parameters (dict): Additional parameters containing:
-            - desired_response_prefix (str, optional): Optional parameter to set
-              the desired response prefix that the adversarial prompt should try
-              to elicit from the target model.
+    @params
+    attack_model (LLM): Model used to craft prompts.
+    target_model (LLM): Model that is to be attacked.
+    parameters (dict): Additional parameters containing:
+        - desired_response_prefix (str, optional): Optional parameter to set
+            the desired response prefix that the adversarial prompt should try
+            to elicit from the target model.
 
     Returns:
         AttackResult: The result of the PAIR attack.
@@ -474,19 +475,19 @@ def start_pyrit_attack(
     """
     Start an attack using the PyRIT attack framework with a pre-configured orchestrator.
     
-    Args:
-        attack_model (LLM): Model used to craft prompts.
-        target_model (LLM): Model that is to be attacked.
-        orchestrator (Orchestrator): Instantiated PyRIT orchestrator instance.
-        parameters (dict): Additional parameters containing:
-            - objective (str): Required parameter to set the objective the attack 
-              is supposed to achieve.
-            - display_intermediate_results (bool, optional): Optional parameter to 
-              control if status responses are sent when running from agent.
-            - vulnerability_type (str, optional): Optional parameter to mark which 
-              vulnerability this attack is supposed to test.
-        attack_name (str, optional): Name of the attack for result reporting.
-        attack_description (str, optional): Description of the attack for result reporting.
+    @params
+    attack_model (LLM): Model used to craft prompts.
+    target_model (LLM): Model that is to be attacked.
+    orchestrator (Orchestrator): Instantiated PyRIT orchestrator instance.
+    parameters (dict): Additional parameters containing:
+        - objective (str): Required parameter to set the objective the attack 
+            is supposed to achieve.
+        - display_intermediate_results (bool, optional): Optional parameter to 
+            control if status responses are sent when running from agent.
+        - vulnerability_type (str, optional): Optional parameter to mark which 
+            vulnerability this attack is supposed to test.
+    attack_name (str): Name of the attack for result reporting.
+    attack_description (str): Description of the attack for result reporting.
 
     Returns:
         AttackResult: The result of the PyRIT attack.
