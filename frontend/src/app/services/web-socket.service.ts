@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { retry } from 'rxjs';
 import { webSocket } from 'rxjs/webSocket';
 import { ConfigService } from './config.service';
@@ -7,8 +7,7 @@ import { ConfigService } from './config.service';
   providedIn: 'root',
 })
 export class WebSocketService {
-  private config = inject(ConfigService);
-
+  constructor(private config: ConfigService) { }
   readonly URL = this.config.backendUrl;
   connected: boolean = false;
   private webSocketSubject = webSocket<any>(  // eslint-disable-line @typescript-eslint/no-explicit-any

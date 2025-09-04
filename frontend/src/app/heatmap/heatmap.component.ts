@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit } from '@angular/core';
 import { capitalizeFirstLetter, splitModelName } from '../utils/utils';
 
 import ApexCharts from 'apexcharts';
@@ -24,13 +24,11 @@ import { environment } from '../../environments/environment';
   imports: [CommonModule, MatFormFieldModule, MatSelectModule, FormsModule, MatCardModule, MatButtonModule, MatIconModule],
 })
 export class HeatmapComponent implements AfterViewInit, OnInit {
-  private http = inject(HttpClient);
-  private el = inject(ElementRef);
-  private dialog = inject(MatDialog);
-
   private latestData: ScoreResponse | null = null;
   private attackNames: string[] = [];
   private attackWeights: { [attackName: string]: number } = {};
+
+  constructor(private http: HttpClient, private el: ElementRef, private dialog: MatDialog) {}
 
   ngAfterViewInit() {
     this.createHeatmap({

@@ -1,6 +1,6 @@
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogRef } from "@angular/material/dialog";
 
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 
 import { environment } from '../../environments/environment';
@@ -19,15 +19,15 @@ import { MatSnackBar } from "@angular/material/snack-bar";
   styleUrls: ['./weight-dialog.component.css']
 })
 export class WeightDialogComponent implements OnInit {
-  private http = inject(HttpClient);
-  dialogRef = inject<MatDialogRef<WeightDialogComponent>>(MatDialogRef);
-  private snackBar = inject(MatSnackBar);
-  data = inject(MAT_DIALOG_DATA);
-
   currentWeights: { [attack: string]: number } = {};
   attackNames: string[] = [];
   apiKey: string;
-  constructor() {
+  constructor(
+    private http: HttpClient,
+    public dialogRef: MatDialogRef<WeightDialogComponent>,
+    private snackBar: MatSnackBar,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
     this.apiKey = localStorage.getItem('key') || '';
   }
 
@@ -58,7 +58,6 @@ export class WeightDialogComponent implements OnInit {
             verticalPosition: 'top',
           });
           console.error('Error updating weights, verify your input and try again later.', err);
-          this.dialogRef.close(true);
         }
       });
   }
