@@ -33,7 +33,7 @@ from libs.promptmap import (
     OUTPUT_FILE as prompt_map_out_file,
     start_prompt_map,
 )
-from libs.pyrit import start_pyrit_attack, start_pyrit_attack_red_teaming, start_pyrit_attack_crescendo, start_pyrit_attack_pair
+from libs.pyrit import start_pyrit_attack_red_teaming, start_pyrit_attack_crescendo, start_pyrit_attack_pair
 from llm import LLM
 from status import Trace
 
@@ -162,12 +162,6 @@ class AttackSpecification:
                         self.target_model,
                         self.parameters
                     ))
-                case 'pyrit':
-                    return t.trace(start_pyrit_attack(
-                        self.attack_model,
-                        self.target_model,
-                        self.parameters
-                    ), print_output=False)
                 case 'pyrit_red_teaming':
                     return t.trace(start_pyrit_attack_red_teaming(
                         self.attack_model,
