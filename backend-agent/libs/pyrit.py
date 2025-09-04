@@ -82,10 +82,6 @@ class LLMAdapter(PromptChatTarget):
             messages.append(
                 {'role': piece.role, 'content': piece.converted_value})
         return messages
-    
-
-
-
 
     def clean_json(self, response_msg: str) -> str:
         """
@@ -161,18 +157,6 @@ class LLMAdapter(PromptChatTarget):
             request=request_piece,
             response_text_pieces=[self.clean_json(result.unwrap_first())],
         )
-
-
-# =============================================================================
-# NEW APPROACH: Orchestrator-Agnostic Wrapper (Composition over Inheritance)
-# =============================================================================
-# This wrapper allows us to use ANY PyRIT orchestrator (RedTeaming, Crescendo, PAIR, etc.)
-# while adding our custom status reporting and result formatting.
-# Benefits:
-# 1. Can switch between orchestrator types easily
-# 2. No code duplication - reuses PyRIT's logic
-# 3. Maintains compatibility with PyRIT updates
-# 4. Cleaner separation of concerns
 
 class OrchestratorWrapper:
     """
