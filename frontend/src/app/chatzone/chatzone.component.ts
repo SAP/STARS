@@ -1,5 +1,5 @@
 import { APIResponse, ReportItem } from '../types/API';
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, QueryList, ViewChildren } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, QueryList, ViewChildren, inject } from '@angular/core';
 import { ChatItem, Message, ReportCard, VulnerabilityReportCard } from '../types/ChatItem';
 import { Status, Step } from '../types/Step';
 
@@ -19,6 +19,9 @@ import { WebSocketService } from '../services/web-socket.service';
   standalone: true,
 })
 export class ChatzoneComponent implements AfterViewInit, AfterViewChecked {
+  private ws = inject(WebSocketService);
+  private vis = inject(VulnerabilityInfoService);
+
   chatItems: ChatItem[];
 
   steps: Step[];
@@ -26,7 +29,7 @@ export class ChatzoneComponent implements AfterViewInit, AfterViewChecked {
   inputValue: string;
   apiKey: string;
   progress: number | undefined;
-  constructor(private ws: WebSocketService, private vis: VulnerabilityInfoService) {
+  constructor() {
     this.inputValue = '';
     this.apiKey = localStorage.getItem('key') || '';
     this.errorMessage = '';
