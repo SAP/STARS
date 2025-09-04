@@ -4,6 +4,7 @@ import { capitalizeFirstLetter, splitModelName } from '../utils/utils';
 import ApexCharts from 'apexcharts';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HeatmapSeries } from '../types/Serie';
 import { HttpClient } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -76,7 +77,7 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
     const allAttackWeights = Object.fromEntries(
       data.attacks.map(attack => [attack.name, attack.weight ?? 1])
     );
-    const seriesData: any[] = [];
+    const seriesData: HeatmapSeries[] = [];
     // Process each model's scores and calculate the exposure score
     data.models.forEach(model => {
       let weightedSum = 0;
@@ -197,7 +198,7 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
           dataPointIndex,
           w
         }: {
-          series: any[];
+          series: number[][];
           seriesIndex: number;
           dataPointIndex: number;
           w: any;
