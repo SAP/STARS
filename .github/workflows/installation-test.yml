@@ -38,8 +38,9 @@ jobs:
               run: uv sync --locked --all-extras --dev --project backend-agent
 
             - name: Start server and check health
+              working-directory: backend-agent
               run: |
-                DISABLE_AGENT=1 DB_PATH=${RUNNER_TEMP}/data.db uv run backend-agent/main.py > server.log 2>&1 &
+                DISABLE_AGENT=1 DB_PATH=${RUNNER_TEMP}/data.db uv run main.py > server.log 2>&1 &
                 for i in {1..20}; do
                   sleep 1
                   status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/health || true)
