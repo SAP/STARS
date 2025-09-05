@@ -1,5 +1,6 @@
 import json
 import os
+from importlib.metadata import version
 
 
 from dotenv import load_dotenv
@@ -13,6 +14,8 @@ from app.db.models import TargetModel, ModelAttackScore, Attack, db
 from attack_result import SuiteResult
 from status import LangchainStatusCallbackHandler, status
 
+
+__version__ = version('stars')
 load_dotenv()
 
 if not os.getenv('DISABLE_AGENT'):
@@ -273,4 +276,5 @@ if __name__ == '__main__':
         print('No API key is set! Access is unrestricted.')
     port = os.getenv('BACKEND_PORT', 8080)
     debug = bool(os.getenv('DEBUG', False))
+    print(f'Loading backend version {__version__} on port {port}')
     app.run(host='0.0.0.0', port=int(port), debug=debug)

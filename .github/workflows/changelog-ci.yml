@@ -4,6 +4,8 @@ on:
   pull_request:
     types: [ opened, reopened ]
     branches: [ main ]
+    paths: ['backend-agent/**']
+    # changelog-ci triggers only on backend changes
 
   # Optionally you can use `workflow_dispatch` to run Changelog CI Manually
   workflow_dispatch:
