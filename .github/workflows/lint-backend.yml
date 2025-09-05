@@ -1,7 +1,7 @@
 name: Lint backend
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - develop
       - main
@@ -11,7 +11,8 @@ on:
 
 permissions:
   checks: write
-  contents: write
+  contents: read
+  pull-requests: write
 
 jobs:
   lint-backend:

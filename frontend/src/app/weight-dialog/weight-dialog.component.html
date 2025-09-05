@@ -1,0 +1,26 @@
+<div class="dialog-container">
+    <div class="dialog-title">
+        <h2 mat-dialog-title>
+            {{ data.title }}
+        </h2>
+    </div>
+    <div class="input-container">
+        <form>
+            <div *ngFor="let attack of attackNames">
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>{{ attack }}</mat-label>
+                    <input matInput type="number" min="0" step="1" [(ngModel)]="currentWeights[attack]"
+                        name="{{ attack }}" />
+                </mat-form-field>
+            </div>
+        </form>
+    </div>
+    <div mat-dialog-actions align="end" class="dialog-actions">
+        <button mat-stroked-button color="warn" (click)="dialogRef.close()">
+            Cancel
+        </button>
+        <button mat-raised-button class="save-button" (click)="onSave()">
+            Save
+        </button>
+    </div>
+</div>

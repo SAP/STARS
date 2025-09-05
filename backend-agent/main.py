@@ -74,6 +74,20 @@ def send_intro(sock):
         sock.send(json.dumps({'type': 'message', 'data': intro}))
 
 
+def verify_api_key():
+    """
+    Verifies the API key from the request headers against the env variable.
+    If the API key is not set or does not match, it aborts the request
+    with a 403 status code.
+    """
+    if os.getenv('API_KEY'):
+        provided_key = request.headers.get('X-API-Key')
+        if provided_key != os.getenv('API_KEY'):
+            abort(403)
+    else:
+        abort(403)
+
+
 @sock.route('/agent')
 def query_agent(sock):
     """
@@ -119,10 +133,6 @@ def download_report():
     This route allows to download attack suite reports by specifying
     their name.
     """
-    if os.getenv('API_KEY'):
-        provided_key = request.headers.get('X-API-Key')
-        if provided_key != os.getenv('API_KEY'):
-            abort(403)
     name = request.args.get('name')
     format = request.args.get('format', 'md')
 
@@ -216,6 +226,48 @@ def get_heatmap():
             ]
         })
     except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/attacks', methods=['GET'])
+def get_attacks():
+    """
+    Endpoint to retrieve all attacks with their weights.
+    Returns a JSON object with attack names and their weights.
+    """
+    try:
+        attacks = db.session.query(Attack).all()
+        attack_list = [{'name': attack.name, 'weight': attack.weight}
+                       for attack in attacks]
+        return jsonify(attack_list), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+@app.route('/api/attacks', methods=['PUT'])
+def update_attack_weights():
+    """
+    Update weights for multiple attacks.
+    Expects a JSON object like: {"artPrompt": 2, "codeAttack": 1, ...}
+    """
+    verify_api_key()
+    try:
+        weights = request.get_json()
+        if not isinstance(weights, dict):
+            return jsonify({'error': 'Invalid payload format'}), 400
+
+        for name, weight in weights.items():
+            attack = db.session.query(Attack).filter_by(name=name).first()
+            if attack:
+                attack.weight = float(weight)
+            else:
+                return jsonify({'error': f'Attack not found: {name}'}), 404
+
+        db.session.commit()
+        return jsonify({'message': 'Weights updated successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
 
