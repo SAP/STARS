@@ -5375,7 +5375,7 @@ wheels = [
 [[package]]
 name = "stars"
 version = "0.4.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "art" },
     { name = "codeattack" },
