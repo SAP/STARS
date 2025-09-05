@@ -25,16 +25,21 @@ jobs:
             - name: Set up Python environment
               uses: actions/setup-python@v5
               with:
-                python-version: "3.10"
+                python-version: "3.11"
                 token: ${{ secrets.GITHUB_TOKEN }}
-                cache: 'pip'
-                cache-dependency-path: backend-agent/requirements.txt
-            - run: pip install -r backend-agent/requirements.txt
+
+            - name: Install uv
+              uses: astral-sh/setup-uv@v6
+              with:
+                version: "latest"
+                enable-cache: true
+
+            - name: Install dependencies
+              run: uv sync --locked --all-extras --dev --project backend-agent
 
             - name: Start server and check health
               run: |
-                cd backend-agent
-                DISABLE_AGENT=1 DB_PATH=${RUNNER_TEMP}/data.db python main.py > server.log 2>&1 &
+                DISABLE_AGENT=1 DB_PATH=${RUNNER_TEMP}/data.db uv run backend-agent/main.py > server.log 2>&1 &
                 for i in {1..20}; do
                   sleep 1
                   status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/health || true)
