@@ -58,24 +58,6 @@
                   "with": "src/environments/environment.development.ts"
                 }
               ]
-            },
-            "docker": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.docker.ts"
-                }
-              ],
-              "outputHashing": "all"
-            },
-            "k8s": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.k8s.ts"
-                }
-              ],
-              "outputHashing": "all"
             }
           },
           "defaultConfiguration": "production"
@@ -88,12 +70,6 @@
             },
             "development": {
               "buildTarget": "stars:build:development"
-            },
-            "docker": {
-              "buildTarget": "stars:build:docker"
-            },
-            "k8s": {
-              "buildTarget": "stars:build:k8s"
             }
           },
           "defaultConfiguration": "development"

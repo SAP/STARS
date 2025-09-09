@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogRef } from "@angular/materi
 import { Component, OnInit, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from "@angular/common/http";
 
-import { environment } from '../../environments/environment';
+import { ConfigService } from '../services/config.service';
 import { MatFormFieldModule, MatLabel } from "@angular/material/form-field";
 import { CommonModule } from "@angular/common";
 import { FormsModule } from "@angular/forms";
@@ -22,6 +22,7 @@ export class WeightDialogComponent implements OnInit {
   private http = inject(HttpClient);
   dialogRef = inject<MatDialogRef<WeightDialogComponent>>(MatDialogRef);
   private snackBar = inject(MatSnackBar);
+  private configService = inject(ConfigService);
   data = inject(MAT_DIALOG_DATA);
 
   currentWeights: { [attack: string]: number } = {};
@@ -37,18 +38,18 @@ export class WeightDialogComponent implements OnInit {
   }
 
   onSave() {
-  const headers = new HttpHeaders({
-      'X-API-Key': this.apiKey  // ← make sure this.apiKey is correctly defined
+    const headers = new HttpHeaders({
+      'X-API-Key': this.apiKey
     });
 
-  this.http.put(`${environment.api_url}/api/attacks`, this.currentWeights, { headers })
-    .subscribe({
-      next: () => {
-        this.snackBar.open('Weights successfully updated ', '✅', {
-          duration: 3000,
-          horizontalPosition: 'right',
-          verticalPosition: 'top',
-        });
+    this.http.put(`${this.configService.apiUrl}/api/attacks`, this.currentWeights, { headers })
+      .subscribe({
+        next: () => {
+          this.snackBar.open('Weights successfully updated ', '✅', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+          });
           this.dialogRef.close(true);
         },
         error: err => {
