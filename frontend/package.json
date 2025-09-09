@@ -3,11 +3,11 @@
   "version": "0.0.5",
   "scripts": {
     "ng": "ng",
-    "start": "cp src/assets/configs/config.local.json src/assets/configs/config.json && ng serve",
+    "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "lint": "eslint . --ext .ts,.html"
+    "lint": "eslint . --ext .js,.ts,.html"
   },
   "private": true,
   "dependencies": {
