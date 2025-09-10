@@ -3,7 +3,7 @@ name = 'stars'
 version = '0.4.0'
 description = 'Smart Threat AI Reporting Scanner (STARS)'
 readme = 'README.md'
-license = 'Apache-2.0'
+license = {text = 'Apache-2.0'}
 authors = [
     {name = 'SAP SE'}
 ]
