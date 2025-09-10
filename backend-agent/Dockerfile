@@ -1,11 +1,18 @@
-FROM python:3.11
+FROM astral/uv:python3.11-trixie
 
 WORKDIR /app
 
-COPY requirements.txt .
-RUN pip install -r requirements.txt --no-cache-dir
+# Install uv for fast dependency management
+# RUN pip install uv
 
+# Copy dependency files first for better Docker layer caching
+COPY pyproject.toml uv.lock ./
+
+# Install dependencies using uv
+RUN uv sync --frozen --no-dev --no-cache
+
+# Copy the rest of the application
 COPY . .
 
 EXPOSE 8080
-CMD [ "python", "main.py" ]
+CMD ["uv", "run", "main.py"]
