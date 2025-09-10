@@ -1,5 +1,6 @@
 services:
   frontend:
+    platform: linux/amd64
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -15,6 +16,7 @@ services:
       - stars-network
 
   backend:
+    platform: linux/amd64
     build:
       context: ./backend-agent
       dockerfile: Dockerfile
