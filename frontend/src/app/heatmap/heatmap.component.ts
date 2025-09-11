@@ -3,6 +3,7 @@ import { capitalizeFirstLetter, splitModelName } from '../utils/utils';
 
 import ApexCharts from 'apexcharts';
 import { CommonModule } from '@angular/common';
+import { ConfigService } from '../services/config.service';
 import { FormsModule } from '@angular/forms';
 import { HeatmapSeries } from '../types/Serie';
 import { HttpClient } from '@angular/common/http';
@@ -14,7 +15,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { ScoreResponse } from './../types/API';
 import { WeightDialogComponent } from '../weight-dialog/weight-dialog.component';
-import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-heatmap',
@@ -27,6 +27,7 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
   private http = inject(HttpClient);
   private el = inject(ElementRef);
   private dialog = inject(MatDialog);
+  private configService = inject(ConfigService);
 
   private latestData: ScoreResponse | null = null;
   private attackNames: string[] = [];
@@ -45,13 +46,12 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
 
   // Load the heatmap data from the server
   loadHeatmapData() {
-    let url = '';
-    url = `${environment.api_url}/api/heatmap`;
+    const url = `${this.configService.apiUrl}/api/heatmap`;
     this.http.get<ScoreResponse>(url).subscribe({
       next: scoresData => {
         this.processDataAfterScan(scoresData);
       },
-      error: error => console.error('❌ Erreur API:', error),
+      error: error => console.error('❌ Error API:', error),
     });
   }
 
