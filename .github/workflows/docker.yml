@@ -112,8 +112,10 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_REGISTRY_URL }}/stars-backend:${{ needs.check_version_update.outputs.backend_version }}
             ${{ secrets.DOCKER_REGISTRY_URL }}/stars-backend:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=${{ secrets.DOCKER_REGISTRY_URL }}/stars-backend:cache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_REGISTRY_URL }}/stars-backend:cache,mode=max
+          # Use docker registry cache not to exceed GitHub Actions storage limits
+          # Builds will be slower but won't fail due to storage limits
 
       - name: Backend Build Summary
         run: |

@@ -1,8 +1,9 @@
-FROM astral/uv:python3.11-trixie AS builder
+FROM astral/uv:python3.11-trixie-slim AS builder
 
 # Install build dependencies including Rust for packages that need it
 RUN apt-get update && apt-get install -y \
     build-essential \
+    git \
     curl \
     pkg-config \
     libssl-dev \
@@ -32,13 +33,14 @@ RUN . ~/.cargo/env && \
 
 # ----------------------------------------
 
-FROM python:3.11-slim-trixie
+FROM python:3.11-slim-trixie AS runtime
 
 # Install only runtime dependencies
 RUN apt-get update && apt-get install -y \
     libssl3 \
     libffi8 \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 WORKDIR /app
 
