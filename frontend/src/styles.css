@@ -1,8 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html, body { 
+  height: 100%;
+}
+
+body { 
+  margin: 0;
+  padding: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  /* overflow: hidden; */
+}
 
 ::ng-deep .mat-list .mat-list-item {
   height:initial!important;
@@ -13,17 +21,9 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   white-space: pre-wrap !important;
 }
 
-
 /* For responses from agent, which can contain very long lines */
 pre {
   overflow-x: auto;
-}
-
-body {
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-  margin: 0;
-  padding: 30px;
-  height: 100%;
 }
 
 .apexcharts-canvas {
@@ -59,9 +59,9 @@ body {
 html { height: 100%; }
 
 .card-header {
-  font-size: 2.5rem;  /* Larger font for the header */
-  font-weight: bold;  /* Make the text bold */
-  text-align: center; /* Center the text */
+  font-size: 2rem;
+  font-weight: bold;
+  text-align: center;
   padding: 16px;
 }
 
@@ -72,4 +72,11 @@ mat-select {
 
 .apexcharts-legend {
   translate: 50px;
+}
+
+.apexcharts-legend::before {
+  content: 'Score Legend';
+  display: block;
+  font-size: 13px;
+  translate: -10px;
 }

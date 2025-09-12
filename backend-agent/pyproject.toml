@@ -1,0 +1,53 @@
+[project]
+name = 'stars'
+version = '0.5.0'
+description = 'Smart Threat AI Reporting Scanner (STARS)'
+readme = 'README.md'
+license = {text = 'Apache-2.0'}
+authors = [
+    {name = 'SAP SE'}
+]
+maintainers = [
+    {name = 'Marco Rosa', email = 'marco.rosa@sap.com'},
+    {name = 'Slim Trabelsi', email = 'slim.trabelsi@sap.com'}
+]
+requires-python = '>=3.10,<3.13'
+dependencies = [
+    'sap-ai-sdk-gen[all]>=5.4.5',
+    'python-dotenv==1.1.1',
+    'faiss-cpu~=1.12.0',
+    'Flask==3.1.2',
+    'Flask-Cors==6.0.1',
+    'flask_sock==0.7.0',
+    'Flask-SQLAlchemy==3.1.1',
+    'langchain>=0.3.0,<0.4.0',
+    'langchain-community>=0.3.0,<0.4.0',
+    'langchain-core>=0.3.0,<0.4.0',
+    'langchain-text-splitters>=0.3.0,<0.4.0',
+    'PyYAML==6.0.2',
+    'requests==2.32.5',
+    'unstructured>=0.18.14',
+    'art',
+    'pandas',
+    'ollama==0.5.3',
+    'weasyprint',
+    'pyrit==0.9.0',
+    'codeattack @ git+https://github.com/marcorosa/CodeAttack',
+    'gptfuzzer @ git+https://github.com/marcorosa/GPTFuzz@no-vllm',
+    'garak~=0.11.0',
+    'sentence-transformers~=5.1.0',
+]
+
+[project.optional-dependencies]
+nlp = [
+    'textattack>=0.3.10',
+    'tensorflow~=2.19.1',
+    'tensorflow-hub>=0.16.1',
+]
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*", "libs*"]

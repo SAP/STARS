@@ -8,11 +8,7 @@ h1 {
   /* max-width: 600px;
   max-height: 400px; */
   display: block;
-  margin: 10px auto;
-}
-
-* {
-  font-family: Helvetica, Arial, sans-serif;
+  margin: 10px auto 0 auto;
 }
 
 #vendorChoice {
@@ -28,6 +24,7 @@ h1 {
   height: 100px;
   padding: 25px;
 }
+
  .heatmap-card {
   width: 700px;
   margin: auto;
@@ -35,23 +32,14 @@ h1 {
   padding: 25px;
 }
 
-/* .card-header {
-  font-size: 2rem;
-  font-weight: bold;
-} */
-
 #overview {
   font-size: medium;
 }
 
-/* .header-icon {
-  width: 50px;
-} */
-
 .card-header {
   display: flex;
   align-items: center; 
-  gap: 10px; 
+  justify-content: space-between;
   font-size: 2rem; 
   font-weight: bold;
   justify-content: center;
@@ -61,16 +49,9 @@ h1 {
   width: 45px;
 }
 
-.title {
-  display: flex;
-  align-items: center; 
-}
-
 .buttons-wrapper {
-  /* margin-top: auto; pousse les boutons en bas */
   display: flex;
   flex-direction: column;
-  gap: 1rem; /* espace entre les boutons */
 }
 
 .centered-button {
@@ -78,3 +59,23 @@ h1 {
   justify-content: center;
   align-items: center;
 }
+
+.left{
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.center {
+  flex: 2;
+  text-align: center;
+}
+

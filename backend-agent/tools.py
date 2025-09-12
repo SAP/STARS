@@ -61,7 +61,7 @@ def run_gptfuzz(mutate_model_name: str,
     using the GPTFuzz attack framework.
     @ param
     mutate_model_name: The model used in the attack to mutate prompts.
-    If no model is specified, use gpt-4.
+    If no model is specified, use gpt-4o.
     target_model_name: The name of the model that should be pentested,
     as it appears on SAP AI Core (or "mistral" for the local
     mistral-instruct instance). You cannot run this tool without this

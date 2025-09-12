@@ -16,7 +16,7 @@ For a list of supported custom tools (i.e., the attacks), refer to the project's
 Before running the tool, make sure to have an account configured and fully
 working on SAP AI Core (requires a SAP BTP subaccount with a running AI Core service instance).
 
-Please note that the agent requires `gpt-4` LLM and `text-embedding-ada-002`
+Please note that the agent requires `gpt-4o` LLM and `text-embedding-ada-002`
 embedding function.
 They must be already **deployed and running in SAP AI Core** before running this
 tool.
@@ -28,7 +28,7 @@ In general, the pentest tools integrated in the agent can be run on LLMs deploye
 
 ## Installation
 - Use Python 3.10 or 3.11
-- Install dependencies with `pip install -r requirements.txt`
+- Install dependencies with `pip install .` or `uv sync`
 - MacOS only: install libmagic `brew install libmagic`
 
 > Tested on a M3 MacOS and on Ubuntu 22.04
@@ -38,7 +38,7 @@ In general, the pentest tools integrated in the agent can be run on LLMs deploye
 
 The agent is run in a backend (Flask webserver).
 
-`python main.py`
+`python main.py` or `uv run main.py`
 
 Refer to `frontend` folder for the frontend.
 

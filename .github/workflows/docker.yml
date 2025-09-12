@@ -1,0 +1,205 @@
+name: Build and Push Docker Images
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+
+jobs:
+  check_version_update:
+    name: Check Version Updates
+    if: github.event.pull_request.merged
+    runs-on: ubuntu-latest
+    outputs:
+      build_backend: ${{ steps.version_check.outputs.build_backend }}
+      build_frontend: ${{ steps.version_check.outputs.build_frontend }}
+      backend_version: ${{ steps.version_check.outputs.backend_version }}
+      frontend_version: ${{ steps.version_check.outputs.frontend_version }}
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 2  # Need at least 2 commits to compare
+
+      - name: Detect version changes
+        id: version_check
+        run: |
+          echo "🔍 Checking for version changes..."
+
+          # Get current commit and previous commit
+          CURRENT_COMMIT=$(git rev-parse HEAD)
+          # Previous commit refers to the latest commit on main before the PR
+          # was merged
+          PREVIOUS_COMMIT=$(git rev-parse HEAD~1)
+
+          echo "Current commit: $CURRENT_COMMIT"
+          echo "Previous commit: $PREVIOUS_COMMIT"
+
+          # Initialize build flags and version variables
+          BUILD_BACKEND=false
+          BUILD_FRONTEND=false
+          # Extract current versions for backend and frontend
+          BACKEND_VERSION=$(grep '^version = ' backend-agent/pyproject.toml | sed "s/version = '\(.*\)'/\1/")
+          FRONTEND_VERSION=$(grep '"version":' frontend/package.json | sed 's/.*"version": "\(.*\)".*/\1/')
+
+          # Check if backend version file changed
+          if git diff --name-only $PREVIOUS_COMMIT $CURRENT_COMMIT | grep -q 'backend-agent/pyproject.toml'; then
+            # Extract previous backend version
+            PREVIOUS_BACKEND_VERSION=$(git show $PREVIOUS_COMMIT:backend-agent/pyproject.toml | grep '^version = ' | sed "s/version = '\(.*\)'/\1/")
+            echo "Backend version - Current: $BACKEND_VERSION, Previous: $PREVIOUS_BACKEND_VERSION"
+
+            if [ "$BACKEND_VERSION" != "$PREVIOUS_BACKEND_VERSION" ]; then
+              # The version has changed, set flag to build backend
+              BUILD_BACKEND=true
+              echo "✅ Backend version changed: $PREVIOUS_BACKEND_VERSION → $BACKEND_VERSION"
+            else
+              echo "❎ Backend version unchanged: $BACKEND_VERSION. Skip docker backend."
+            fi
+          fi
+
+          # Check if frontend version file changed
+          if git diff --name-only $PREVIOUS_COMMIT $CURRENT_COMMIT | grep -q 'frontend/package.json'; then
+            # Extract previous frontend version
+            PREVIOUS_FRONTEND_VERSION=$(git show $PREVIOUS_COMMIT:frontend/package.json | grep '"version":' | sed 's/.*"version": "\(.*\)".*/\1/')
+            echo "Frontend version - Current: $FRONTEND_VERSION, Previous: $PREVIOUS_FRONTEND_VERSION"
+
+            if [ "$FRONTEND_VERSION" != "$PREVIOUS_FRONTEND_VERSION" ]; then
+              # The version has changed, set flag to build frontend
+              BUILD_FRONTEND=true
+              echo "✅ Frontend version changed: $PREVIOUS_FRONTEND_VERSION → $FRONTEND_VERSION"
+            else
+              echo "❎ Frontend version unchanged: $FRONTEND_VERSION. Skip docker frontend."
+            fi
+          fi
+
+          # Set build outputs
+          echo "build_backend=$BUILD_BACKEND" >> $GITHUB_OUTPUT
+          echo "build_frontend=$BUILD_FRONTEND" >> $GITHUB_OUTPUT
+          echo "backend_version=$BACKEND_VERSION" >> $GITHUB_OUTPUT
+          echo "frontend_version=$FRONTEND_VERSION" >> $GITHUB_OUTPUT
+
+          if [ "$BUILD_BACKEND" = "false" ] && [ "$BUILD_FRONTEND" = "false" ]; then
+            echo "⚠️  No version changes detected. Skipping builds."
+          fi
+
+  build-backend:
+    name: Build and Push Backend Docker Image
+    if: github.event.pull_request.merged && needs.check_version_update.outputs.build_backend == 'true'
+    needs: check_version_update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v5
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY_URL }}
+          username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+          password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
+
+      - name: 🐳 Build and push Backend Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./backend-agent
+          file: ./backend-agent/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_REGISTRY_URL }}/stars-backend:${{ needs.check_version_update.outputs.backend_version }}
+            ${{ secrets.DOCKER_REGISTRY_URL }}/stars-backend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Backend Build Summary
+        run: |
+          echo "Backend Build Complete"
+          echo "✅ Backend: stars-backend:${{ needs.check_version_update.outputs.backend_version }}"
+
+  build-frontend:
+    name: Build and Push Frontend Docker Image
+    if: github.event.pull_request.merged && needs.check_version_update.outputs.build_frontend == 'true'
+    needs: check_version_update
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js for Frontend build
+        uses: actions/setup-node@v5
+        with:
+          node-version: '24'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Build Angular application
+        run: |
+          cd frontend
+          npm ci
+          npm run build -- --configuration production
+          # Verify build output exists
+          ls -la dist/
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ secrets.DOCKER_REGISTRY_URL }}
+          username: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
+          password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
+
+      - name: 🐳 Build and push Frontend Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./frontend
+          file: ./frontend/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_REGISTRY_URL }}/stars-frontend:${{ needs.check_version_update.outputs.frontend_version }}
+            ${{ secrets.DOCKER_REGISTRY_URL }}/stars-frontend:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Frontend Build Summary
+        run: |
+          echo "Frontend Build Complete"
+          echo "✅ Frontend: stars-frontend:${{ needs.check_version_update.outputs.frontend_version }}"
+
+  build-summary:
+    name: Build Pipeline Summary
+    needs: [check_version_update, build-backend, build-frontend]
+    runs-on: ubuntu-latest
+    # Allow this job to run even if backend or frontend jobs are skipped
+    if: always() && github.event.pull_request.merged
+    steps:
+      - name: Pipeline Summary
+        run: |
+          echo "STARS Build Pipeline Summary"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          # Backend
+          if [ "${{ needs.check_version_update.outputs.build_backend }}" = "true" ]; then
+            if [ "${{ needs.build-backend.result }}" = "success" ]; then
+              echo "✅ Backend: stars-backend:${{ needs.check_version_update.outputs.backend_version }}"
+            else
+              echo "❌ Backend: Build failed"
+            fi
+          else
+            echo "⏭️ (SKIP) Backend: No version change detected"
+          fi
+          # Frontend
+          if [ "${{ needs.check_version_update.outputs.build_frontend }}" = "true" ]; then
+            if [ "${{ needs.build-frontend.result }}" = "success" ]; then
+              echo "✅ Frontend: stars-frontend:${{ needs.check_version_update.outputs.frontend_version }}"
+            else
+              echo "❌ Frontend: Build failed"
+            fi
+          else
+            echo "⏭️ (SKIP) Frontend: No version change detected"
+          fi
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

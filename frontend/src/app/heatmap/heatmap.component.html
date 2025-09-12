@@ -1,5 +1,19 @@
-  <div class="card-header">
-    <span class="title">STARS Results Heatmap</span>
+<div class="card-header">
+  <div class="left">
+    <button mat-raised-button (click)="closeAndReturn()">
+      <mat-icon>arrow_back</mat-icon>
+      Return to Agent
+    </button>
   </div>
-  <div id="heatmapChart"></div>
+  <div class="center">
+    <span>STARS Results Heatmap</span>
+  </div>
+  <div class="right">
+    <button mat-raised-button (click)="openWeightDialog()">
+      <mat-icon>tune</mat-icon>
+      Set weights
+    </button>
+  </div>
+</div>
+<div id="heatmapChart"></div>
 

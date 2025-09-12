@@ -1,3 +1,8 @@
+<div class="card-header">
+  <div class="center">
+    <span>STARS Agent</span>
+  </div>
+</div>
 <div class="main-content">
   <div class="status-report-container container">
     <mat-card class="status-container-card">
@@ -41,7 +46,7 @@
         <mat-list>
           @for (chatItem of chatItems; track $index){
           <span #chatItem>
-            @if (chatItem.type == 'message') {
+            @if (chatItem.type === 'message') {
             <mat-list-item class="{{'list-item-' + chatItem.id}}">
               <mat-icon matListItemIcon class="message.id">{{ chatItem.avatar }}</mat-icon>
               <span class="message-date">{{ chatItem.timestamp | date:'HH:mm:ss' }} </span>
