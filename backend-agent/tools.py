@@ -82,145 +82,65 @@ def run_gptfuzz(mutate_model_name: str,
 
 
 @tool
-def run_pyrit(
-    objective: str,
-    attack_model: str,
+def run_pyrit_attack(
+    attack_name: str,
     target_model: str,
-    orchestrator_type: str,
-    max_turns: int = 3
+    attack_model: str,
+    objective: str,
+    parameters: dict = {}
 ) -> str:
-    """"You should use this tool to start attacks using the PyRIT framework.
-    Start this only after using the tool pyrit_how, which explains
-    how to use this tool.
-    PyRIT is an open-source red teaming framework for LLMs.
-    @param
-    objective: What is the attack trying to achieve. This should be a string
-    that outlines the objective, for example something that the target LLM
-    should not be doing.
+    """
+    Use this function to start an attack using the PyRIT framework. PyRIT is a
+    framework that comprises several attack orchestrators, each of them coming with a
+    specific name (redteaming, crescendo, pair).
+    Run pyrit_how before running this function. Some attacks may need
+    different parameters.
+    @params
+    attack_name: Since PyRIT supports many attack orchestrators, the name of the
+    attack must be specified here. Supported: "redteaming", "crescendo", "pair"
     attack_model: The name of the model that is used to generate adversarial
     prompts as it appears on SAP AI Core. You cannot run this tool
     without this information.
     target_model: The name of the model that should be attacked as it appears
     on SAP AI Core. You cannot run this tool without
     this information.
-    orchestrator_type: The type of orchestrator to use for the attack.
-    It can be one of the following: "red_teaming", "crescendo", "pair"
-    max_turns: Determines how often the attack model is queried. 3 is a
-    sensible default.
-    """
 
-    return str(AttackSpecification.create(
-        'pyrit',
-        target_model,
-        attack_model,
-        params={'objective': objective,
-                'orchestrator_type': orchestrator_type,
-                'max_turns': max_turns}
-    ).start())
-
-
-@tool
-def run_pyrit_red_teaming(
-    objective: str,
-    attack_model: str,
-    target_model: str,
-    max_turns: int = 3
-) -> str:
-    """"You should use this tool to start red teaming attack using the PyRIT framework.
-    This tool specifically uses the red teaming orchestrator.
-    PyRIT is an open-source red teaming framework for LLMs.
-    @param
     objective: What is the attack trying to achieve. This should be a string
     that outlines the objective, for example something that the target LLM
-    should not be doing.
-    attack_model: The name of the model that is used to generate adversarial
-    prompts as it appears on SAP AI Core. You cannot run this tool
+    should not be doing. You cannot run this tool
     without this information.
-    target_model: The name of the model that should be attacked as it appears
-    on SAP AI Core. You cannot run this tool without
-    this information.
-    max_turns: Determines how often the attack model is queried. 3 is a
-    sensible default.
+    parameters: Dictionary containing attack-specific parameters:
+        - For "redteaming": {"max_turns": int}
+        - For "crescendo": {"max_turns": int, "max_backtracks": int}
+        - For "pair": {"desired_response_prefix": str}. You cannot run this tool
+    without this information.
     """
 
-    return str(AttackSpecification.create(
-        'pyrit_red_teaming',
-        target_model,
-        attack_model,
-        params={'objective': objective,
-                'max_turns': max_turns}
-    ).start())
+    attack = attack_name.lower()
+    supported_attacks = ['redteaming', 'crescendo', 'pair']
+    
+    if attack not in supported_attacks:
+        return f'The attack "{attack}" is not available. \
+        Supported attacks are: {",".join(supported_attacks)}'
 
+    # Build parameters based on attack type
+    params = {'objective': objective}
+    
+    if attack == 'redteaming' and 'max_turns' in parameters:
+        params['max_turns'] = parameters['max_turns']
 
-@tool
-def run_pyrit_crescendo(
-    objective: str,
-    attack_model: str,
-    target_model: str,
-    max_turns: int = 10,
-    max_backtracks: int = 5
-) -> str:
-    """"You should use this tool to start crescendo attacks using the PyRIT framework.
-    This tool specifically uses the crescendo orchestrator.
-    PyRIT is an open-source red teaming framework for LLMs.
-    @param
-    objective: What is the attack trying to achieve. This should be a string
-    that outlines the objective, for example something that the target LLM
-    should not be doing.
-    attack_model: The name of the model that is used to generate adversarial
-    prompts as it appears on SAP AI Core. You cannot run this tool
-    without this information.
-    target_model: The name of the model that should be attacked as it appears
-    on SAP AI Core. You cannot run this tool without
-    this information.
-    max_turns: Determines how often the attack model is queried. 10 is a
-    sensible default for crescendo attacks.
-    max_backtracks: Determines how often the attack model can backtrack to a
-    previous prompt if the current line of prompts is not successful. 5 is a
-    sensible default.
-    """
+    elif attack == 'crescendo' and 'max_turns' in parameters:
+        params['max_turns'] = parameters['max_turns']
+        params['max_backtracks'] = parameters['max_backtracks']
+
+    elif attack == 'pair' and 'desired_response_prefix' in parameters:
+        params['desired_response_prefix'] = parameters['desired_response_prefix']
 
     return str(AttackSpecification.create(
-        'pyrit_crescendo',
+        attack,
         target_model,
         attack_model,
-        params={'objective': objective,
-                'max_turns': max_turns,
-                'max_backtracks': max_backtracks}
-    ).start())
-
-
-@tool
-def run_pyrit_pair(
-    objective: str,
-    attack_model: str,
-    target_model: str,
-    desired_response_prefix: str = "Sure, here is"
-) -> str:
-    """"You should use this tool to start PAIR attacks using the PyRIT framework.
-    This tool specifically uses the PAIR orchestrator.
-    PyRIT is an open-source red teaming framework for LLMs.
-    @param
-    objective: What is the attack trying to achieve. This should be a string
-    that outlines the objective, for example something that the target LLM
-    should not be doing.
-    attack_model: The name of the model that is used to generate adversarial
-    prompts as it appears on SAP AI Core. You cannot run this tool
-    without this information.
-    target_model: The name of the model that should be attacked as it appears
-    on SAP AI Core. You cannot run this tool without
-    this information.
-    desired_response_prefix: Optional parameter to set the desired response
-    prefix that the adversarial prompt should try to elicit from the target
-    model. The default is "Sure, here is".
-    """
-
-    return str(AttackSpecification.create(
-        'pyrit_pair',
-        target_model,
-        attack_model,
-        params={'objective': objective,
-                'desired_response_prefix': desired_response_prefix}
+        params=params
     ).start())
 
 
