@@ -192,10 +192,7 @@ print('Define tools')
 # Custom tools
 from tools import run_prompt_attack, \
     run_gptfuzz, \
-    run_pyrit, \
-    run_pyrit_red_teaming, \
-    run_pyrit_crescendo, \
-    run_pyrit_pair, \
+    run_pyrit_attack, \
     run_codeattack, \
     run_artprompt, \
     run_garak_attack, \
@@ -249,7 +246,7 @@ pyrit_notes = get_retriever(
     'pyrit_how',
     'Steps to take to run a pentest on a LLM using the \
     "PyRIT" framework. ALWAYS run this before using the \
-    run_pyrit tool, because it will explain how to use the tool'
+    run_pyrit_attack tool, because it will explain how to use the tool'
 )
 # Retriever that contains notes on how to use CodeAttack
 codeattack_notes = get_retriever(
@@ -308,10 +305,7 @@ tools = [
     gprfuzz_notes,
     run_gptfuzz,
     pyrit_notes,
-    run_pyrit,
-    run_pyrit_red_teaming,
-    run_pyrit_crescendo,
-    run_pyrit_pair,
+    run_pyrit_attack,
     codeattack_notes,
     run_codeattack,
     artprompt_notes,
