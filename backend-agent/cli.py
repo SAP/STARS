@@ -151,21 +151,14 @@ def textattack(args):
                  type=int,
                  help='Number of turns (=prompts to the target) to take before quitting.',  # noqa: E501
                  default=3)])
-def pyrit_red_teaming(args):
+def redteaming(args):
     spec = AttackSpecification.create(
-        'pyrit_red_teaming',
+        'redteaming',
         args.target_model,
         attack_model=args.attack_model,
         params=vars(args))
-    result = start_spec(spec, args)
-    if not result:
-        print('Something went wrong. No result returned from the attack.')
-        return
-    print(
-        'The attack was successful.' if result.success
-        else 'The attack was not successful.')
-    print('Overall response:')
-    print(result.details['response'])
+    start_spec(spec, args)
+
 
 
 @subcommand([arg('target_model', help='Name of the target model to attack'),
@@ -182,21 +175,13 @@ def pyrit_red_teaming(args):
                      type=int,
                      help='Number of backtracks to allow during the attack.',
                      default=5)])
-def pyrit_crescendo(args):
+def crescendo(args):
     spec = AttackSpecification.create(
-        'pyrit_crescendo',
+        'crescendo',
         args.target_model,
         attack_model=args.attack_model,
         params=vars(args))
-    result = start_spec(spec, args)
-    if not result:
-        print('Something went wrong. No result returned from the attack.')
-        return
-    print(
-        'The attack was successful.' if result.success
-        else 'The attack was not successful.')
-    print('Overall response:')
-    print(result.details['response'])
+    start_spec(spec, args)
 
 
 @subcommand([arg('target_model', help='Name of the target model to attack'),
@@ -209,21 +194,13 @@ def pyrit_crescendo(args):
                  type=str,
                  help='The desired response prefix that the adversarial prompt should try to elicit from the target model.',  # noqa: E501
                  default="Sure, here is"),])
-def pyrit_pair(args):
+def pair(args):
     spec = AttackSpecification.create(
-        'pyrit_pair',
+        'pair',
         args.target_model,
         attack_model=args.attack_model,
         params=vars(args))
-    result = start_spec(spec, args)
-    if not result:
-        print('Something went wrong. No result returned from the attack.')
-        return
-    print(
-        'The attack was successful.' if result.success
-        else 'The attack was not successful.')
-    print('Overall response:')
-    print(result.details['response'])
+    start_spec(spec, args)
 
 
 @subcommand([arg('target_model', help='Name of the target model to attack'),
