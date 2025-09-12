@@ -306,7 +306,7 @@ def start_pyrit_attack_red_teaming(
     Returns:
         AttackResult: The result of the red teaming attack.
     """
-    attack_name = 'PyRIT Red Teaming'
+    attack_name = 'Red Teaming'
     attack_description = "A multi-turn red-teaming attack where an orchestrator LLM iteratively generates adversarial prompts to a target model, evaluates the responses through a scoring engine, and refines prompts until the objective is achieved or attempts are exhausted."
         
     initialize_pyrit(memory_db_type=DUCK_DB)
@@ -367,7 +367,7 @@ def start_pyrit_attack_crescendo(
     """
     initialize_pyrit(memory_db_type=DUCK_DB)
 
-    attack_name = 'PyRIT Crescendo'
+    attack_name = 'Crescendo'
     attack_description = "A crescendo attack where an adversarial chat model iteratively crafts prompts to elicit a desired response from a target model, with the goal of achieving a specific objective through a series of targeted interactions."  # noqa
 
     max_turns = parameters.get('max_turns', 10)
@@ -422,7 +422,7 @@ def start_pyrit_attack_pair(
 
     desired_response_prefix = parameters.get('desired_response_prefix', "Sure, I'm happy to help with that.")
 
-    attack_name = 'PyRIT PAIR'
+    attack_name = 'PAIR'
     attack_description = "The Prompt Automatic Iterative Refinement (PAIR) algorithm uses a single adversarial chat model to iteratively generate and refine prompts to elicit a desired response from a target model, with the goal of achieving a specific objective through a series of targeted interactions."  # noqa
 
     # Create orchestrator-specific components
