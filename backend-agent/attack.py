@@ -162,19 +162,19 @@ class AttackSpecification:
                         self.target_model,
                         self.parameters
                     ))
-                case 'pyrit_red_teaming':
+                case 'redteaming':
                     return t.trace(start_pyrit_attack_red_teaming(
                         self.attack_model,
                         self.target_model,
                         self.parameters
                     ), print_output=False)
-                case 'pyrit_crescendo':
+                case 'crescendo':
                     return t.trace(start_pyrit_attack_crescendo(
                         self.attack_model,
                         self.target_model,
                         self.parameters
                     ), print_output=False)
-                case 'pyrit_pair':
+                case 'pair':
                     return t.trace(start_pyrit_attack_pair(
                         self.attack_model,
                         self.target_model,
