@@ -22,3 +22,5 @@ jobs:
           aicore-service-key: ${{ secrets.AICORE_SERVICE_KEY }}
           model: anthropic--claude-4-sonnet
           exclude-files: package-lock.json, uv.lock
+          footer-text: |
+            Always critique what AI says. Do not let AI replace YOUR I.

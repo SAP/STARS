@@ -38,6 +38,17 @@ export class WeightDialogComponent implements OnInit {
   }
 
   onSave() {
+    // Validate weights before sending
+    const invalidWeights = Object.entries(this.currentWeights)
+      .filter(([_, weight]) => weight < 0 || !Number.isInteger(weight));
+
+    if (invalidWeights.length > 0) {
+      this.snackBar.open('Please enter valid positive integers for all weights', '❌', {
+        duration: 3000
+      });
+      return;
+    }
+
     const headers = new HttpHeaders({
       'X-API-Key': this.apiKey
     });
