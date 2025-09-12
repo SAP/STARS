@@ -112,8 +112,10 @@ jobs:
           tags: |
             ${{ secrets.DOCKER_REGISTRY_URL }}/stars-backend:${{ needs.check_version_update.outputs.backend_version }}
             ${{ secrets.DOCKER_REGISTRY_URL }}/stars-backend:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=registry,ref=${{ secrets.DOCKER_REGISTRY_URL }}/stars-backend:cache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_REGISTRY_URL }}/stars-backend:cache,mode=max
+          # Use docker registry cache not to exceed GitHub Actions storage limits
+          # Builds will be slower but won't fail due to storage limits
 
       - name: Backend Build Summary
         run: |
@@ -203,3 +205,51 @@ jobs:
             echo "⏭️ (SKIP) Frontend: No version change detected"
           fi
           echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+
+  deploy-backend:
+    name: Restart Backend Deployment
+    if: github.event.pull_request.merged && needs.build-backend.result == 'success'
+    needs: [check_version_update, build-backend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure kubectl for SAP BTP Kyma
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Restart Backend Deployment
+        run: |
+          echo "🔄 Restarting backend deployment to pull latest image..."
+          kubectl rollout restart deployment/stars-backend -n stars
+          kubectl rollout status deployment/stars-backend -n stars --timeout=10m
+          echo "✅ Backend deployment restarted successfully"
+
+  deploy-frontend:
+    name: Restart Frontend Deployment
+    if: github.event.pull_request.merged && needs.build-frontend.result == 'success'
+    needs: [check_version_update, build-frontend]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure kubectl for SAP BTP Kyma
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Restart Frontend Deployment
+        run: |
+          echo "🔄 Restarting frontend deployment to pull latest image..."
+          kubectl rollout restart deployment/stars-frontend -n stars
+          kubectl rollout status deployment/stars-frontend -n stars --timeout=10m
+          echo "✅ Frontend deployment restarted successfully"
