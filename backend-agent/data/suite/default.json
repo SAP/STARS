@@ -3,12 +3,9 @@
     "name": "Default LLM attack suite"
   },
   "attacks": [
+
     {
-      "attack": "promptmap",
-      "target-model": "<target>"
-    },
-    {
-      "attack": "pyrit_pair",
+      "attack": "pair",
       "target-model": "<target>",
       "attack-model": "mistralai--mistral-large-instruct",
       "parameters": {
@@ -20,7 +17,7 @@
       }
     },
     {
-      "attack": "pyrit_crescendo",
+      "attack": "crescendo",
       "target-model": "<target>",
       "attack-model": "mistralai--mistral-large-instruct",
       "parameters": {
@@ -32,7 +29,7 @@
       }
     },
     {
-      "attack": "pyrit_red_teaming",
+      "attack": "redteaming",
       "target-model": "<target>",
       "attack-model": "mistralai--mistral-large-instruct",
       "parameters": {
