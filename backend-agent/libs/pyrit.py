@@ -106,14 +106,14 @@ class LLMAdapter(PromptChatTarget):
         """
         # Step 1: Remove markdown start patterns
         start_pattern = re.compile(
-            r"^(```json\n| ```json\n`|json\n|```\n|`\n|"
-            r"```json|`json|```|`|json|json\n)"
+            r'^(```json\n| ```json\n`|json\n|```\n|`\n|'
+            r'```json|`json|```|`|json|json\n)'
         )
         match = start_pattern.match(response_msg)
         if match:
             response_msg = response_msg[match.end():]
         # Step 2: Remove markdown end patterns
-        end_pattern = re.compile(r"(\n```|\n`|```|`|\n```)$")
+        end_pattern = re.compile(r'(\n```|\n`|```|`|\n```)$')
         match = end_pattern.search(response_msg)
         if match:
             response_msg = response_msg[:match.start()]
@@ -133,7 +133,7 @@ class LLMAdapter(PromptChatTarget):
                 json.loads(response_msg)
                 return response_msg
             except json.JSONDecodeError as e:
-                return "Invalid JSON response: {} - Error: {}".format(
+                return 'Invalid JSON response: {} - Error: {}'.format(
                     response_msg, str(e))
         else:
             return response_msg
@@ -223,7 +223,7 @@ class OrchestratorWrapper:
             if conversation:
                 assistant_responses = [
                     m.request_pieces[0] for m in conversation
-                    if m.request_pieces[0].role == "assistant"
+                    if m.request_pieces[0].role == 'assistant'
                 ]
                 if assistant_responses:
                     response = assistant_responses[-1]
@@ -255,9 +255,9 @@ class ObjectiveScorer(SelfAskTrueFalseScorer):
             chat_target=prompt_target,
             true_false_question=question,
             true_false_system_prompt_path=Path(
-                "data/true_false_system_prompt.yaml"
-                ).resolve()
-            )
+                'data/true_false_system_prompt.yaml'
+            ).resolve()
+        )
         self.objective = objective
         self.prompt_target = prompt_target
 
@@ -390,7 +390,12 @@ def start_pyrit_attack_crescendo(
     initialize_pyrit(memory_db_type=DUCK_DB)
 
     attack_name = 'Crescendo'
-    attack_description = "A crescendo attack where an adversarial chat model iteratively crafts prompts to elicit a desired response from a target model, with the goal of achieving a specific objective through a series of targeted interactions."  # noqa
+    attack_description = '''
+    A crescendo attack where an adversarial chat model
+    iteratively crafts prompts to elicit a desired
+    response from a target model, with the goal of
+    achieving a specific objective through a series
+    of targeted interactions.'''
 
     max_turns = parameters.get('max_turns', 10)
     max_backtracks = parameters.get('max_backtracks', 5)
@@ -444,7 +449,13 @@ def start_pyrit_attack_pair(
         'desired_response_prefix', "Sure, I'm happy to help with that.")
 
     attack_name = 'PAIR'
-    attack_description = "The Prompt Automatic Iterative Refinement (PAIR) algorithm uses a single adversarial chat model to iteratively generate and refine prompts to elicit a desired response from a target model, with the goal of achieving a specific objective through a series of targeted interactions."  # noqa
+    attack_description = '''
+    The Prompt Automatic Iterative Refinement (PAIR)
+    algorithm uses a single adversarial chat model to
+    iteratively generate and refine prompts to elicit
+    a desired response from a target model, with the
+    goal of achieving a specific objective through
+    a series of targeted interactions.'''
 
     # Create orchestrator-specific components
     adversarial_chat = LLMAdapter(attack_model)
