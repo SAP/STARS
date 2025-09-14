@@ -160,7 +160,6 @@ def redteaming(args):
     start_spec(spec, args)
 
 
-
 @subcommand([arg('target_model', help='Name of the target model to attack'),
              arg('attack_model',
                  help='Name of the model that is used to attack/ mutate prompts'),  # noqa: E501
@@ -172,9 +171,9 @@ def redteaming(args):
                  help='Number of turns (=prompts to the target) to take before quitting.',  # noqa: E501
                  default=10),
              arg('--max-backtracks', '-b',
-                     type=int,
-                     help='Number of backtracks to allow during the attack.',
-                     default=5)])
+                 type=int,
+                 help='Number of backtracks to allow during the attack.',
+                 default=5)])
 def crescendo(args):
     spec = AttackSpecification.create(
         'crescendo',

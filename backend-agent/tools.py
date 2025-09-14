@@ -91,13 +91,15 @@ def run_pyrit_attack(
 ) -> str:
     """
     Use this function to start an attack using the PyRIT framework. PyRIT is a
-    framework that comprises several attack orchestrators, each of them coming with a
+    framework that comprises several attack orchestrators,
+    each of them coming with a
     specific name (redteaming, crescendo, pair).
     Run pyrit_how before running this function. Some attacks may need
     different parameters.
     @params
-    attack_name: Since PyRIT supports many attack orchestrators, the name of the
-    attack must be specified here. Supported: "redteaming", "crescendo", "pair"
+    attack_name: Since PyRIT supports many attack orchestrators,
+    the name of the attack must be specified here.
+    Supported: "redteaming", "crescendo", "pair"
     attack_model: The name of the model that is used to generate adversarial
     prompts as it appears on SAP AI Core. You cannot run this tool
     without this information.
@@ -112,20 +114,17 @@ def run_pyrit_attack(
     parameters: Dictionary containing attack-specific parameters:
         - For "redteaming": {"max_turns": int}
         - For "crescendo": {"max_turns": int, "max_backtracks": int}
-        - For "pair": {"desired_response_prefix": str}. You cannot run this tool
-    without this information.
+        - For "pair": {"desired_response_prefix": str}.
+    You cannot run this tool without this information.
     """
 
     attack = attack_name.lower()
     supported_attacks = ['redteaming', 'crescendo', 'pair']
-    
     if attack not in supported_attacks:
         return f'The attack "{attack}" is not available. \
         Supported attacks are: {",".join(supported_attacks)}'
-
     # Build parameters based on attack type
     params = {'objective': objective}
-    
     if attack == 'redteaming' and 'max_turns' in parameters:
         params['max_turns'] = parameters['max_turns']
 
@@ -134,7 +133,9 @@ def run_pyrit_attack(
         params['max_backtracks'] = parameters['max_backtracks']
 
     elif attack == 'pair' and 'desired_response_prefix' in parameters:
-        params['desired_response_prefix'] = parameters['desired_response_prefix']
+        params['desired_response_prefix'] = (
+            parameters['desired_response_prefix']
+            )
 
     return str(AttackSpecification.create(
         attack,
