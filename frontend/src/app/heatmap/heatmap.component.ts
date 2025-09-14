@@ -1,26 +1,37 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, inject } from '@angular/core';
 import { capitalizeFirstLetter, splitModelName } from '../utils/utils';
 
 import ApexCharts from 'apexcharts';
 import { CommonModule } from '@angular/common';
+import { ConfigService } from '../services/config.service';
 import { FormsModule } from '@angular/forms';
+import { HeatmapSeries } from '../types/Serie';
 import { HttpClient } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { ScoreResponse } from './../types/API';
-import { environment } from '../../environments/environment';
+import { WeightDialogComponent } from '../weight-dialog/weight-dialog.component';
 
 @Component({
   selector: 'app-heatmap',
   templateUrl: './heatmap.component.html',
   styleUrls: ['./heatmap.component.css'],
   standalone: true,
-  imports: [CommonModule, MatFormFieldModule, MatSelectModule, FormsModule, MatCardModule, MatButtonModule],
+  imports: [CommonModule, MatFormFieldModule, MatSelectModule, FormsModule, MatCardModule, MatButtonModule, MatIconModule],
 })
 export class HeatmapComponent implements AfterViewInit, OnInit {
-  constructor(private http: HttpClient, private el: ElementRef, private changeDetector: ChangeDetectorRef) {}
+  private http = inject(HttpClient);
+  private el = inject(ElementRef);
+  private dialog = inject(MatDialog);
+  private configService = inject(ConfigService);
+
+  private latestData: ScoreResponse | null = null;
+  private attackNames: string[] = [];
+  private attackWeights: { [attackName: string]: number } = {};
 
   ngAfterViewInit() {
     this.createHeatmap({
@@ -35,23 +46,25 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
 
   // Load the heatmap data from the server
   loadHeatmapData() {
-    let url = '';
-    url = `${environment.api_url}/api/heatmap`;
+    const url = `${this.configService.apiUrl}/api/heatmap`;
     this.http.get<ScoreResponse>(url).subscribe({
       next: scoresData => {
         this.processDataAfterScan(scoresData);
       },
-      error: error => console.error('❌ Erreur API:', error),
+      error: error => console.error('❌ Error API:', error),
     });
   }
 
   // Construct the heatmap data from the API response
   processDataAfterScan(data: ScoreResponse) {
+    this.latestData = data;
     let modelNames: string[] = [];
-    let attackNames: string[] = [];
     modelNames = data.models.map(model => model.name);
-    attackNames = data.attacks.map(attack => attack.name);
-    this.createHeatmap(data, modelNames, attackNames);
+    this.attackNames = data.attacks.map(attack => attack.name);
+    this.attackWeights = Object.fromEntries(
+      data.attacks.map(attack => [attack.name, attack.weight ?? 1])
+    );
+    this.createHeatmap(data, modelNames, this.attackNames);
   }
 
   // Create the heatmap chart with the processed data
@@ -64,7 +77,7 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
     const allAttackWeights = Object.fromEntries(
       data.attacks.map(attack => [attack.name, attack.weight ?? 1])
     );
-    let seriesData: any[] = [];
+    const seriesData: HeatmapSeries[] = [];
     // Process each model's scores and calculate the exposure score
     data.models.forEach(model => {
       let weightedSum = 0;
@@ -110,11 +123,11 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
           colorScale: {
             ranges: [
               {from: -10, to: 0, color: '#cccccc', name: 'N/A'}, // Color for unscanned cells = '-'
-              {from: 0, to: 40, color: '#00A100'},
+              {from: 0, to: 40, color: '#00A100', name: '0% - 40%'},
               // {from: 21, to: 40, color: '#128FD9'},
-              {from: 41, to: 80, color: '#FF7300'},
+              {from: 41, to: 80, color: '#FF7300', name: '41% - 80%'},
               // {from: 61, to: 80, color: '#FFB200'},
-              {from: 81, to: 100, color: '#FF0000'},
+              {from: 81, to: 100, color: '#FF0000', name: '81% - 100%'},
             ],
           },
         },
@@ -126,7 +139,7 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
       dataLabels: {
         // Format the data labels visualized in the heatmap cells
         formatter: function (val: number | null) {
-          return (val === null || val < 0) ? '-' : val;
+          return (val === null || val < 0) ? '-' : `${val}%`;
         },
         style: {
           // Size of the numbers in the cells
@@ -167,7 +180,7 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
               return modelName; // Return as is when it's a number
             }
               const splitName = splitModelName(modelName);
-              return splitName
+              return splitName;
           },
           style: {
             fontSize: '12px',
@@ -185,13 +198,13 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
           dataPointIndex,
           w
         }: {
-          series: any[];
+          series: number[][];
           seriesIndex: number;
           dataPointIndex: number;
           w: any;
         }) {
           // Handle the case where the score is -1 (unscanned) and display 'N/A' in the tooltip
-          const value = series[seriesIndex][dataPointIndex] === -1 ? 'N/A' : series[seriesIndex][dataPointIndex];
+          const value = series[seriesIndex][dataPointIndex] === -1 ? 'N/A' : series[seriesIndex][dataPointIndex] + '%';
           const yLabel = capitalizeFirstLetter(w.globals.initialSeries[seriesIndex].name);
           const xLabel = capitalizeFirstLetter(w.globals.labels[dataPointIndex]);
           // Html format the tooltip content with title = model name and body = attack name and score
@@ -218,5 +231,29 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
       const chart = new ApexCharts(chartElement, options);
       chart.render();
     }
+  }
+
+  closeAndReturn() {
+    window.close(); // Closes the tab and go back to the previous page = the agent
+  }
+
+  openWeightDialog() {
+    if (!this.latestData) return;
+
+    const dialogRef = this.dialog.open(WeightDialogComponent, {
+      width: '500px',
+      data: {
+        title: 'Update weights',
+        weights: this.attackWeights,
+        attackNames: this.attackNames,
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === true) {
+        // Reload the heatmap data after weights successfully updated
+        this.loadHeatmapData();
+      }
+    });
   }
 }

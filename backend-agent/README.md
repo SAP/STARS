@@ -28,7 +28,7 @@ In general, the pentest tools integrated in the agent can be run on LLMs deploye
 
 ## Installation
 - Use Python 3.10 or 3.11
-- Install dependencies with `pip install -r requirements.txt`
+- Install dependencies with `pip install .` or `uv sync`
 - MacOS only: install libmagic `brew install libmagic`
 
 > Tested on a M3 MacOS and on Ubuntu 22.04
@@ -38,7 +38,7 @@ In general, the pentest tools integrated in the agent can be run on LLMs deploye
 
 The agent is run in a backend (Flask webserver).
 
-`python main.py`
+`python main.py` or `uv run main.py`
 
 Refer to `frontend` folder for the frontend.
 

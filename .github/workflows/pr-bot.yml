@@ -1,7 +1,7 @@
 name: AI-assisted
 on:
   pull_request:
-    types: [ready_for_review]
+    types: [ready_for_review, opened, reopened]
 
 jobs:
   summary:
@@ -12,7 +12,7 @@ jobs:
         with:
           aicore-service-key: ${{ secrets.AICORE_SERVICE_KEY }}
           model: gpt-4o
-          exclude-files: package-lock.json
+          exclude-files: package-lock.json, uv.lock
   review:
     name: PR Review
     runs-on: [ubuntu-latest]
@@ -21,4 +21,7 @@ jobs:
         with:
           aicore-service-key: ${{ secrets.AICORE_SERVICE_KEY }}
           model: anthropic--claude-4-sonnet
-          exclude-files: package-lock.json
+          exclude-files: package-lock.json, uv.lock
+          footer-text: |
+            ---
+            > Always critique what AI says. Do not let AI replace YOUR I.

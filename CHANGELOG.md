@@ -1,3 +1,18 @@
+# Version: v0.5.0
+
+* [#84](https://github.com/SAP/STARS/pull/84): Bump flask-cors from 6.0.0 to 6.0.1 in /backend-agent
+* [#85](https://github.com/SAP/STARS/pull/85): Bump requests from 2.32.4 to 2.32.5 in /backend-agent
+* [#87](https://github.com/SAP/STARS/pull/87): Bump flask from 3.1.1 to 3.1.2 in /backend-agent
+* [#88](https://github.com/SAP/STARS/pull/88): Replace SAP library for accessing LLMs
+* [#89](https://github.com/SAP/STARS/pull/89): Add GitHub action for SAP PR bot
+* [#91](https://github.com/SAP/STARS/pull/91): Add back button and weights config in dashboard
+* [#94](https://github.com/SAP/STARS/pull/94): Add support for uv
+* [#95](https://github.com/SAP/STARS/pull/95): Bump actions/setup-python from 5 to 6
+* [#96](https://github.com/SAP/STARS/pull/96): Bump actions/setup-node from 4 to 5
+* [#99](https://github.com/SAP/STARS/pull/99): Bump the js-dependencies group across 1 directory with 28 updates
+* [#100](https://github.com/SAP/STARS/pull/100): Improve maintainability and add docker action
+
+
 # Version: v0.4.0
 
 * [#44](https://github.com/SAP/STARS/pull/44): Add Garak tool

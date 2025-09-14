@@ -34,8 +34,8 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kb",
-                  "maximumError": "1mb"
+                  "maximumWarning": "1mb",
+                  "maximumError": "3mb"
                 },
                 {
                   "type": "anyComponentStyle",
@@ -51,31 +51,7 @@
               "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
-              "namedChunks": true,
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.development.ts"
-                }
-              ]
-            },
-            "docker": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.docker.ts"
-                }
-              ],
-              "outputHashing": "all"
-            },
-            "k8s": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.k8s.ts"
-                }
-              ],
-              "outputHashing": "all"
+              "namedChunks": true
             }
           },
           "defaultConfiguration": "production"
@@ -88,12 +64,6 @@
             },
             "development": {
               "buildTarget": "stars:build:development"
-            },
-            "docker": {
-              "buildTarget": "stars:build:docker"
-            },
-            "k8s": {
-              "buildTarget": "stars:build:k8s"
             }
           },
           "defaultConfiguration": "development"
