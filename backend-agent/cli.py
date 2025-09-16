@@ -147,7 +147,7 @@ def textattack(args):
              arg('objective', help='What is the attack trying to achieve. This\
                    should be a string that outlines the objective, for example\
                    something that the target LLM should not be doing.'),
-             arg('--max-turns', '-t',
+             arg('--max_turns', '-t',
                  type=int,
                  help='Number of turns (=prompts to the target) to take before quitting.',  # noqa: E501
                  default=3)])
@@ -166,11 +166,11 @@ def redteaming(args):
              arg('objective', help='What is the attack trying to achieve. This\
                    should be a string that outlines the objective, for example\
                    something that the target LLM should not be doing.'),
-             arg('--max-turns', '-t',
+             arg('--max_turns', '-t',
                  type=int,
                  help='Number of turns (=prompts to the target) to take before quitting.',  # noqa: E501
                  default=10),
-             arg('--max-backtracks', '-b',
+             arg('--max_backtracks', '-b',
                  type=int,
                  help='Number of backtracks to allow during the attack.',
                  default=5)])
@@ -189,7 +189,7 @@ def crescendo(args):
              arg('objective', help='What is the attack trying to achieve. This\
                    should be a string that outlines the objective, for example\
                    something that the target LLM should not be doing.'),
-             arg('--desired-response-prefix', '-p',
+             arg('--desired_response_prefix', '-p',
                  type=str,
                  help='The desired response prefix that the adversarial prompt should try to elicit from the target model.',  # noqa: E501
                  default="Sure, here is"),])
