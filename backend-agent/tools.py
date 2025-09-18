@@ -82,36 +82,51 @@ def run_gptfuzz(mutate_model_name: str,
 
 
 @tool
-def run_pyrit(
-    objective: str,
-    attack_model: str,
+def run_pyrit_attack(
+    attack_name: str,
     target_model: str,
-    max_turns: int = 3
+    attack_model: str,
+    objective: str,
+    **kwargs
 ) -> str:
-    """"You should use this tool to start attacks using the PyRIT framework.
-    Start this only after using the tool pyrit_how, which explains
-    how to use this tool.
-    PyRIT is an open-source red teaming framework for LLMs.
-    @param
-    objective: What is the attack trying to achieve. This should be a string
-    that outlines the objective, for example something that the target LLM
-    should not be doing.
-    attack_model: The name of the model that is used to generate adversarial
-    prompts as it appears on SAP AI Core. You cannot run this tool
-    without this information.
+    """
+    Use this function to start an attack using the PyRIT framework. PyRIT is a
+    framework that comprises several attack orchestrators,
+    each of them coming with a
+    specific name (redteaming, crescendo, pair ...).
+    Run pyrit_how before running this function. Some attacks may need
+    different parameters.
+    @params
+    attack_name: Since PyRIT supports many attack orchestrators,
+    the name of the attack must be specified here.
+    Supported: "redteaming", "crescendo", "pair"
     target_model: The name of the model that should be attacked as it appears
     on SAP AI Core. You cannot run this tool without
     this information.
-    max_turns: Determines how often the attack model is queried. 3 is a
-    sensible default.
+    attack_model: The name of the model that is used to generate adversarial
+    prompts as it appears on SAP AI Core. You cannot run this tool
+    without this information.
+    objective: What is the attack trying to achieve. This should be a string
+    that outlines the objective, for example something that the target LLM
+    should not be doing. You cannot run this tool
+    without this information.
+    **kwargs: optional attack-specific parameters passed as keyword arguments
     """
 
+    attack_name = attack_name.lower()
+    supported_attacks = ['redteaming', 'crescendo', 'pair']
+    if attack_name not in supported_attacks:
+        return f'The attack "{attack_name}" is not available. \
+        Supported attacks are: {",".join(supported_attacks)}'
+
+    # Build parameters - now using kwargs directly
+    params = {'objective': objective, **kwargs}
+
     return str(AttackSpecification.create(
-        'pyrit',
+        attack_name,
         target_model,
         attack_model,
-        params={'objective': objective,
-                'max_turns': max_turns}
+        params=params
     ).start())
 
 

@@ -147,25 +147,59 @@ def textattack(args):
              arg('objective', help='What is the attack trying to achieve. This\
                    should be a string that outlines the objective, for example\
                    something that the target LLM should not be doing.'),
-             arg('--max-turns', '-t',
+             arg('--max_turns', '-t',
                  type=int,
                  help='Number of turns (=prompts to the target) to take before quitting.',  # noqa: E501
                  default=3)])
-def pyrit(args):
+def redteaming(args):
     spec = AttackSpecification.create(
-        'pyrit',
+        'redteaming',
         args.target_model,
         attack_model=args.attack_model,
         params=vars(args))
-    result = start_spec(spec, args)
-    if not result:
-        print('Something went wrong. No result returned from the attack.')
-        return
-    print(
-        'The attack was successful.' if result.success
-        else 'The attack was not successful.')
-    print('Overall response:')
-    print(result.details['response'])
+    start_spec(spec, args)
+
+
+@subcommand([arg('target_model', help='Name of the target model to attack'),
+             arg('attack_model',
+                 help='Name of the model that is used to attack/ mutate prompts'),  # noqa: E501
+             arg('objective', help='What is the attack trying to achieve. This\
+                   should be a string that outlines the objective, for example\
+                   something that the target LLM should not be doing.'),
+             arg('--max_turns', '-t',
+                 type=int,
+                 help='Number of turns (=prompts to the target) to take before quitting.',  # noqa: E501
+                 default=10),
+             arg('--max_backtracks', '-b',
+                 type=int,
+                 help='Number of backtracks to allow during the attack.',
+                 default=5)])
+def crescendo(args):
+    spec = AttackSpecification.create(
+        'crescendo',
+        args.target_model,
+        attack_model=args.attack_model,
+        params=vars(args))
+    start_spec(spec, args)
+
+
+@subcommand([arg('target_model', help='Name of the target model to attack'),
+             arg('attack_model',
+                 help='Name of the model that is used to attack/ mutate prompts'),  # noqa: E501
+             arg('objective', help='What is the attack trying to achieve. This\
+                   should be a string that outlines the objective, for example\
+                   something that the target LLM should not be doing.'),
+             arg('--desired_response_prefix', '-p',
+                 type=str,
+                 help='The desired response prefix that the adversarial prompt should try to elicit from the target model.',  # noqa: E501
+                 default="Sure, here is"),])
+def pair(args):
+    spec = AttackSpecification.create(
+        'pair',
+        args.target_model,
+        attack_model=args.attack_model,
+        params=vars(args))
+    start_spec(spec, args)
 
 
 @subcommand([arg('target_model', help='Name of the target model to attack'),
