@@ -517,7 +517,7 @@ def start_pyrit_attack(
 
     objective = parameters['objective']
     display_intermediate_results = parameters.get(
-        'display_intermediate_results', True)
+        'display_intermediate_results', False)
     vulnerability_type = parameters.get('vulnerability_type', 'jailbreak')
 
     with Step(f'Running {attack_name} Attack'):
@@ -529,8 +529,7 @@ def start_pyrit_attack(
 
         attack_result = asyncio.run(
             wrapped_orchestrator.run_attack_async(
-                objective=objective,
-                display_intermediate_results=display_intermediate_results,
+                objective=objective
             )
         )
 
