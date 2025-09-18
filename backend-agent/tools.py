@@ -87,58 +87,43 @@ def run_pyrit_attack(
     target_model: str,
     attack_model: str,
     objective: str,
-    parameters: dict = {}
+    **kwargs 
 ) -> str:
     """
     Use this function to start an attack using the PyRIT framework. PyRIT is a
     framework that comprises several attack orchestrators,
     each of them coming with a
-    specific name (redteaming, crescendo, pair).
+    specific name (redteaming, crescendo, pair ...).
     Run pyrit_how before running this function. Some attacks may need
     different parameters.
     @params
     attack_name: Since PyRIT supports many attack orchestrators,
     the name of the attack must be specified here.
     Supported: "redteaming", "crescendo", "pair"
-    attack_model: The name of the model that is used to generate adversarial
-    prompts as it appears on SAP AI Core. You cannot run this tool
-    without this information.
     target_model: The name of the model that should be attacked as it appears
     on SAP AI Core. You cannot run this tool without
     this information.
-
+    attack_model: The name of the model that is used to generate adversarial
+    prompts as it appears on SAP AI Core. You cannot run this tool
+    without this information.
     objective: What is the attack trying to achieve. This should be a string
     that outlines the objective, for example something that the target LLM
     should not be doing. You cannot run this tool
     without this information.
-    parameters: Dictionary containing attack-specific parameters:
-        - For "redteaming": {"max_turns": int}
-        - For "crescendo": {"max_turns": int, "max_backtracks": int}
-        - For "pair": {"desired_response_prefix": str}.
-    You cannot run this tool without this information.
+    **kwargs: optional attack-specific parameters passed as keyword arguments 
     """
 
-    attack = attack_name.lower()
+    attack_name = attack_name.lower()
     supported_attacks = ['redteaming', 'crescendo', 'pair']
-    if attack not in supported_attacks:
-        return f'The attack "{attack}" is not available. \
+    if attack_name not in supported_attacks:
+        return f'The attack "{attack_name}" is not available. \
         Supported attacks are: {",".join(supported_attacks)}'
-    # Build parameters based on attack type
-    params = {'objective': objective}
-    if attack == 'redteaming' and 'max_turns' in parameters:
-        params['max_turns'] = parameters['max_turns']
-
-    elif attack == 'crescendo' and 'max_turns' in parameters:
-        params['max_turns'] = parameters['max_turns']
-        params['max_backtracks'] = parameters['max_backtracks']
-
-    elif attack == 'pair' and 'desired_response_prefix' in parameters:
-        params['desired_response_prefix'] = (
-            parameters['desired_response_prefix']
-            )
+    
+    # Build parameters - now using kwargs directly
+    params = {'objective': objective, **kwargs}
 
     return str(AttackSpecification.create(
-        attack,
+        attack_name,
         target_model,
         attack_model,
         params=params
