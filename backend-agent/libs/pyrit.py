@@ -208,7 +208,8 @@ class OrchestratorWrapper:
 
     def _convert_orchestrator_result(self, result) -> Dict[str, Any]:
         """Convert PyRIT's OrchestratorResult to our expected format"""
-        # Check if the result has a status attribute (e.g., "success", "failure", "pruned", etc.)
+        # Check if the result has a status attribute
+        # (e.g., "success", "failure", "pruned", etc.)
         if hasattr(result, 'status'):
             success = result.status == 'success'
         else:

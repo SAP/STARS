@@ -87,7 +87,7 @@ def run_pyrit_attack(
     target_model: str,
     attack_model: str,
     objective: str,
-    **kwargs 
+    **kwargs
 ) -> str:
     """
     Use this function to start an attack using the PyRIT framework. PyRIT is a
@@ -110,7 +110,7 @@ def run_pyrit_attack(
     that outlines the objective, for example something that the target LLM
     should not be doing. You cannot run this tool
     without this information.
-    **kwargs: optional attack-specific parameters passed as keyword arguments 
+    **kwargs: optional attack-specific parameters passed as keyword arguments
     """
 
     attack_name = attack_name.lower()
@@ -118,7 +118,7 @@ def run_pyrit_attack(
     if attack_name not in supported_attacks:
         return f'The attack "{attack_name}" is not available. \
         Supported attacks are: {",".join(supported_attacks)}'
-    
+
     # Build parameters - now using kwargs directly
     params = {'objective': objective, **kwargs}
 
