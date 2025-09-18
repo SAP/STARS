@@ -208,6 +208,7 @@ class OrchestratorWrapper:
 
     def _convert_orchestrator_result(self, result) -> Dict[str, Any]:
         """Convert PyRIT's OrchestratorResult to our expected format"""
+        # Check if the result has a status attribute (e.g., "success", "failure", "pruned", etc.)
         if hasattr(result, 'status'):
             success = result.status == 'success'
         else:
@@ -215,20 +216,24 @@ class OrchestratorWrapper:
 
         response = None
         if hasattr(result, 'conversation_id') and result.conversation_id:
-            # Get the last response from memory
+            # Get the Central Memory instance to retrieve the conversation
             memory = CentralMemory.get_memory_instance()
+            # Retrieve the conversation from memory by its conversation_id
             conversation = memory.get_conversation(
                 conversation_id=result.conversation_id
-                )
+            )
+            # If the conversation was found, extract all assistant responses
+            # (i.e., the target model’s replies to user prompts)
             if conversation:
                 assistant_responses = [
                     m.request_pieces[0] for m in conversation
                     if m.request_pieces[0].role == 'assistant'
                 ]
+                # Use the last assistant response for reporting,
+                # since it contains the final details of the attack outcome
                 if assistant_responses:
                     response = assistant_responses[-1]
-                else:
-                    None
+        # Return in our reporting format
         return {
             'success': success,
             'response': response
@@ -255,7 +260,7 @@ class ObjectiveScorer(SelfAskTrueFalseScorer):
             chat_target=prompt_target,
             true_false_question=question,
             true_false_system_prompt_path=Path(
-                'data/true_false_system_prompt.yaml'
+                'libs/data/true_false_system_prompt.yaml'
             ).resolve()
         )
         self.objective = objective
@@ -323,7 +328,7 @@ def start_pyrit_attack_red_teaming(
     Returns:
         AttackResult: The result of the red teaming attack.
     """
-    attack_name = 'Red Teaming'
+    attack_name = 'redteaming'
     attack_description = """
     A multi-turn red-teaming attack where an orchestrator LLM
     iteratively generates adversarial prompts to a target model,
@@ -389,13 +394,13 @@ def start_pyrit_attack_crescendo(
     """
     initialize_pyrit(memory_db_type=DUCK_DB)
 
-    attack_name = 'Crescendo'
-    attack_description = '''
+    attack_name = 'crescendo'
+    attack_description = """
     A crescendo attack where an adversarial chat model
     iteratively crafts prompts to elicit a desired
     response from a target model, with the goal of
     achieving a specific objective through a series
-    of targeted interactions.'''
+    of targeted interactions."""
 
     max_turns = parameters.get('max_turns', 10)
     max_backtracks = parameters.get('max_backtracks', 5)
@@ -448,14 +453,14 @@ def start_pyrit_attack_pair(
     desired_response_prefix = parameters.get(
         'desired_response_prefix', "Sure, I'm happy to help with that.")
 
-    attack_name = 'PAIR'
-    attack_description = '''
+    attack_name = 'pair'
+    attack_description = """
     The Prompt Automatic Iterative Refinement (PAIR)
     algorithm uses a single adversarial chat model to
     iteratively generate and refine prompts to elicit
     a desired response from a target model, with the
     goal of achieving a specific objective through
-    a series of targeted interactions.'''
+    a series of targeted interactions."""
 
     # Create orchestrator-specific components
     adversarial_chat = LLMAdapter(attack_model)
