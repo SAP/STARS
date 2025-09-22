@@ -8,48 +8,50 @@ on:
     paths:
       - '**.py'
       - '**.txt'
+      - '**/pyproject.toml'
+      - '**/uv.lock'
   workflow_dispatch:
 
 permissions:
-    checks: read
-    contents: read
+  checks: read
+  contents: read
 
 jobs:
-    installation:
-        name: Test backend installation
-        runs-on: ubuntu-latest
-        steps:
-            - name: Check out Git repository
-              uses: actions/checkout@v5
+  installation-backend:
+    name: Test backend installation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v5
 
-            - name: Set up Python environment
-              uses: actions/setup-python@v6
-              with:
-                python-version: "3.11"
-                token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set up Python environment
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.11"
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-            - name: Install uv
-              uses: astral-sh/setup-uv@v6
-              with:
-                version: "latest"
-                enable-cache: true
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: "latest"
+          enable-cache: true
 
-            - name: Install dependencies
-              run: uv sync --locked --all-extras --dev --project backend-agent
+      - name: Install dependencies
+        run: uv sync --locked --all-extras --dev --project backend-agent
 
-            - name: Start server and check health
-              working-directory: backend-agent
-              run: |
-                DISABLE_AGENT=1 DB_PATH=${RUNNER_TEMP}/data.db uv run main.py > server.log 2>&1 &
-                for i in {1..20}; do
-                  sleep 1
-                  status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/health || true)
-                  if [ "$status" -eq 200 ]; then
-                    echo "Health check succeeded"
-                    cat server.log
-                    exit 0
-                  fi
-                done
-                echo "Health check failed after waiting"
-                cat server.log
-                exit 1
+      - name: Start server and check health
+        working-directory: backend-agent
+        run: |
+          DISABLE_AGENT=1 DB_PATH=${RUNNER_TEMP}/data.db uv run main.py > server.log 2>&1 &
+          for i in {1..20}; do
+            sleep 1
+            status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/health || true)
+            if [ "$status" -eq 200 ]; then
+              echo "Health check succeeded"
+              cat server.log
+              exit 0
+            fi
+          done
+          echo "Health check failed after waiting"
+          cat server.log
+          exit 1
