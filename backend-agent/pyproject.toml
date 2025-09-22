@@ -29,7 +29,7 @@ dependencies = [
     'unstructured>=0.18.14',
     'art',
     'pandas',
-    'ollama==0.5.3',
+    'ollama==0.5.4',
     'weasyprint',
     'pyrit==0.9.0',
     'codeattack @ git+https://github.com/marcorosa/CodeAttack',
