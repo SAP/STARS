@@ -9,6 +9,7 @@ on:
       - '**.ts'
       - '**.js'
       - '**/package.json'
+      - 'CHANGELOG.md'
   workflow_dispatch:
 
 permissions:
