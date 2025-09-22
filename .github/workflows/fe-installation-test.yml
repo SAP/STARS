@@ -1,0 +1,73 @@
+name: Test frontend installation
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+    paths:
+      - 'frontend/package*.json'
+      - 'frontend/**.ts'
+      - 'frontend/**.js'
+      - 'frontend/**.json'
+      - 'frontend/**.css'
+      - 'frontend/**.html'
+  workflow_dispatch:
+
+permissions:
+  checks: read
+  contents: read
+
+jobs:
+  installation-frontend:
+    name: Test frontend installation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js environment
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+
+      - name: Verify build artifacts
+        working-directory: frontend
+        run: |
+          if [ -d "dist/" ]; then
+            echo "Build artifacts found in dist/"
+            ls -la dist/
+          else
+            echo "Build artifacts not found"
+            exit 1
+          fi
+
+      - name: Test dev server startup
+        working-directory: frontend
+        timeout-minutes: 2
+        run: |
+          # Start the dev server in background
+          npm start &
+          DEV_SERVER_PID=$!
+
+          # Wait for server to be ready (max 60 seconds)
+          for i in {1..60}; do
+            sleep 1
+            if curl -f -s http://localhost:4200 > /dev/null 2>&1; then
+              echo "Dev server started successfully"
+              kill $DEV_SERVER_PID
+              exit 0
+            fi
+          done
+
+          echo "Dev server failed to start within 60 seconds"
+          kill $DEV_SERVER_PID
+          exit 1
