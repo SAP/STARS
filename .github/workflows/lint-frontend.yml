@@ -6,9 +6,9 @@ on:
       - develop
       - main
     paths:
-      - '**.json'
       - '**.ts'
       - '**.js'
+      - '**/package.json'
   workflow_dispatch:
 
 permissions:
