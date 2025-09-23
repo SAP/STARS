@@ -1,8 +1,9 @@
+from argparse import Namespace
 import json
 import os
 from importlib.metadata import version
 
-
+from cli import run_all_logic
 from dotenv import load_dotenv
 from flask import abort, jsonify, request, send_file
 from flask_cors import CORS
@@ -269,6 +270,31 @@ def update_attack_weights():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/run_all', methods=['POST'])
+def run_all_attacks():
+    """
+    This route allows to run all attacks. Used for automation
+    Expected JSON body:
+    {
+      "target_model": "string"
+    }
+    """
+    # init args
+    verify_api_key()
+    target_model = request.get_json().get('target_model')
+
+    if not target_model:
+        return jsonify({'error': 'target_model parameter is required'}), 400
+
+    args = Namespace(
+        file='data/all/default.json',
+        target_model=target_model,
+    )
+
+    results = run_all_logic(args)
+    return jsonify(results), 200
 
 
 if __name__ == '__main__':

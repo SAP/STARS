@@ -379,24 +379,7 @@ def run(args):
               file=sys.stderr)
 
 
-@subcommand([
-    arg('file',
-        help='Path to the JSON file containing the attack specification.',
-        nargs='?'),
-    arg('--attack_model',
-        help='Specify the target attack model.',
-        type=str,
-        required=True),
-    arg('--eval_model',
-        help='Specify the evaluation model to use.',
-        type=str,
-        required=True),
-    arg('--target_model',
-        help='Specify the target model if not specified in the spec.',
-        type=str,
-        required=True),
-])
-def run_all(args):
+def run_all_logic(args):
     """Run all LLM attacks with specified target and evaluation models."""
     # Load JSON spec
     if not args.file:
@@ -424,9 +407,32 @@ def run_all(args):
         suite = AttackSuite.from_dict(spec)
         suite.set_target(args.target_model)
         results = suite.run()
-        print(results)
     else:
-        print('JSON is invalid. No attacks run.', file=sys.stderr)
+        results = 'JSON is invalid. No attacks run.'
+    return results
+
+
+@subcommand([
+    arg('file',
+        help='Path to the JSON file containing the attack specification.',
+        nargs='?'),
+    arg('--attack_model',
+        help='Specify the target attack model.',
+        type=str,
+        required=True),
+    arg('--eval_model',
+        help='Specify the evaluation model to use.',
+        type=str,
+        required=True),
+    arg('--target_model',
+        help='Specify the target model if not specified in the spec.',
+        type=str,
+        required=True),
+])
+def run_all(args):
+    """Run all LLM attacks with specified target and evaluation models."""
+    results = run_all_logic(args)
+    print(results, file=sys.stderr)
 
 
 @subcommand()
