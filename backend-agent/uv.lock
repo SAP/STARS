@@ -2700,7 +2700,7 @@ wheels = [
 
 [[package]]
 name = "langchain-core"
-version = "0.3.75"
+version = "0.3.76"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jsonpatch" },
@@ -2711,9 +2711,9 @@ dependencies = [
     { name = "tenacity" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/06/63/270b71a23e849984505ddc7c5c9fd3f4bd9cb14b1a484ee44c4e51c33cc2/langchain_core-0.3.75.tar.gz", hash = "sha256:ab0eb95a06ed6043f76162e6086b45037690cb70b7f090bd83b5ebb8a05b70ed", size = 570876, upload-time = "2025-08-26T15:24:12.246Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4f/4d/5e2ea7754ee0a1f524c412801c6ba9ad49318ecb58b0d524903c3d9efe0a/langchain_core-0.3.76.tar.gz", hash = "sha256:71136a122dd1abae2c289c5809d035cf12b5f2bb682d8a4c1078cd94feae7419", size = 573568, upload-time = "2025-09-10T14:49:39.863Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fb/42/0d0221cce6f168f644d7d96cb6c87c4e42fc55d2941da7a36e970e3ab8ab/langchain_core-0.3.75-py3-none-any.whl", hash = "sha256:03ca1fadf955ee3c7d5806a841f4b3a37b816acea5e61a7e6ba1298c05eea7f5", size = 443986, upload-time = "2025-08-26T15:24:10.883Z" },
+    { url = "https://files.pythonhosted.org/packages/77/b5/501c0ffcb09c734457ceaa86bc7b1dd37b6a261147bd653add03b838aacb/langchain_core-0.3.76-py3-none-any.whl", hash = "sha256:46e0eb48c7ac532432d51f8ca1ece1804c82afe9ae3dcf027b867edadf82b3ec", size = 447508, upload-time = "2025-09-10T14:49:38.179Z" },
 ]
 
 [[package]]
@@ -3701,15 +3701,15 @@ wheels = [
 
 [[package]]
 name = "ollama"
-version = "0.5.3"
+version = "0.5.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
     { name = "pydantic" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/91/6d/ae96027416dcc2e98c944c050c492789502d7d7c0b95a740f0bb39268632/ollama-0.5.3.tar.gz", hash = "sha256:40b6dff729df3b24e56d4042fd9d37e231cee8e528677e0d085413a1d6692394", size = 43331, upload-time = "2025-08-07T21:44:10.422Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/72/62/a36be4555e4218d6c8b35e72e0dfe0823845400097275cd81c9aec4ddf39/ollama-0.5.4.tar.gz", hash = "sha256:75857505a5d42e5e58114a1b78cc8c24596d8866863359d8a2329946a9b6d6f3", size = 45233, upload-time = "2025-09-16T00:25:25.785Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/be/f6/2091e50b8b6c3e6901f6eab283d5efd66fb71c86ddb1b4d68766c3eeba0f/ollama-0.5.3-py3-none-any.whl", hash = "sha256:a8303b413d99a9043dbf77ebf11ced672396b59bec27e6d5db67c88f01b279d2", size = 13490, upload-time = "2025-08-07T21:44:09.353Z" },
+    { url = "https://files.pythonhosted.org/packages/1b/af/d0a23c8fdec4c8ddb771191d9b36a57fbce6741835a78f1b18ab6d15ae7d/ollama-0.5.4-py3-none-any.whl", hash = "sha256:6374c9bb4f2a371b3583c09786112ba85b006516745689c172a7e28af4d4d1a2", size = 13548, upload-time = "2025-09-16T00:25:24.186Z" },
 ]
 
 [[package]]
@@ -4972,7 +4972,7 @@ wheels = [
 
 [[package]]
 name = "sap-ai-sdk-gen"
-version = "5.5.0"
+version = "5.6.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -4989,7 +4989,7 @@ dependencies = [
     { name = "sap-ai-sdk-core" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/48/58/947fb048285a3760024a1f69e5b3d2321e1210e5fb877688f1102c9bd9b9/sap_ai_sdk_gen-5.5.0-py3-none-any.whl", hash = "sha256:38ccd2cd51f257f560be5aba8e5ee54cefb8c6e3e7cc455b71b029e51b7e368a", size = 743414, upload-time = "2025-09-02T14:17:32.952Z" },
+    { url = "https://files.pythonhosted.org/packages/60/88/1a80fd52347748252f21b72019045d5df47f94cae8eeaecbef95c57c6ff9/sap_ai_sdk_gen-5.6.3-py3-none-any.whl", hash = "sha256:e78b841666cff44dba712b760a0b03d88e51d8a4010b8870bdf4bb9388f52d66", size = 742556, upload-time = "2025-09-12T08:16:45.37Z" },
 ]
 
 [package.optional-dependencies]
@@ -5411,32 +5411,32 @@ nlp = [
 
 [package.metadata]
 requires-dist = [
-    { name = "art" },
+    { name = "art", specifier = "==6.5" },
     { name = "codeattack", git = "https://github.com/marcorosa/CodeAttack" },
-    { name = "faiss-cpu", specifier = "~=1.12.0" },
+    { name = "faiss-cpu", specifier = "==1.12.0" },
     { name = "flask", specifier = "==3.1.2" },
     { name = "flask-cors", specifier = "==6.0.1" },
     { name = "flask-sock", specifier = "==0.7.0" },
     { name = "flask-sqlalchemy", specifier = "==3.1.1" },
-    { name = "garak", specifier = "~=0.11.0" },
+    { name = "garak", specifier = "==0.11.0" },
     { name = "gptfuzzer", git = "https://github.com/marcorosa/GPTFuzz?rev=no-vllm" },
     { name = "langchain", specifier = ">=0.3.0,<0.4.0" },
     { name = "langchain-community", specifier = ">=0.3.0,<0.4.0" },
     { name = "langchain-core", specifier = ">=0.3.0,<0.4.0" },
     { name = "langchain-text-splitters", specifier = ">=0.3.0,<0.4.0" },
-    { name = "ollama", specifier = "==0.5.3" },
-    { name = "pandas" },
+    { name = "ollama", specifier = "==0.5.4" },
+    { name = "pandas", specifier = "==2.3.2" },
     { name = "pyrit", specifier = "==0.9.0" },
     { name = "python-dotenv", specifier = "==1.1.1" },
     { name = "pyyaml", specifier = "==6.0.2" },
     { name = "requests", specifier = "==2.32.5" },
-    { name = "sap-ai-sdk-gen", extras = ["all"], specifier = ">=5.4.5" },
-    { name = "sentence-transformers", specifier = "~=5.1.0" },
-    { name = "tensorflow", marker = "extra == 'nlp'", specifier = "~=2.19.1" },
-    { name = "tensorflow-hub", marker = "extra == 'nlp'", specifier = ">=0.16.1" },
-    { name = "textattack", marker = "extra == 'nlp'", specifier = ">=0.3.10" },
-    { name = "unstructured", specifier = ">=0.18.14" },
-    { name = "weasyprint" },
+    { name = "sap-ai-sdk-gen", extras = ["all"], specifier = "==5.6.3" },
+    { name = "sentence-transformers", specifier = "==5.1.0" },
+    { name = "tensorflow", marker = "extra == 'nlp'", specifier = "==2.19.1" },
+    { name = "tensorflow-hub", marker = "extra == 'nlp'", specifier = "==0.16.1" },
+    { name = "textattack", marker = "extra == 'nlp'", specifier = "==0.3.10" },
+    { name = "unstructured", specifier = "==0.18.15" },
+    { name = "weasyprint", specifier = "==66.0" },
 ]
 provides-extras = ["nlp"]
 
@@ -6053,7 +6053,7 @@ wheels = [
 
 [[package]]
 name = "unstructured"
-version = "0.18.14"
+version = "0.18.15"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "backoff" },
@@ -6078,9 +6078,9 @@ dependencies = [
     { name = "unstructured-client" },
     { name = "wrapt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/99/7c/39380d2a2fdb53db3581ddd5ef271dab9afa5fe0d31d92837fcb4252fae3/unstructured-0.18.14.tar.gz", hash = "sha256:c23760dd38dd6eca924a2803a005318f4ddc8af6a69388a7ce9d5b7fbc4b51bf", size = 1690988, upload-time = "2025-08-26T13:26:04.437Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/6c/08/cf969b274f652e2fe48a6807b827498c7142dc749bdbd46ab24ea97a5fd5/unstructured-0.18.15.tar.gz", hash = "sha256:81d8481280a4ac5cefe74bdb6db3687e8f240d5643706f86728eac39549112b5", size = 1691102, upload-time = "2025-09-17T14:30:59.524Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/cf/36/5c6b09f8d4152445015916d3be672471c1b52a71951f22af85d2cece6ad0/unstructured-0.18.14-py3-none-any.whl", hash = "sha256:cc6fadcf2f84fb6d910dd87bcbd54d8b6e2593ce29b851af167bc786d9263f73", size = 1778832, upload-time = "2025-08-26T13:26:02.58Z" },
+    { url = "https://files.pythonhosted.org/packages/62/24/7b8a8a9c23b209dc484b0d82905847c5f6b96a579bade367f3f3e40263f3/unstructured-0.18.15-py3-none-any.whl", hash = "sha256:f05b1defcbe8190319d30da8adddbb888f74bf8ec7f65886867d7dca41d67ad0", size = 1778900, upload-time = "2025-09-17T14:30:57.872Z" },
 ]
 
 [[package]]
