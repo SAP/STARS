@@ -38,7 +38,7 @@ jobs:
           prune-cache: false
 
       - name: Install dependencies
-        run: uv sync -v --locked --dev --project backend-agent
+        run: uv sync --locked --all-extras --dev --project backend-agent
 
       - name: Start server and check health
         working-directory: backend-agent
