@@ -1,19 +1,22 @@
-from argparse import ArgumentParser, Namespace
 import json
 import logging
 import os
 import sys
+from argparse import ArgumentParser, Namespace
+from pathlib import Path
 from typing import Callable
 
-from llm import LLM
-from libs.textattack import test as test_textattack, \
-    hf_model_attack, \
-    own_model_attack, \
-    FILE_ERROR as textattack_out_error, \
-    FILE_FAIL as textattack_out_fail, \
-    FILE_SUCCESS as textattack_out_success, \
-    FILE_SUMMARY as textattack_out_summary
 from attack import AttackSpecification, AttackSuite
+from libs.textattack import (
+    FILE_ERROR as textattack_out_error,
+    FILE_FAIL as textattack_out_fail,
+    FILE_SUCCESS as textattack_out_success,
+    FILE_SUMMARY as textattack_out_summary,
+    hf_model_attack,
+    own_model_attack,
+    test as test_textattack,
+)
+from llm import LLM
 from status import Trace
 
 # Library-free Subcommand utilities from
@@ -327,7 +330,8 @@ def suffix(args):
 
 @subcommand([arg('file',
                  help='Path to the JSON file containing the attack specification.',  # noqa: E501
-                 nargs='?'),
+                 nargs='?',
+                 default='data/suite/default.json'),
             arg('--target',
                 help='Specify a target model if not specified in the spec.',
                 type=str),
@@ -341,23 +345,16 @@ def suffix(args):
                 action='store_true',
                 help='Use an LLM to summarize attacks.')])
 def run(args):
-    """ Run an LLM attack from a specification JSON. """
-    if not args.file:
-        print(
-            'No file given as argument. Enter specification using stdin.',
-            file=sys.stderr)
-        input = ''
-        for line in sys.stdin:
-            input += line
-            if line == '\n':
-                break
-        if not input:
-            print(
-                'Specify the path to an attack specification or give a specification in stdin.', file=sys.stderr)  # noqa: E501
-        spec = json.loads(input)
-    else:
+    """ Run an LLM attack from a specification JSON file only."""
+    try:
         with open(args.file, 'r') as f:
             spec = json.load(f)
+    except FileNotFoundError:
+        print(f"Error: File '{args.file}' not found.", file=sys.stderr)
+        return
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON in '{args.file}': {e}", file=sys.stderr)
+        return
     if 'attack' in spec:
         # spec specifies an attack
         attack_spec = AttackSpecification(spec)
@@ -375,8 +372,44 @@ def run(args):
                 args.format
             )
     else:
-        print('JSON is invalid. No attacks run.',
-              file=sys.stderr)
+        print(
+            "Error: JSON is invalid. No attacks run.",
+            file=sys.stderr
+        )
+
+
+@subcommand([
+    arg('--target',
+        help='Specify the target model if not specified in the spec.',
+        type=str,
+        required=True),
+])
+def run_all(args):
+    """Run all LLM attacks with specified target and evaluation models."""
+    default_spec_path = Path('data/all/default.json')
+    try:
+        with default_spec_path.open("r") as f:
+            spec = json.load(f)
+    except FileNotFoundError:
+        print(f'File not found: {args.file}', file=sys.stderr)
+        return
+    except json.JSONDecodeError as e:
+        print(f'Invalid JSON format: {e}', file=sys.stderr)
+        return
+    except PermissionError:
+        print(f'Permission denied reading file: {args.file}', file=sys.stderr)
+        return
+    if 'attacks' in spec:
+        suite = AttackSuite.from_dict(spec)
+        suite.set_target(args.target)
+        results = suite.run()
+        result_return = {'success': True, 'results': results}
+    else:
+        result_return = {
+            'success': False,
+            'error': 'JSON is invalid. No attacks run.'
+        }
+    return result_return
 
 
 @subcommand()
