@@ -386,9 +386,9 @@ def run(args):
 ])
 def run_all(args):
     """Run all LLM attacks with specified target and evaluation models."""
-    spec_path = Path(args.file)
+    default_spec_path = Path('data/all/default.json')
     try:
-        with spec_path.open("r") as f:
+        with default_spec_path.open("r") as f:
             spec = json.load(f)
     except FileNotFoundError:
         print(f'File not found: {args.file}', file=sys.stderr)
