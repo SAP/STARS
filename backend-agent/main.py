@@ -312,7 +312,10 @@ def execute_all_attacks():
             results = suite.run()
             result_return = {'success': True, 'results': results}
         else:
-            result_return = {'success': False, 'error': 'JSON is invalid. No attacks run.'}
+            result_return = {
+                'success': False,
+                'error': 'JSON is invalid. No attacks run.'
+            }
         return jsonify(result_return)
     except Exception as e:
         return jsonify({'error': f'Failed to run attacks: {str(e)}'}), 500

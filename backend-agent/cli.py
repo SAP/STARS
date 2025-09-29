@@ -405,7 +405,10 @@ def run_all(args):
         results = suite.run()
         result_return = {'success': True, 'results': results}
     else:
-        result_return = {'success': False, 'error': 'JSON is invalid. No attacks run.'}
+        result_return = {
+            'success': False,
+            'error': 'JSON is invalid. No attacks run.'
+        }
     return result_return
 
 
