@@ -1,6 +1,6 @@
 [project]
 name = 'stars'
-version = '0.5.0'
+version = '0.6.0'
 description = 'Smart Threat AI Reporting Scanner (STARS)'
 readme = 'README.md'
 license = {text = 'Apache-2.0'}
