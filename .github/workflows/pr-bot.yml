@@ -1,11 +1,12 @@
 name: AI-assisted
 on:
-  pull_request:
+  pull_request_target:
     types: [ready_for_review, opened, reopened]
 
 jobs:
   summary:
     name: PR Summary
+    if: github.actor != 'dependabot'
     runs-on: [ubuntu-latest]
     steps:
       - uses: SAP/ai-assisted-github-actions/pr-summary@v3
@@ -15,6 +16,7 @@ jobs:
           exclude-files: package-lock.json, uv.lock
   review:
     name: PR Review
+    if: github.actor != 'dependabot'
     runs-on: [ubuntu-latest]
     steps:
       - uses: SAP/ai-assisted-github-actions/pr-review@v3
@@ -25,3 +27,7 @@ jobs:
           footer-text: |
             ---
             > Always critique what AI says. Do not let AI replace YOUR I.
+          prompt-addition: |
+            Do not feel obliged to comment on every file. Focus on the most important aspects of the code change.
+            Keep your comments concise and to the point.
+            Avoid unnecessary complexity, and focus on maintainability, readability, and performance.

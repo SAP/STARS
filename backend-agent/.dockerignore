@@ -1,6 +1,8 @@
 # Caches
 **/__pycache__
 cache
+**/.cache
+**/.mypy_cache
 
 # Libraries
 venv*
@@ -13,10 +15,28 @@ logger.log
 result_gptfuzz.txt
 prompt_success.txt
 
-# Sensitive data
-.env
+# Non-relevant files and folders
+README.md
+*.md
+docs/
+examples/
+build/
+dist/
+*.egg-info/
 
-# Development files
+# Sensitive data
+.env*
+
+# Development files and folders
 .vscode
 .gitignore
-README.md
+.git
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache
+**/test*
+**/Test*
+**/.coverage
+**/htmlcov
+**/.tox

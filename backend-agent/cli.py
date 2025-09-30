@@ -1,19 +1,22 @@
-from argparse import ArgumentParser, Namespace
 import json
 import logging
 import os
 import sys
+from argparse import ArgumentParser, Namespace
+from pathlib import Path
 from typing import Callable
 
-from llm import LLM
-from libs.textattack import test as test_textattack, \
-    hf_model_attack, \
-    own_model_attack, \
-    FILE_ERROR as textattack_out_error, \
-    FILE_FAIL as textattack_out_fail, \
-    FILE_SUCCESS as textattack_out_success, \
-    FILE_SUMMARY as textattack_out_summary
 from attack import AttackSpecification, AttackSuite
+from libs.textattack import (
+    FILE_ERROR as textattack_out_error,
+    FILE_FAIL as textattack_out_fail,
+    FILE_SUCCESS as textattack_out_success,
+    FILE_SUMMARY as textattack_out_summary,
+    hf_model_attack,
+    own_model_attack,
+    test as test_textattack,
+)
+from llm import LLM
 from status import Trace
 
 # Library-free Subcommand utilities from
@@ -147,25 +150,59 @@ def textattack(args):
              arg('objective', help='What is the attack trying to achieve. This\
                    should be a string that outlines the objective, for example\
                    something that the target LLM should not be doing.'),
-             arg('--max-turns', '-t',
+             arg('--max_turns', '-t',
                  type=int,
                  help='Number of turns (=prompts to the target) to take before quitting.',  # noqa: E501
                  default=3)])
-def pyrit(args):
+def redteaming(args):
     spec = AttackSpecification.create(
-        'pyrit',
+        'redteaming',
         args.target_model,
         attack_model=args.attack_model,
         params=vars(args))
-    result = start_spec(spec, args)
-    if not result:
-        print('Something went wrong. No result returned from the attack.')
-        return
-    print(
-        'The attack was successful.' if result.success
-        else 'The attack was not successful.')
-    print('Overall response:')
-    print(result.details['response'])
+    start_spec(spec, args)
+
+
+@subcommand([arg('target_model', help='Name of the target model to attack'),
+             arg('attack_model',
+                 help='Name of the model that is used to attack/ mutate prompts'),  # noqa: E501
+             arg('objective', help='What is the attack trying to achieve. This\
+                   should be a string that outlines the objective, for example\
+                   something that the target LLM should not be doing.'),
+             arg('--max_turns', '-t',
+                 type=int,
+                 help='Number of turns (=prompts to the target) to take before quitting.',  # noqa: E501
+                 default=10),
+             arg('--max_backtracks', '-b',
+                 type=int,
+                 help='Number of backtracks to allow during the attack.',
+                 default=5)])
+def crescendo(args):
+    spec = AttackSpecification.create(
+        'crescendo',
+        args.target_model,
+        attack_model=args.attack_model,
+        params=vars(args))
+    start_spec(spec, args)
+
+
+@subcommand([arg('target_model', help='Name of the target model to attack'),
+             arg('attack_model',
+                 help='Name of the model that is used to attack/ mutate prompts'),  # noqa: E501
+             arg('objective', help='What is the attack trying to achieve. This\
+                   should be a string that outlines the objective, for example\
+                   something that the target LLM should not be doing.'),
+             arg('--desired_response_prefix', '-p',
+                 type=str,
+                 help='The desired response prefix that the adversarial prompt should try to elicit from the target model.',  # noqa: E501
+                 default="Sure, here is"),])
+def pair(args):
+    spec = AttackSpecification.create(
+        'pair',
+        args.target_model,
+        attack_model=args.attack_model,
+        params=vars(args))
+    start_spec(spec, args)
 
 
 @subcommand([arg('target_model', help='Name of the target model to attack'),
@@ -293,7 +330,8 @@ def suffix(args):
 
 @subcommand([arg('file',
                  help='Path to the JSON file containing the attack specification.',  # noqa: E501
-                 nargs='?'),
+                 nargs='?',
+                 default='data/suite/default.json'),
             arg('--target',
                 help='Specify a target model if not specified in the spec.',
                 type=str),
@@ -307,23 +345,16 @@ def suffix(args):
                 action='store_true',
                 help='Use an LLM to summarize attacks.')])
 def run(args):
-    """ Run an LLM attack from a specification JSON. """
-    if not args.file:
-        print(
-            'No file given as argument. Enter specification using stdin.',
-            file=sys.stderr)
-        input = ''
-        for line in sys.stdin:
-            input += line
-            if line == '\n':
-                break
-        if not input:
-            print(
-                'Specify the path to an attack specification or give a specification in stdin.', file=sys.stderr)  # noqa: E501
-        spec = json.loads(input)
-    else:
+    """ Run an LLM attack from a specification JSON file only."""
+    try:
         with open(args.file, 'r') as f:
             spec = json.load(f)
+    except FileNotFoundError:
+        print(f"Error: File '{args.file}' not found.", file=sys.stderr)
+        return
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON in '{args.file}': {e}", file=sys.stderr)
+        return
     if 'attack' in spec:
         # spec specifies an attack
         attack_spec = AttackSpecification(spec)
@@ -341,8 +372,44 @@ def run(args):
                 args.format
             )
     else:
-        print('JSON is invalid. No attacks run.',
-              file=sys.stderr)
+        print(
+            "Error: JSON is invalid. No attacks run.",
+            file=sys.stderr
+        )
+
+
+@subcommand([
+    arg('--target',
+        help='Specify the target model if not specified in the spec.',
+        type=str,
+        required=True),
+])
+def run_all(args):
+    """Run all LLM attacks with specified target and evaluation models."""
+    default_spec_path = Path('data/all/default.json')
+    try:
+        with default_spec_path.open("r") as f:
+            spec = json.load(f)
+    except FileNotFoundError:
+        print(f'File not found: {args.file}', file=sys.stderr)
+        return
+    except json.JSONDecodeError as e:
+        print(f'Invalid JSON format: {e}', file=sys.stderr)
+        return
+    except PermissionError:
+        print(f'Permission denied reading file: {args.file}', file=sys.stderr)
+        return
+    if 'attacks' in spec:
+        suite = AttackSuite.from_dict(spec)
+        suite.set_target(args.target)
+        results = suite.run()
+        result_return = {'success': True, 'results': results}
+    else:
+        result_return = {
+            'success': False,
+            'error': 'JSON is invalid. No attacks run.'
+        }
+    return result_return
 
 
 @subcommand()

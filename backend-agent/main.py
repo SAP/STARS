@@ -1,7 +1,8 @@
 import json
 import os
+from argparse import Namespace
 from importlib.metadata import version
-
+from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import abort, jsonify, request, send_file
@@ -10,10 +11,10 @@ from flask_sock import Sock
 from sqlalchemy import select
 
 from app import create_app
-from app.db.models import TargetModel, ModelAttackScore, Attack, db
+from app.db.models import Attack, ModelAttackScore, TargetModel, db
+from attack import AttackSuite
 from attack_result import SuiteResult
 from status import LangchainStatusCallbackHandler, status
-
 
 __version__ = version('stars')
 load_dotenv()
@@ -269,6 +270,55 @@ def update_attack_weights():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+
+@app.route('/run_all', methods=['POST'])
+def execute_all_attacks():
+    """
+    This route allows to run all attacks. Used for automation
+    Expected JSON body:
+    {
+      "target": "string"
+    }
+    """
+    # init args
+    verify_api_key()
+    target_model = request.get_json().get('target')
+
+    if not target_model:
+        return jsonify({'error': 'target parameter is required'}), 400
+
+    args = Namespace(
+        file='data/all/default.json',
+        target=target_model,
+    )
+    spec_path = Path(args.file)
+    try:
+        with spec_path.open("r") as f:
+            spec = json.load(f)
+    except FileNotFoundError:
+        print(f'File not found: {args.file}')
+        return
+    except json.JSONDecodeError as e:
+        print(f'Invalid JSON format: {e}')
+        return
+    except PermissionError:
+        print(f'Permission denied reading file: {args.file}')
+        return
+    try:
+        if 'attacks' in spec:
+            suite = AttackSuite.from_dict(spec)
+            suite.set_target(args.target)
+            results = suite.run()
+            result_return = {'success': True, 'results': results}
+        else:
+            result_return = {
+                'success': False,
+                'error': 'JSON is invalid. No attacks run.'
+            }
+        return jsonify(result_return)
+    except Exception as e:
+        return jsonify({'error': f'Failed to run attacks: {str(e)}'}), 500
 
 
 if __name__ == '__main__':

@@ -6,9 +6,10 @@ on:
       - develop
       - main
     paths:
-      - '**.json'
       - '**.ts'
       - '**.js'
+      - '**/package.json'
+      - 'CHANGELOG.md'
   workflow_dispatch:
 
 permissions:
@@ -30,11 +31,11 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v5
         with:
-            node-version: 20
+            node-version: 24
 
       - name: Install Node.js dependencies
+        working-directory: frontend
         run: |
-          cd frontend
           npm ci
 
       - name: Run linters
@@ -42,6 +43,6 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           reporter: github-pr-review
+          workdir: frontend
           eslint_flags: "--format rdjson --ext .js,.jsx,.ts,.tsx ./"
           fail_level: error
-          workdir: frontend

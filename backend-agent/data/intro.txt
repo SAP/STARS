@@ -6,8 +6,9 @@ I can help you with assessing security of **Large Language Models**.
 I can run a **vulnerability scan** against a Large Language Model of your choice.
 For that I will run a number of attacks against the Large Language Model:
 - promptmap to identify Prompt Injections.
-- PyRIT to try to leak the System Prompt and to get the model to generate
-  malicious content, e.g., writing a phishing email.
+- Crescendo and PAIR to try to leak the System Prompt and to get the model to generate
+  malicious content, e.g., writing a phishing email. These attacks are
+  performed using PyRIT.
 - CodeAttack to run a prompt Injection Attack hidden in a code completion task.
   As CodeAttack includes hundreds of test prompts, a quick version (i.e., running
   only 20 test prompts) will be run as part of the vulnerability scan.
@@ -24,7 +25,8 @@ Say the name of the attack and I will ask for further details if required.
 Supported attacks are:
 - promptmap
 - gptfuzz
-- PyRIT
+- crescendo (with pyrit)
+- pair (with pyrit)
 - CodeAttack
 - ArtPrompt
 - dan (with garak)
