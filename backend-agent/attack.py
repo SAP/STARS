@@ -171,19 +171,19 @@ class AttackSpecification:
                         self.attack_model,
                         self.target_model,
                         self.parameters
-                    ), print_output=False)
+                    ), print_output=True)
                 case 'crescendo':
                     return t.trace(start_pyrit_attack_crescendo(
                         self.attack_model,
                         self.target_model,
                         self.parameters
-                    ), print_output=False)
+                    ), print_output=True)
                 case 'pair':
                     return t.trace(start_pyrit_attack_pair(
                         self.attack_model,
                         self.target_model,
                         self.parameters
-                    ), print_output=False)
+                    ), print_output=True)
                 case 'gptfuzz':
                     return t.trace(perform_gptfuzz_attack(
                         self.attack_model,
@@ -309,6 +309,7 @@ class AttackSuite():
         print(f'Running suite {self.name}')
         full_result = []  # Concatenating results for the agent
         for a in self.attacks:
+            logger.info(f'> Starting attack {a.attack}')
             try:
                 result = a.start()
             except KeyboardInterrupt:

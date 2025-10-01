@@ -1,6 +1,6 @@
 [project]
 name = 'stars'
-version = '0.5.0'
+version = '0.6.0'
 description = 'Smart Threat AI Reporting Scanner (STARS)'
 readme = 'README.md'
 license = {text = 'Apache-2.0'}
@@ -24,18 +24,18 @@ dependencies = [
     'langchain-community>=0.3.0,<0.4.0',
     'langchain-core>=0.3.0,<0.4.0',
     'langchain-text-splitters>=0.3.0,<0.4.0',
-    'PyYAML==6.0.2',
+    'PyYAML==6.0.3',
     'requests==2.32.5',
     'unstructured==0.18.15',
     'art==6.5',
-    'pandas==2.3.2',
-    'ollama==0.5.4',
+    'pandas==2.3.3',
+    'ollama==0.6.0',
     'weasyprint==66.0',
     'pyrit==0.9.0',
     'codeattack @ git+https://github.com/marcorosa/CodeAttack',
     'gptfuzzer @ git+https://github.com/marcorosa/GPTFuzz@no-vllm',
     'garak==0.13.0',
-    'sentence-transformers==5.1.0',
+    'sentence-transformers==5.1.1',
 ]
 
 [project.optional-dependencies]

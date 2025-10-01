@@ -1,3 +1,20 @@
+# Version: v0.6.0
+
+* [#93](https://github.com/SAP/STARS/pull/93): Add 2 PyRIT orchestrators ((Crescendo, PAIR)) and re-strucutre PyRIT code.
+* [#102](https://github.com/SAP/STARS/pull/102): Restart k8s deployments running new images
+* [#103](https://github.com/SAP/STARS/pull/103): Optimize docker builds and auto-deploy
+* [#104](https://github.com/SAP/STARS/pull/104): Bump azure/setup-kubectl from 3 to 4
+* [#106](https://github.com/SAP/STARS/pull/106): Bump ollama from 0.5.3 to 0.5.4 in /backend-agent
+* [#107](https://github.com/SAP/STARS/pull/107): Bump the js-dependencies group across 1 directory with 22 updates
+* [#109](https://github.com/SAP/STARS/pull/109): [chore] Fix GitHub Actions
+* [#110](https://github.com/SAP/STARS/pull/110): Add run_all cli + route
+* [#111](https://github.com/SAP/STARS/pull/111): Update current dependencies with versions
+* [#113](https://github.com/SAP/STARS/pull/113): Bump pyyaml from 6.0.2 to 6.0.3 in /backend-agent
+* [#114](https://github.com/SAP/STARS/pull/114): Bump ollama from 0.5.4 to 0.6.0 in /backend-agent
+* [#115](https://github.com/SAP/STARS/pull/115): Bump the js-dependencies group in /frontend with 15 updates
+* [#116](https://github.com/SAP/STARS/pull/116): Fix run_all attacks configuration
+
+
 # Version: v0.5.0
 
 * [#84](https://github.com/SAP/STARS/pull/84): Bump flask-cors from 6.0.0 to 6.0.1 in /backend-agent

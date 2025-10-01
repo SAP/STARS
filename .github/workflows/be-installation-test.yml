@@ -44,7 +44,7 @@ jobs:
         working-directory: backend-agent
         run: |
           DISABLE_AGENT=1 DB_PATH=${RUNNER_TEMP}/data.db uv run main.py > server.log 2>&1 &
-          for i in {1..20}; do
+          for i in {1..60}; do
             sleep 1
             status=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080/health || true)
             if [ "$status" -eq 200 ]; then
