@@ -1,15 +1,19 @@
 FROM astral/uv:python3.11-trixie-slim AS builder
 
-# Install build dependencies including Rust for packages that need it
-RUN apt-get update && apt-get install -y \
+# Install build dependencies with minimal footprint
+RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     git \
     curl \
     pkg-config \
     libssl-dev \
-    && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get autoremove -y
+
+# Install Rust with minimal profile and immediate cleanup
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal \
     && . ~/.cargo/env \
-    && rm -rf /var/lib/apt/lists/*
+    && rustup component add rustfmt
 
 # Add Rust to PATH
 ENV PATH="/root/.cargo/bin:${PATH}"
@@ -23,24 +27,50 @@ COPY pyproject.toml uv.lock ./
 ENV UV_EXTRA_INDEX_URL="https://download.pytorch.org/whl/cpu"
 ENV TORCH_INDEX_URL="https://download.pytorch.org/whl/cpu"
 
-# Install dependencies using uv with proper build environment
+# Install dependencies with aggressive progressive cleanup
 RUN . ~/.cargo/env && \
-    uv sync --frozen --no-dev --no-cache && \
-    # Clean up any temporary files to reduce layer size
-    rm -rf /root/.cache/uv /tmp/* /var/tmp/* && \
-    # Remove Rust toolchain after build to reduce image size
-    rustup self uninstall -y
+    # Install dependencies with bytecode compilation for better performance
+    uv sync --frozen --no-dev --no-cache --compile-bytecode && \
+    # Immediate cleanup of build artifacts during installation
+    find /app/.venv -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true && \
+    find /app/.venv -name "*.pyc" -delete 2>/dev/null || true && \
+    find /app/.venv -name "*.pyo" -delete 2>/dev/null || true && \
+    # Remove test files and documentation from packages (keeping runtime libs)
+    find /app/.venv -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true && \
+    find /app/.venv -type d -name "test" -exec rm -rf {} + 2>/dev/null || true && \
+    find /app/.venv -type d -name "docs" -exec rm -rf {} + 2>/dev/null || true && \
+    # Strip debug symbols from shared libraries to reduce size
+    find /app/.venv -name "*.so" -exec strip {} + 2>/dev/null || true && \
+    # Aggressive cache and temporary file cleanup
+    rm -rf /root/.cache/uv \
+           /root/.cache/pip \
+           /root/.cache/* \
+           /tmp/* \
+           /var/tmp/* \
+           /root/.cargo/registry \
+           /root/.cargo/git \
+           /app/.venv/share \
+           && \
+    # Remove Rust toolchain completely after build
+    rustup self uninstall -y && \
+    # Final build tools cleanup to free space
+    apt-get autoremove -y build-essential git curl pkg-config && \
+    apt-get autoclean
 
 # ----------------------------------------
 
 FROM python:3.11-slim-trixie AS runtime
 
-# Install only runtime dependencies
-RUN apt-get update && apt-get install -y \
+# Install minimal runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
     libssl3 \
     libffi8 \
+    # Add required libraries for ML packages
+    libgomp1 \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+    && apt-get autoremove -y \
+    && apt-get autoclean
 
 WORKDIR /app
 
@@ -50,7 +80,7 @@ COPY --from=builder /app/.venv /app/.venv
 # Copy dependency files
 COPY pyproject.toml uv.lock ./
 
-# Copy the rest of the application
+# Copy the application
 COPY . .
 
 # Make sure we use the virtual environment

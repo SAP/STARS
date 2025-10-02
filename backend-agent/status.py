@@ -178,7 +178,9 @@ provided. Skipping further status reports.')
             'prompt': prompt,
             'response': response.to_dict()
         }
-        self.trace['llm_messages'].append(message)
+        # Only trace if there's an active trace context
+        if hasattr(self, 'trace') and self.trace:
+            self.trace['llm_messages'].append(message)
 
     def finish_trace(self, completed: bool, output: str):
         """

@@ -217,6 +217,13 @@ jobs:
         with:
           version: 'latest'
 
+      - name: Set up kubelogin
+        uses: azure/use-kubelogin@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          kubelogin-version: 'latest'
+
       - name: Configure kubectl for SAP BTP Kyma
         run: |
           mkdir -p ~/.kube
@@ -240,6 +247,13 @@ jobs:
         uses: azure/setup-kubectl@v4
         with:
           version: 'latest'
+
+      - name: Set up kubelogin
+        uses: azure/use-kubelogin@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          kubelogin-version: 'latest'
 
       - name: Configure kubectl for SAP BTP Kyma
         run: |
