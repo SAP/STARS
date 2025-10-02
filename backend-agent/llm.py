@@ -30,6 +30,7 @@ AICORE_MODELS = {
     'aicore-mistralai':
     [
         'mistralai--mistral-large-instruct',
+        'mistralai--mistral-medium-instruct',
         'mistralai--mistral-small-instruct',
     ],
     'aicore-opensource':
@@ -43,7 +44,6 @@ AICORE_MODELS = {
         'amazon--nova-pro',
         'amazon--nova-premier',
         'anthropic--claude-3-haiku',
-        'anthropic--claude-3-sonnet',
         'anthropic--claude-3-opus',
         'anthropic--claude-3.5-sonnet',
         'anthropic--claude-3.7-sonnet',
