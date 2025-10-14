@@ -68,6 +68,7 @@
     {
       "attack": "gptfuzz",
       "target-model": "<target>",
+      "attack-model": "gpt-4o-mini",
       "parameters": {
         "max_query_count": 300
       }
