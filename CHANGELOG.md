@@ -1,3 +1,19 @@
+# Version: v0.6.1
+
+* [#112](https://github.com/SAP/STARS/pull/112): Bump sentence-transformers from 5.1.0 to 5.1.1 in /backend-agent
+* [#118](https://github.com/SAP/STARS/pull/118): Bump pandas from 2.3.2 to 2.3.3 in /backend-agent
+* [#119](https://github.com/SAP/STARS/pull/119): Bump tensorflow from 2.19.1 to 2.20.0 in /backend-agent
+* [#120](https://github.com/SAP/STARS/pull/120): Bump sentence-transformers from 5.1.0 to 5.1.1 in /backend-agent
+* [#121](https://github.com/SAP/STARS/pull/121): Bump langchain-community from 0.3.29 to 0.3.30 in /backend-agent
+* [#123](https://github.com/SAP/STARS/pull/123): [chore] Optimize k8s steps in GHA
+* [#124](https://github.com/SAP/STARS/pull/124): Update models with note 26-09-25
+* [#130](https://github.com/SAP/STARS/pull/130): Bump astral-sh/setup-uv from 6 to 7
+* [#131](https://github.com/SAP/STARS/pull/131): Bump langchain-core from 0.3.76 to 0.3.79 in /backend-agent
+* [#132](https://github.com/SAP/STARS/pull/132): Bump langchain-community from 0.3.30 to 0.3.31 in /backend-agent
+* [#133](https://github.com/SAP/STARS/pull/133): Bump sap-ai-sdk-gen[all] from 5.6.3 to 5.7.5 in /backend-agent
+* [#134](https://github.com/SAP/STARS/pull/134): Bump the js-dependencies group across 1 directory with 24 updates
+
+
 # Version: v0.6.0
 
 * [#93](https://github.com/SAP/STARS/pull/93): Add 2 PyRIT orchestrators ((Crescendo, PAIR)) and re-strucutre PyRIT code.
