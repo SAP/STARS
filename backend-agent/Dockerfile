@@ -1,4 +1,4 @@
-FROM astral/uv:python3.11-trixie-slim AS builder
+FROM astral/uv:python3.12-trixie-slim AS builder
 
 # Install build dependencies with minimal footprint
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -59,7 +59,7 @@ RUN . ~/.cargo/env && \
 
 # ----------------------------------------
 
-FROM python:3.11-slim-trixie AS runtime
+FROM python:3.12-slim-trixie AS runtime
 
 # Install minimal runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
