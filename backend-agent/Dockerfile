@@ -38,7 +38,8 @@ RUN . ~/.cargo/env && \
     # Remove test files and documentation from packages (keeping runtime libs)
     find /app/.venv -type d -name "tests" -exec rm -rf {} + 2>/dev/null || true && \
     find /app/.venv -type d -name "test" -exec rm -rf {} + 2>/dev/null || true && \
-    find /app/.venv -type d -name "docs" -exec rm -rf {} + 2>/dev/null || true && \
+    # Do not remove docs folders as they may contain relevant files
+    # find /app/.venv -type d -name "docs" -exec rm -rf {} + 2>/dev/null || true && \
     # Strip debug symbols from shared libraries to reduce size
     find /app/.venv -name "*.so" -exec strip {} + 2>/dev/null || true && \
     # Aggressive cache and temporary file cleanup
