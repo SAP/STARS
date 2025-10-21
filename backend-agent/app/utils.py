@@ -32,5 +32,3 @@ def verify_api_key():
         provided_key = request.headers.get('X-API-Key')
         if provided_key != os.getenv('API_KEY'):
             abort(403)
-    else:
-        abort(403)
