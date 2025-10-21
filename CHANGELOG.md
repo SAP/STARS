@@ -1,3 +1,10 @@
+# Version: v0.6.2
+
+* [#125](https://github.com/SAP/STARS/pull/125): Re organize backend
+* [#136](https://github.com/SAP/STARS/pull/136): Bump actions/setup-node from 5 to 6
+* [#137](https://github.com/SAP/STARS/pull/137): Bump the js-dependencies group in /frontend with 17 updates
+
+
 # Version: v0.6.1
 
 * [#112](https://github.com/SAP/STARS/pull/112): Bump sentence-transformers from 5.1.0 to 5.1.1 in /backend-agent
