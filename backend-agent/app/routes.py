@@ -100,10 +100,13 @@ def register_routes(app, sock, agent=None, callbacks=None):
         name = request.args.get('name')
         format = request.args.get('format', 'md')
 
+        # Ensure that a name is provided
+        if not name:
+            abort(400)
         # Ensure that only allowed chars are in the filename
         # (e.g. no path traversal)
         if not all([c in SuiteResult.FILENAME_ALLOWED_CHARS for c in name]):
-            abort(500)
+            abort(400)
 
         results = SuiteResult.load_from_name(name)
 
@@ -200,6 +203,8 @@ def register_routes(app, sock, agent=None, callbacks=None):
             "key":"secretapikey"
         }
         """
+        # Verify API key from headers before establishing session
+        verify_api_key()
         if not agent:
             sock.send(json.dumps({
                 'type': 'message',
@@ -210,19 +215,17 @@ def register_routes(app, sock, agent=None, callbacks=None):
         # Intro is sent after connecting successfully
         send_intro(sock)
         while True:
-            data_raw = sock.receive()
-            data = json.loads(data_raw)
-            # API Key is used to protect the API if it is exposed in the public
-            # internet. There is only one API key at the moment.
-            if os.getenv('API_KEY') and data.get('key', None) != \
-                    os.getenv('API_KEY'):
-                sock.send(json.dumps(
-                    {'type': 'message', 'data': 'Not authenticated!'}))
-                continue
-            assert 'data' in data
-            query = data['data']
-            status.clear_report()
-            response = agent.invoke({'input': query}, config=callbacks or {})
-            ai_response = response['output']
-            formatted_output = {'type': 'message', 'data': f'{ai_response}'}
-            sock.send(json.dumps(formatted_output))
+            try:
+                data_raw = sock.receive()
+                data = json.loads(data_raw)
+                assert 'data' in data
+                query = data['data']
+                status.clear_report()
+                response = agent.invoke({'input': query}, config=callbacks or {})
+                ai_response = response['output']
+                formatted_output = {'type': 'message', 'data': f'{ai_response}'}
+                sock.send(json.dumps(formatted_output))
+            except json.JSONDecodeError:
+                sock.send(json.dumps({'type': 'error', 'data': 'Invalid JSON format'}))
+            except Exception as e:
+                sock.send(json.dumps({'type': 'error', 'data': f'Error: {str(e)}'}))

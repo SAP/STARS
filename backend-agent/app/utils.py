@@ -25,8 +25,8 @@ def send_intro(sock):
 def verify_api_key():
     """
     Verifies the API key from the request headers against the env variable.
-    If the API key is not set or does not match, it aborts the request
-    with a 403 status code.
+    If no API key is configured, access is allowed.
+    If API key is configured but missing/invalid, request is rejected.
     """
     if os.getenv('API_KEY'):
         provided_key = request.headers.get('X-API-Key')
