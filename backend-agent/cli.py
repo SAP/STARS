@@ -3,7 +3,6 @@ import logging
 import os
 import sys
 from argparse import ArgumentParser, Namespace
-from pathlib import Path
 from typing import Callable
 
 from attack import AttackSpecification, AttackSuite
@@ -17,6 +16,7 @@ from libs.textattack import (
     test as test_textattack,
 )
 from llm import LLM
+from services import run_all_attacks
 from status import Trace
 
 # Library-free Subcommand utilities from
@@ -385,31 +385,9 @@ def run(args):
         required=True),
 ])
 def run_all(args):
-    """Run all LLM attacks with specified target and evaluation models."""
-    default_spec_path = Path('data/all/default.json')
-    try:
-        with default_spec_path.open("r") as f:
-            spec = json.load(f)
-    except FileNotFoundError:
-        print(f'File not found: {args.file}', file=sys.stderr)
-        return
-    except json.JSONDecodeError as e:
-        print(f'Invalid JSON format: {e}', file=sys.stderr)
-        return
-    except PermissionError:
-        print(f'Permission denied reading file: {args.file}', file=sys.stderr)
-        return
-    if 'attacks' in spec:
-        suite = AttackSuite.from_dict(spec)
-        suite.set_target(args.target)
-        results = suite.run()
-        result_return = {'success': True, 'results': results}
-    else:
-        result_return = {
-            'success': False,
-            'error': 'JSON is invalid. No attacks run.'
-        }
-    return result_return
+    """Run all LLM attacks with specified target."""
+    result = run_all_attacks(target=args.target)
+    return result
 
 
 @subcommand()
