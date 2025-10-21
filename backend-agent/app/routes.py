@@ -221,11 +221,25 @@ def register_routes(app, sock, agent=None, callbacks=None):
                 assert 'data' in data
                 query = data['data']
                 status.clear_report()
-                response = agent.invoke({'input': query}, config=callbacks or {})
+                response = agent.invoke(
+                    {'input': query},
+                    config=callbacks or {}
+                )
                 ai_response = response['output']
-                formatted_output = {'type': 'message', 'data': f'{ai_response}'}
+                formatted_output = {
+                    'type': 'message',
+                    'data': (
+                        f'{ai_response}'
+                    )
+                }
                 sock.send(json.dumps(formatted_output))
             except json.JSONDecodeError:
-                sock.send(json.dumps({'type': 'error', 'data': 'Invalid JSON format'}))
+                sock.send(json.dumps({
+                    'type': 'error',
+                    'data': 'Invalid JSON format'
+                }))
             except Exception as e:
-                sock.send(json.dumps({'type': 'error', 'data': f'Error: {str(e)}'}))
+                sock.send(json.dumps({
+                    'type': 'error',
+                    'data': f'Error: {str(e)}'
+                }))

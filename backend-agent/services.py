@@ -40,6 +40,11 @@ def run_all_attacks(
             results = suite.run()
             return {"success": True, "results": results}
         else:
-            return {"success": False, "error": "JSON is invalid. No attacks run."}
+            return {
+                "success": False,
+                "error": (
+                    "JSON is invalid. No attacks run."
+                )
+            }
     except Exception as e:
         return {"success": False, "error": f"Failed to run attacks: {str(e)}"}
