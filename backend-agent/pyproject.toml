@@ -35,7 +35,7 @@ dependencies = [
     'codeattack @ git+https://github.com/marcorosa/CodeAttack',
     'gptfuzzer @ git+https://github.com/marcorosa/GPTFuzz@no-vllm',
     'garak==0.11.0',
-    'sentence-transformers==5.1.1',
+    'sentence-transformers==5.1.2',
 ]
 
 [project.optional-dependencies]
