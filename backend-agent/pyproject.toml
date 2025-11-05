@@ -1,6 +1,6 @@
 [project]
 name = 'stars'
-version = '0.6.2'
+version = '0.6.3'
 description = 'Smart Threat AI Reporting Scanner (STARS)'
 readme = 'README.md'
 license = {text = 'Apache-2.0'}
@@ -13,8 +13,8 @@ maintainers = [
 ]
 requires-python = '>=3.10,<3.13'
 dependencies = [
-    'sap-ai-sdk-gen[all]==5.7.5',
-    'python-dotenv==1.1.1',
+    'sap-ai-sdk-gen[all]==5.8.0',
+    'python-dotenv==1.2.1',
     'faiss-cpu==1.12.0',
     'Flask==3.1.2',
     'Flask-Cors==6.0.1',
@@ -35,7 +35,7 @@ dependencies = [
     'codeattack @ git+https://github.com/marcorosa/CodeAttack',
     'gptfuzzer @ git+https://github.com/marcorosa/GPTFuzz@no-vllm',
     'garak==0.11.0',
-    'sentence-transformers==5.1.1',
+    'sentence-transformers==5.1.2',
 ]
 
 [project.optional-dependencies]

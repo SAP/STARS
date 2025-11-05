@@ -226,6 +226,8 @@ jobs:
 
       - name: Configure kubectl for SAP BTP Kyma
         run: |
+          # Create symlink for kubectl-oidc_login
+          ln -s $(which kubelogin) /usr/local/bin/kubectl-oidc_login
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
           chmod 600 ~/.kube/config
@@ -257,6 +259,8 @@ jobs:
 
       - name: Configure kubectl for SAP BTP Kyma
         run: |
+          # Create symlink for kubectl-oidc_login
+          ln -s $(which kubelogin) /usr/local/bin/kubectl-oidc_login
           mkdir -p ~/.kube
           echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
           chmod 600 ~/.kube/config

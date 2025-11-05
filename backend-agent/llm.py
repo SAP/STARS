@@ -49,6 +49,7 @@ AICORE_MODELS = {
         'anthropic--claude-3.7-sonnet',
         'anthropic--claude-4-sonnet',
         'anthropic--claude-4-opus',
+        'anthropic--claude-4.5-sonnet',
     ],
     'azure-openai':
     [
@@ -72,6 +73,11 @@ AICORE_MODELS = {
         'gemini-2.5-flash',
         'gemini-2.5-pro',
     ],
+    'perplexity-ai':
+    [
+        'sonar',
+        'sonar-pro',
+    ],
 }
 
 
@@ -91,13 +97,19 @@ class LLM(abc.ABC):
         # Foundation-models scenarios in AI Core
         if model_name in AICORE_MODELS['azure-openai']:
             return AICoreOpenAILLM(model_name)
+        # IBM models are compatible with OpenAI completion API
         if model_name in AICORE_MODELS['aicore-ibm']:
-            # IBM models are compatible with OpenAI completion API
             return AICoreOpenAILLM(model_name)
         if model_name in AICORE_MODELS['aicore-opensource']:
             return AICoreOpenAILLM(model_name, False)
+        # Mistral models are compatible with OpenAI completion API
         if model_name in AICORE_MODELS['aicore-mistralai']:
             return AICoreOpenAILLM(model_name, False)
+        # Perplexity models are compatible with OpenAI completion API
+        if model_name in AICORE_MODELS['perplexity-ai']:
+            return AICoreOpenAILLM(model_name)
+
+        # Non OpenAI-compatible models in AI Core
         if model_name in AICORE_MODELS['aws-bedrock']:
             if 'titan' in model_name:
                 # Titan models don't support system prompts

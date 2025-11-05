@@ -1,3 +1,12 @@
+# Version: v0.6.3
+
+* [#139](https://github.com/SAP/STARS/pull/139): Add perplexity model family
+* [#140](https://github.com/SAP/STARS/pull/140): Bump python-dotenv from 1.1.1 to 1.2.1 in /backend-agent
+* [#141](https://github.com/SAP/STARS/pull/141): Bump sentence-transformers from 5.1.1 to 5.1.2 in /backend-agent
+* [#143](https://github.com/SAP/STARS/pull/143): Bump sap-ai-sdk-gen[all] from 5.7.5 to 5.8.0 in /backend-agent
+* [#144](https://github.com/SAP/STARS/pull/144): Bump the js-dependencies group across 1 directory with 23 updates
+
+
 # Version: v0.6.2
 
 * [#125](https://github.com/SAP/STARS/pull/125): Re organize backend
