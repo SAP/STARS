@@ -5442,7 +5442,7 @@ requires-dist = [
     { name = "tensorflow", marker = "extra == 'nlp'", specifier = "==2.20.0" },
     { name = "tensorflow-hub", marker = "extra == 'nlp'", specifier = "==0.16.1" },
     { name = "textattack", marker = "extra == 'nlp'", specifier = "==0.3.10" },
-    { name = "unstructured", specifier = "==0.18.15" },
+    { name = "unstructured", specifier = "==0.18.20" },
     { name = "weasyprint", specifier = "==66.0" },
 ]
 provides-extras = ["nlp"]
@@ -6040,7 +6040,7 @@ wheels = [
 
 [[package]]
 name = "unstructured"
-version = "0.18.15"
+version = "0.18.20"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "backoff" },
@@ -6065,9 +6065,9 @@ dependencies = [
     { name = "unstructured-client" },
     { name = "wrapt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6c/08/cf969b274f652e2fe48a6807b827498c7142dc749bdbd46ab24ea97a5fd5/unstructured-0.18.15.tar.gz", hash = "sha256:81d8481280a4ac5cefe74bdb6db3687e8f240d5643706f86728eac39549112b5", size = 1691102, upload-time = "2025-09-17T14:30:59.524Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/62/9f/4548e655724598e71b494db9f4664d34b7e9d42fbf638723230ed8abcb45/unstructured-0.18.20.tar.gz", hash = "sha256:aeccb9af05ea2e5ec6a51854ca3e7851bbfd4e20dd7cc7d80a8c511f7d668d69", size = 1696275, upload-time = "2025-11-15T00:18:32.146Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/62/24/7b8a8a9c23b209dc484b0d82905847c5f6b96a579bade367f3f3e40263f3/unstructured-0.18.15-py3-none-any.whl", hash = "sha256:f05b1defcbe8190319d30da8adddbb888f74bf8ec7f65886867d7dca41d67ad0", size = 1778900, upload-time = "2025-09-17T14:30:57.872Z" },
+    { url = "https://files.pythonhosted.org/packages/80/38/33859f5b3c2dae636c6d2cbd1fe1ef70461ffef63ab14b95aeae5e349d95/unstructured-0.18.20-py3-none-any.whl", hash = "sha256:bcb6630aa79393435464c6c0a43c8673042307fdebcdd6a2aab283045ce26d66", size = 1783090, upload-time = "2025-11-15T00:18:30.387Z" },
 ]
 
 [[package]]
