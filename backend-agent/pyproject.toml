@@ -20,7 +20,7 @@ dependencies = [
     'Flask-Cors==6.0.1',
     'flask_sock==0.7.0',
     'Flask-SQLAlchemy==3.1.1',
-    'langchain>=0.3.0,<0.4.0',
+    'langchain>=0.3.0,<1.2.0',
     'langchain-community>=0.3.0,<0.4.0',
     'langchain-core>=0.3.0,<0.4.0',
     'langchain-text-splitters>=0.3.0,<0.4.0',
