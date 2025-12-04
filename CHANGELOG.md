@@ -1,3 +1,18 @@
+# Version: v0.6.4
+
+* [#148](https://github.com/SAP/STARS/pull/148): Bump js-yaml from 4.1.0 to 4.1.1 in /frontend
+* [#149](https://github.com/SAP/STARS/pull/149): Bump ollama from 0.6.0 to 0.6.1 in /backend-agent
+* [#150](https://github.com/SAP/STARS/pull/150): Bump unstructured from 0.18.15 to 0.18.20 in /backend-agent
+* [#151](https://github.com/SAP/STARS/pull/151): Bump the js-dependencies group across 1 directory with 24 updates
+* [#152](https://github.com/SAP/STARS/pull/152): Bump js-yaml from 4.1.0 to 4.1.1 in /frontend
+* [#153](https://github.com/SAP/STARS/pull/153): Bump actions/checkout from 5 to 6
+* [#154](https://github.com/SAP/STARS/pull/154): Bump faiss-cpu from 1.12.0 to 1.13.0 in /backend-agent
+* [#157](https://github.com/SAP/STARS/pull/157): Bump node-forge from 1.3.1 to 1.3.2 in /frontend
+* [#159](https://github.com/SAP/STARS/pull/159): Bump unstructured from 0.18.20 to 0.18.21 in /backend-agent
+* [#163](https://github.com/SAP/STARS/pull/163): Bump express in /frontend
+* [#166](https://github.com/SAP/STARS/pull/166): Update angular packages
+
+
 # Version: v0.6.3
 
 * [#139](https://github.com/SAP/STARS/pull/139): Add perplexity model family
