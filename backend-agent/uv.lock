@@ -4943,7 +4943,7 @@ wheels = [
 
 [[package]]
 name = "sap-ai-sdk-gen"
-version = "5.9.0"
+version = "5.10.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -4960,7 +4960,7 @@ dependencies = [
     { name = "sap-ai-sdk-core" },
 ]
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9d/ce/298419dae15f3d0a5547b8a52e7d89a81598720dcadc8ff9e6d9aeb8548a/sap_ai_sdk_gen-5.9.0-py3-none-any.whl", hash = "sha256:f04a98535d49361f7462a098ff646439b8dcf977c1849480b7336e5c8e625637", size = 1177919, upload-time = "2025-12-01T14:42:23.473Z" },
+    { url = "https://files.pythonhosted.org/packages/26/a6/9cd9d83c590f87617d92327ee4599fd538a73d1e14382d32f8716511fe14/sap_ai_sdk_gen-5.10.0-py3-none-any.whl", hash = "sha256:b4151b0fa8ccf7c76528e0dfac95a1b777644e70a2ec12db8118a31da36c758f", size = 1180738, upload-time = "2025-12-16T13:17:54.73Z" },
 ]
 
 [package.optional-dependencies]
@@ -5400,7 +5400,7 @@ requires-dist = [
     { name = "python-dotenv", specifier = "==1.2.1" },
     { name = "pyyaml", specifier = "==6.0.3" },
     { name = "requests", specifier = "==2.32.5" },
-    { name = "sap-ai-sdk-gen", extras = ["all"], specifier = "==5.9.0" },
+    { name = "sap-ai-sdk-gen", extras = ["all"], specifier = "==5.10.0" },
     { name = "sentence-transformers", specifier = "==5.2.0" },
     { name = "tensorflow", marker = "extra == 'nlp'", specifier = "==2.20.0" },
     { name = "tensorflow-hub", marker = "extra == 'nlp'", specifier = "==0.16.1" },
