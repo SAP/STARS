@@ -71,3 +71,4 @@ if __name__ == '__main__':
     debug = bool(os.getenv('DEBUG', False))
     print(f'Loading backend version {__version__} on port {port}')
     app.run(host='0.0.0.0', port=int(port), debug=debug)
+
