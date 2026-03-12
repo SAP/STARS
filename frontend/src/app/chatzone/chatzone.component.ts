@@ -38,14 +38,14 @@ export class ChatzoneComponent implements AfterViewInit, AfterViewChecked {
     this.progress = undefined;
 
     this.ws.webSocket$.subscribe({
-      next: (value: any) => {
+      next: (value: APIResponse) => {
         this.handleWSMessage(value as APIResponse);
       },
-      error: (error: any) => {
+      error: (error: unknown) => {
         console.log(error);
-        if (error?.type != 'close') {
+        if ((error as {type?: string})?.type) {
           // Close is already handled via the isConnected call
-          this.errorMessage = error;
+          this.errorMessage = String(error);
         }
       },
       complete: () => alert('Connection to server closed.'),

@@ -99,7 +99,7 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
         data: [
           ...attackNames.map(name => ({
             x: name,
-            y: model.scores.hasOwnProperty(name) ? model.scores[name] : -1,
+            y: Object.prototype.hasOwnProperty.call(model.scores, name) ? model.scores[name] : -1,
           })),
           {
             x: 'Exposure score',
@@ -203,7 +203,7 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
           series: number[][];
           seriesIndex: number;
           dataPointIndex: number;
-          w: any;
+          w: { globals: { initialSeries: Array<{name: string}>; labels: string[] } };
         }) {
           // Handle the case where the score is -1 (unscanned) and display 'N/A' in the tooltip
           const value = series[seriesIndex][dataPointIndex] === -1 ? 'N/A' : series[seriesIndex][dataPointIndex] + '%';
