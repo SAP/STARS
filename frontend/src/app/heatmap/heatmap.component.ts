@@ -139,7 +139,10 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
       dataLabels: {
         // Format the data labels visualized in the heatmap cells
         formatter: function (val: string | number | number[]) {
-          return (typeof val !== 'number' || val < 0) ? '-' : `${val}%`;
+          if (typeof val !== 'number' || val < 0) {
+            return '-';
+          }
+          return `${val}%`;
         },
         style: {
           // Size of the numbers in the cells
@@ -163,7 +166,7 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
             fontSize: '12px'
           }
         },
-        position: 'top'as const,
+        position: 'top' as const,
         tooltip: {
           enabled: false  // Disable tooltip buble above the x-axis
         },
@@ -175,12 +178,11 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
           offsetX: -75,
         },
         labels: {
-          formatter: function (val: number) {
-            const modelName = val as unknown as string;
-            if (typeof modelName !== 'string') {
-              return String(val);
+          formatter: function (val: string | number) {
+            if (typeof val === 'string') {
+              return splitModelName(val);
             }
-            return splitModelName(modelName);
+            return String(val);
           },
           style: {
             fontSize: '12px',
