@@ -13,7 +13,7 @@ maintainers = [
 ]
 requires-python = '>=3.10,<3.13'
 dependencies = [
-    'sap-ai-sdk-gen[all]==5.10.0',
+    "sap-ai-sdk-gen[all]==5.11.0",
     'python-dotenv==1.2.1',
     'faiss-cpu==1.13.2',
     'Flask==3.1.2',
@@ -51,3 +51,8 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 include = ["app*", "libs*"]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+]

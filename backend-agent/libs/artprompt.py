@@ -27,7 +27,7 @@ from nltk.corpus import stopwords
 
 from app.db.utils import save_to_db
 from attack_result import AttackResult
-from llm import LLM
+from orc import Orchestration
 from status import Step, status
 
 
@@ -251,7 +251,7 @@ def extract_content(tag: str, text: str) -> str | int:
 
 
 class GPTJudge:
-    def __init__(self, judge_model: LLM):
+    def __init__(self, judge_model: Orchestration):
         self.judge = judge_model
 
     @classmethod
@@ -359,7 +359,7 @@ def load_dataset(num_samples: int = -1) -> list[str]:
     return goals
 
 
-def single_inference(idx: int, target_model: LLM, instruction: str,
+def single_inference(idx: int, target_model: Orchestration, instruction: str,
                      temperature: float = 0.3,
                      max_tokens: int = 1024,
                      debug: bool = False) -> dict:
@@ -417,8 +417,8 @@ def single_inference(idx: int, target_model: LLM, instruction: str,
     return res
 
 
-def start_artprompt(target_model: LLM,
-                    eval_model: LLM,
+def start_artprompt(target_model: Orchestration,
+                    eval_model: Orchestration,
                     parameters: dict) -> AttackResult:
     """
     Start an attack using the ArtPrompt attack framework.
