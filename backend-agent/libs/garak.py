@@ -13,7 +13,7 @@ from garak.report import Report
 
 from app.db.utils import save_to_db
 from attack_result import AttackResult
-from llm import LLM
+from orc import Orchestration
 from status import status, Step
 
 
@@ -48,7 +48,7 @@ class SAPAICoreGenerator(Generator):
     def __init__(self, name, config_root=_config):
         super().__init__(name, config_root)  # Sets the name and generations
 
-        self.client = LLM.from_model_name(name)
+        self.client = Orchestration.from_model_name(name)
 
     def _call_model(
         self, prompt: str, generations_this_call: int = 1
@@ -90,7 +90,7 @@ def _configure_garak(model_name: str, output_filename: str):
     _config.system.lite = False
 
 
-def run_garak(target_model: LLM, probes: list,
+def run_garak(target_model: Orchestration, probes: list,
               output_filename: str = OUTPUT_FILE):
     """Run a list of attacks (probes) from Garak attack framework.
 
@@ -165,7 +165,7 @@ def run_garak(target_model: LLM, probes: list,
     return successful_attacks
 
 
-def start_dan(target_model: LLM, parameters: dict) -> AttackResult:
+def start_dan(target_model: Orchestration, parameters: dict) -> AttackResult:
     """Start a DAN attack using Garak attack framework.
 
     @params
@@ -215,7 +215,7 @@ def start_dan(target_model: LLM, parameters: dict) -> AttackResult:
     return result
 
 
-def start_encoding(target_model: LLM, parameters: dict) -> AttackResult:
+def start_encoding(target_model: Orchestration, parameters: dict) -> AttackResult:
     """Start a encoding attack using Garak attack framework.
 
     @params
@@ -266,7 +266,7 @@ def start_encoding(target_model: LLM, parameters: dict) -> AttackResult:
     return result
 
 
-def start_goodside(target_model: LLM, parameters: dict) -> AttackResult:
+def start_goodside(target_model: Orchestration, parameters: dict) -> AttackResult:
     """Start a goodside attack using Garak attack framework.
 
      Implementation of Riley Goodside attack using Garak framework.
@@ -306,7 +306,7 @@ def start_goodside(target_model: LLM, parameters: dict) -> AttackResult:
     return result
 
 
-def start_latentinjection(target_model: LLM, parameters: dict) -> AttackResult:
+def start_latentinjection(target_model: Orchestration, parameters: dict) -> AttackResult:
     """Start a latentinjection attack using Garak attack framework.
 
     @params
@@ -355,7 +355,7 @@ def start_latentinjection(target_model: LLM, parameters: dict) -> AttackResult:
     return result
 
 
-def start_malwaregen(target_model: LLM, parameters: dict) -> AttackResult:
+def start_malwaregen(target_model: Orchestration, parameters: dict) -> AttackResult:
     """Start a malwaregen attack using Garak attack framework.
 
     Drive the LLM into generating malware. Each of the 4 attack implementations
@@ -398,7 +398,7 @@ def start_malwaregen(target_model: LLM, parameters: dict) -> AttackResult:
     return result
 
 
-def start_phrasing(target_model: LLM, parameters: dict) -> AttackResult:
+def start_phrasing(target_model: Orchestration, parameters: dict) -> AttackResult:
     """Start a phrasing attack using Garak attack framework.
 
     @params
@@ -436,7 +436,7 @@ def start_phrasing(target_model: LLM, parameters: dict) -> AttackResult:
     return result
 
 
-def start_promptinject(target_model: LLM, parameters: dict) -> AttackResult:
+def start_promptinject(target_model: Orchestration, parameters: dict) -> AttackResult:
     """Start a PromptInject attack using Garak attack framework.
 
     This is a lighter version of the official PromptInject attack, testing 100
@@ -481,7 +481,7 @@ def start_promptinject(target_model: LLM, parameters: dict) -> AttackResult:
     return result
 
 
-def start_suffix(target_model: LLM, parameters: dict) -> AttackResult:
+def start_suffix(target_model: Orchestration, parameters: dict) -> AttackResult:
     """Start a suffix attack using Garak attack framework.
 
     This is a lighter version of GCG with 26 pre-computed prompts.

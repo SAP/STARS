@@ -18,7 +18,7 @@ from gptfuzzer.utils.predict import RoBERTaPredictor
 
 from app.db.utils import save_to_db
 from attack_result import AttackResult
-from llm import LLM as AgentLLM
+from orc import Orchestration as AgentLLM
 from status import Step, status
 
 load_dotenv()
