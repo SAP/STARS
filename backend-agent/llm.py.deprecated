@@ -23,19 +23,11 @@ logger.setLevel(logging.DEBUG)
 logger.addHandler(status.trace_logging)
 
 AICORE_MODELS = {
-    'aicore-ibm':
-    [
-        'ibm--granite-13b-chat'
-    ],
     'aicore-mistralai':
     [
         'mistralai--mistral-large-instruct',
         'mistralai--mistral-medium-instruct',
         'mistralai--mistral-small-instruct',
-    ],
-    'aicore-opensource':
-    [
-        'meta--llama3.1-70b-instruct',
     ],
     'aws-bedrock':
     [
@@ -51,6 +43,7 @@ AICORE_MODELS = {
         'anthropic--claude-4-opus',
         'anthropic--claude-4.5-sonnet',
         'anthropic--claude-4.5-haiku',
+        'anthropic--claude-4.5-opus',
     ],
     'azure-openai':
     [
@@ -69,8 +62,6 @@ AICORE_MODELS = {
     ],
     'gcp-vertexai':
     [
-        'gemini-2.0-flash',
-        'gemini-2.0-flash-lite',
         'gemini-2.5-flash',
         'gemini-2.5-flash-lite',
         'gemini-2.5-pro',
@@ -97,28 +88,28 @@ class LLM(abc.ABC):
         Useful because the user can specify only the name in the agent.
         """
         # Foundation-models scenarios in AI Core
-        if model_name in AICORE_MODELS['azure-openai']:
+        if model_name in AICORE_MODELS.get('azure-openai', []):
             return AICoreOpenAILLM(model_name)
         # IBM models are compatible with OpenAI completion API
-        if model_name in AICORE_MODELS['aicore-ibm']:
+        if model_name in AICORE_MODELS.get('aicore-ibm', []):
             return AICoreOpenAILLM(model_name)
-        if model_name in AICORE_MODELS['aicore-opensource']:
+        if model_name in AICORE_MODELS.get('aicore-opensource', []):
             return AICoreOpenAILLM(model_name, False)
         # Mistral models are compatible with OpenAI completion API
-        if model_name in AICORE_MODELS['aicore-mistralai']:
+        if model_name in AICORE_MODELS.get('aicore-mistralai', []):
             return AICoreOpenAILLM(model_name, False)
         # Perplexity models are compatible with OpenAI completion API
-        if model_name in AICORE_MODELS['perplexity-ai']:
+        if model_name in AICORE_MODELS.get('perplexity-ai', []):
             return AICoreOpenAILLM(model_name)
 
         # Non OpenAI-compatible models in AI Core
-        if model_name in AICORE_MODELS['aws-bedrock']:
+        if model_name in AICORE_MODELS.get('aws-bedrock', []):
             if 'titan' in model_name:
                 # Titan models don't support system prompts
                 return AICoreAmazonBedrockLLM(model_name, False)
             else:
                 return AICoreAmazonBedrockLLM(model_name)
-        if model_name in AICORE_MODELS['gcp-vertexai']:
+        if model_name in AICORE_MODELS.get('gcp-vertexai', []):
             return AICoreGoogleVertexLLM(model_name)
 
         # Custom models
@@ -166,8 +157,8 @@ class LLM(abc.ABC):
                 # The model is served in a remote ollama instance
                 remote_ollama_host = f'{ollama_host}:{ollama_port}'
                 ollama_models = [m['model'] for m in
-                                 ollama.Client(remote_ollama_host).list()
-                                 ['models']]
+                                ollama.Client(remote_ollama_host).list()
+                                ['models']]
             else:
                 ollama_models = [m['name'] for m in ollama.list()['models']]
             return models + ollama_models
@@ -187,9 +178,9 @@ class LLM(abc.ABC):
 
     @abc.abstractmethod
     def generate(self,
-                 system_prompt: str,
-                 prompt: str,
-                 **kwargs: dict) -> LLMResponse:
+                system_prompt: str,
+                prompt: str,
+                **kwargs: dict) -> LLMResponse:
         """
         Generate completions using the LLM for a single message.
         Implementation is responsibility of subclasses.
@@ -198,8 +189,8 @@ class LLM(abc.ABC):
 
     @abc.abstractmethod
     def generate_completions_for_messages(self,
-                                          messages: list,
-                                          **kwargs: dict) -> LLMResponse:
+                                        messages: list,
+                                        **kwargs: dict) -> LLMResponse:
         """
         Generate completions using the LLM for a list of messages
         in OpenAI-API style (dictionaries with keys role and content).
@@ -232,8 +223,8 @@ class AICoreOpenAILLM(LLM):
     """
 
     def __init__(self,
-                 model_name: str,
-                 uses_system_prompt=True):
+                model_name: str,
+                uses_system_prompt=True):
         self.model_name = model_name
         self.client = ProxyOpenAI()
         self.uses_system_prompt = uses_system_prompt
@@ -242,8 +233,8 @@ class AICoreOpenAILLM(LLM):
         return f'{self.model_name}/OpenAI LLM via AI Core proxy'
 
     def generate(self,
-                 system_prompt: str,
-                 prompt: str,
+                system_prompt: str,
+                prompt: str,
                  **kwargs) -> LLMResponse:
         if not system_prompt:
             messages = [
@@ -270,7 +261,7 @@ class AICoreOpenAILLM(LLM):
         )
 
     def generate_completions_for_messages(self,
-                                          messages: list,
+                                        messages: list,
                                           **kwargs) -> LLMResponse:
         try:
             if not self.uses_system_prompt:
@@ -284,10 +275,10 @@ class AICoreOpenAILLM(LLM):
                 messages=messages,
                 **kwargs)
             responses = [response.choices[i].message.content for i in
-                         range(kwargs.get('n', 1))]
+                        range(kwargs.get('n', 1))]
         except InternalServerError as e:
             logger.error(f'A HTTP server-side error occurred while calling '
-                         f'{self.model_name} model: {e}')
+                        f'{self.model_name} model: {e}')
             if 'gpt' in self.model_name:
                 logger.error("The completion triggered OpenAI's firewall")
                 return self._trace_llm_call(messages, Filtered(e))
@@ -308,17 +299,17 @@ class LocalOpenAILLM(AICoreOpenAILLM):
     """
 
     def __init__(self,
-                 model_name: str,
-                 api_key: str = '',
-                 base_url: str = '',
-                 supports_openai_style_system_messages=True):
+                model_name: str,
+                api_key: str = '',
+                base_url: str = '',
+                supports_openai_style_system_messages=True):
         self.client = OfficialOpenAI(api_key=api_key, base_url=base_url)
         self.model_name = model_name
         self.uses_system_prompt = \
             supports_openai_style_system_messages
 
     def generate_completions_for_messages(self,
-                                          messages: list,
+                                        messages: list,
                                           **kwargs) -> LLMResponse:
         if not self.uses_system_prompt:
             if messages[0]['role'] == 'system':
@@ -350,8 +341,8 @@ class OllamaLLM(LLM):
         return f'{self.model_name}/Ollama LLM'
 
     def generate(self,
-                 system_prompt: str,
-                 prompt: str,
+                system_prompt: str,
+                prompt: str,
                  **kwargs) -> list[str]:  # TODO:check
         try:
             messages = [
@@ -360,11 +351,11 @@ class OllamaLLM(LLM):
             ]
             generations = [
                 self.client.generate(model=self.model_name,
-                                     prompt=prompt,
-                                     system=system_prompt,
-                                     options={'temperature':
-                                              kwargs.get('temperature')}
-                                     )['response']
+                                    prompt=prompt,
+                                    system=system_prompt,
+                                    options={'temperature':
+                                            kwargs.get('temperature')}
+                                    )['response']
                 for _ in range(kwargs.get('n', 1))]
             return self._trace_llm_call(messages, Success(generations))
         except Exception as e:
@@ -428,8 +419,8 @@ class AICoreGoogleVertexLLM(LLM):
             return Error(str(v))
 
     def generate(self,
-                 system_prompt: str,
-                 prompt: str,
+                system_prompt: str,
+                prompt: str,
                  **kwargs) -> LLMResponse:
         contents = []
         if system_prompt:
@@ -520,8 +511,8 @@ class AICoreAmazonBedrockLLM(LLM):
             return Error(str(v))
 
     def generate(self,
-                 system_prompt: str,
-                 prompt: str,
+                system_prompt: str,
+                prompt: str,
                  **kwargs: dict) -> LLMResponse:
 
         # Declare types for messages and kwargs to avoid mypy errors
@@ -548,7 +539,7 @@ class AICoreAmazonBedrockLLM(LLM):
                 # models).
                 messages.append(
                     {'role': 'user',
-                     'content': [{'text': f'{system_prompt}\n{prompt}'}]},
+                    'content': [{'text': f'{system_prompt}\n{prompt}'}]},
                 )
         return self._send_request(messages, **kwargs)
 

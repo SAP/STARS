@@ -99,7 +99,7 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
         data: [
           ...attackNames.map(name => ({
             x: name,
-            y: model.scores.hasOwnProperty(name) ? model.scores[name] : -1,
+            y: Object.prototype.hasOwnProperty.call(model.scores, name) ? model.scores[name] : -1,
           })),
           {
             x: 'Exposure score',
@@ -111,7 +111,7 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
     // Create the heatmap chart with the processed data and parameters
     const options = {
       chart: {
-        type: 'heatmap',
+        type: 'heatmap' as const,
         height: chartHeight,
         width: chartWidth,
         toolbar: {show: false},
@@ -138,8 +138,11 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
       },
       dataLabels: {
         // Format the data labels visualized in the heatmap cells
-        formatter: function (val: number | null) {
-          return (val === null || val < 0) ? '-' : `${val}%`;
+        formatter: function (val: string | number | number[]) {
+          if (typeof val !== 'number' || val < 0) {
+            return '-';
+          }
+          return `${val}%`;
         },
         style: {
           // Size of the numbers in the cells
@@ -163,7 +166,7 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
             fontSize: '12px'
           }
         },
-        position: 'top',
+        position: 'top' as const,
         tooltip: {
           enabled: false  // Disable tooltip buble above the x-axis
         },
@@ -175,12 +178,11 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
           offsetX: -75,
         },
         labels: {
-          formatter: function (modelName: string) {
-            if (typeof modelName !== 'string') {
-              return modelName; // Return as is when it's a number
+          formatter: function (val: string | number) {
+            if (typeof val === 'string') {
+              return splitModelName(val);
             }
-              const splitName = splitModelName(modelName);
-              return splitName;
+            return String(val);
           },
           style: {
             fontSize: '12px',
@@ -201,7 +203,7 @@ export class HeatmapComponent implements AfterViewInit, OnInit {
           series: number[][];
           seriesIndex: number;
           dataPointIndex: number;
-          w: any;
+          w: { globals: { initialSeries: Array<{name: string}>; labels: string[] } };
         }) {
           // Handle the case where the score is -1 (unscanned) and display 'N/A' in the tooltip
           const value = series[seriesIndex][dataPointIndex] === -1 ? 'N/A' : series[seriesIndex][dataPointIndex] + '%';

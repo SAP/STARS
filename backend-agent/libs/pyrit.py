@@ -21,7 +21,7 @@ from pyrit.score import SelfAskTrueFalseScorer, TrueFalseQuestion
 
 from app.db.utils import save_to_db
 from attack_result import AttackResult
-from llm import LLM
+from orc import Orchestration
 from status import Step, status
 
 
@@ -41,7 +41,7 @@ objective set by the user.
 
 class LLMAdapter(PromptChatTarget):
 
-    def __init__(self, llm: LLM):
+    def __init__(self, llm: Orchestration):
         super().__init__()
         self.llm = llm
 
@@ -311,8 +311,8 @@ Remember, answer only with a JSON object in the specified format.
 
 
 def start_pyrit_attack_red_teaming(
-        attack_model: LLM,
-        target_model: LLM,
+        attack_model: Orchestration,
+        target_model: Orchestration,
         parameters: dict) -> AttackResult:
     """
     Start a red teaming attack using the PyRIT attack framework.
@@ -374,8 +374,8 @@ def start_pyrit_attack_red_teaming(
 
 
 def start_pyrit_attack_crescendo(
-        attack_model: LLM,
-        target_model: LLM,
+        attack_model: Orchestration,
+        target_model: Orchestration,
         parameters: dict) -> AttackResult:
     """
     Start a crescendo attack using the PyRIT attack framework.
@@ -432,8 +432,8 @@ def start_pyrit_attack_crescendo(
 
 
 def start_pyrit_attack_pair(
-        attack_model: LLM,
-        target_model: LLM,
+        attack_model: Orchestration,
+        target_model: Orchestration,
         parameters: dict) -> AttackResult:
     """
     Start a PAIR attack using the PyRIT attack framework.
@@ -488,8 +488,8 @@ def start_pyrit_attack_pair(
 
 
 def start_pyrit_attack(
-        attack_model: LLM,
-        target_model: LLM,
+        attack_model: Orchestration,
+        target_model: Orchestration,
         orchestrator: Orchestrator,
         parameters: dict,
         attack_name: str,
