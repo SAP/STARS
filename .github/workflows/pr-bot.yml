@@ -1,28 +1,35 @@
 name: AI-assisted
 on:
-  pull_request_target:
+  pull_request:
     types: [ready_for_review, opened, reopened]
 
 jobs:
+  approve:
+    name: Approve
+    runs-on: ubuntu-latest
+    environment: ${{ github.event.pull_request.head.repo.fork == true && 'manual-approval' || '' }}
+
   summary:
     name: PR Summary
-    if: github.actor != 'dependabot'
+    needs: approve
+    if: github.actor != 'dependabot[bot]'
     runs-on: [ubuntu-latest]
     steps:
       - uses: SAP/ai-assisted-github-actions/pr-summary@v3
         with:
           aicore-service-key: ${{ secrets.AICORE_SERVICE_KEY }}
-          model: gpt-4o
+          model: gpt-4.1-nano
           exclude-files: package-lock.json, uv.lock
   review:
     name: PR Review
-    if: github.actor != 'dependabot'
+    needs: approve
+    if: github.actor != 'dependabot[bot]'
     runs-on: [ubuntu-latest]
     steps:
       - uses: SAP/ai-assisted-github-actions/pr-review@v3
         with:
           aicore-service-key: ${{ secrets.AICORE_SERVICE_KEY }}
-          model: anthropic--claude-4-sonnet
+          model: anthropic--claude-4.6-sonnet
           exclude-files: package-lock.json, uv.lock
           footer-text: |
             ---

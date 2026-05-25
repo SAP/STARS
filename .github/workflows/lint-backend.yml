@@ -1,7 +1,7 @@
 name: Lint backend
 
 on:
-  pull_request_target:
+  pull_request:
     branches:
       - develop
       - main
@@ -13,12 +13,14 @@ on:
 permissions:
   checks: write
   contents: read
-  pull-requests: write
 
 jobs:
   lint-backend:
     name: Run backend linter
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
 
     steps:
       - name: Check out Git repository
