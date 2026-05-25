@@ -1,3 +1,21 @@
+# Version: v0.6.6
+
+* [#182](https://github.com/SAP/STARS/pull/182): Bump pypdf from 6.0.0 to 6.6.0 in /backend-agent
+* [#183](https://github.com/SAP/STARS/pull/183): Bump unstructured from 0.18.21 to 0.18.27 in /backend-agent
+* [#185](https://github.com/SAP/STARS/pull/185): Bump filelock from 3.19.1 to 3.20.3 in /backend-agent
+* [#186](https://github.com/SAP/STARS/pull/186): Bump azure-core from 1.35.0 to 1.38.0 in /backend-agent
+* [#187](https://github.com/SAP/STARS/pull/187): Bump pyasn1 from 0.6.1 to 0.6.2 in /backend-agent
+* [#189](https://github.com/SAP/STARS/pull/189): Bump weasyprint from 67.0 to 68.0 in /backend-agent
+* [#191](https://github.com/SAP/STARS/pull/191): Bump lodash from 4.17.21 to 4.17.23 in /frontend
+* [#192](https://github.com/SAP/STARS/pull/192): Bump weasyprint from 67.0 to 68.0 in /backend-agent
+* [#193](https://github.com/SAP/STARS/pull/193): Bump pypdf from 6.0.0 to 6.6.2 in /backend-agent
+* [#194](https://github.com/SAP/STARS/pull/194): Bump python-multipart from 0.0.20 to 0.0.22 in /backend-agent
+* [#196](https://github.com/SAP/STARS/pull/196): Bump sentence-transformers from 5.2.0 to 5.2.2 in /backend-agent
+* [#197](https://github.com/SAP/STARS/pull/197): Bump unstructured from 0.18.27 to 0.18.31 in /backend-agent
+* [#199](https://github.com/SAP/STARS/pull/199): Bump protobuf from 5.29.5 to 5.29.6 in /backend-agent
+* [#201](https://github.com/SAP/STARS/pull/201): Bump langsmith from 0.4.23 to 0.6.3 in /backend-agent
+
+
 # Version: v0.6.5
 
 * [#168](https://github.com/SAP/STARS/pull/168): Bump weasyprint from 66.0 to 67.0 in /backend-agent
