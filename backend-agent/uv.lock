@@ -5717,11 +5717,11 @@ wheels = [
 
 [[package]]
 name = "tinytag"
-version = "2.1.2"
+version = "2.2.1"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f1/dc/a21d37263917e5e3aff95a70966c9be2bf550a792fc95008e2e444f0cd8c/tinytag-2.1.2.tar.gz", hash = "sha256:564e573e308d9fa78432493b4987fca1f84fb1f2ce29c586fc54629155e4fca0", size = 36639, upload-time = "2025-08-13T21:56:28.26Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/96/59/8a8cb2331e2602b53e4dc06960f57d1387a2b18e7efd24e5f9cb60ea4925/tinytag-2.2.1.tar.gz", hash = "sha256:e6d06610ebe7cd66fd07be2d3b9495914ab32654a5e47657bb8cd44c2484523c", size = 38214, upload-time = "2026-03-15T18:48:01.11Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/8a/ca/37249dab162f3332223efade79272b40fd133b32b7abf51c6e86d55b3deb/tinytag-2.1.2-py3-none-any.whl", hash = "sha256:1a6b7b19c59ac4846b2446ec7a85cfaa17fbee6970592eaa5926702c261bad69", size = 31499, upload-time = "2025-08-13T21:56:26.722Z" },
+    { url = "https://files.pythonhosted.org/packages/ce/34/d50e338631baaf65ec5396e70085e5de0b52b24b28db1ffbc1c6e82190dc/tinytag-2.2.1-py3-none-any.whl", hash = "sha256:ed8b1e6d25367937e3321e054f4974f9abfde1a3e0a538824c87da377130c2b6", size = 32927, upload-time = "2026-03-15T18:47:59.613Z" },
 ]
 
 [[package]]
