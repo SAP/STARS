@@ -36,14 +36,14 @@ AICORE_MODELS = {
         'amazon--nova-pro',
         'amazon--nova-premier',
         'anthropic--claude-3-haiku',
-        'anthropic--claude-3-opus',
-        'anthropic--claude-3.5-sonnet',
         'anthropic--claude-3.7-sonnet',
-        'anthropic--claude-4-sonnet',
         'anthropic--claude-4-opus',
-        'anthropic--claude-4.5-sonnet',
+        'anthropic--claude-4-sonnet',
         'anthropic--claude-4.5-haiku',
         'anthropic--claude-4.5-opus',
+        'anthropic--claude-4.5-sonnet',
+        'anthropic--claude-4.6-opus',
+        'anthropic--claude-4.6-sonnet',
     ],
     'azure-openai':
     [
@@ -55,6 +55,7 @@ AICORE_MODELS = {
         'gpt-5',
         'gpt-5-mini',
         'gpt-5-nano',
+        'gpt-5.2',
         'o1',
         'o3',
         'o3-mini',
@@ -62,6 +63,8 @@ AICORE_MODELS = {
     ],
     'gcp-vertexai':
     [
+        'gemini-2.0-flash',
+        'gemini-2.0-flash-lite',
         'gemini-2.5-flash',
         'gemini-2.5-flash-lite',
         'gemini-2.5-pro',
@@ -70,6 +73,7 @@ AICORE_MODELS = {
     [
         'sonar',
         'sonar-pro',
+        'sonar-deep-research',
     ],
 }
 
