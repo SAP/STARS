@@ -15,7 +15,7 @@ from libs.textattack import (
     own_model_attack,
     test as test_textattack,
 )
-from llm import LLM
+from orc import Orchestration
 from services import run_all_attacks
 from status import Trace
 
@@ -396,7 +396,7 @@ def info(_):
     Get some additional information on the state of the tool, useful for
     future usage.
     """
-    available_models = LLM.get_supported_models()
+    available_models = Orchestration.get_supported_models()
     print('### Available LLMs ###')
     print('These can be used as targets and eval/attack models for attacks.')
     print('-' * 30)

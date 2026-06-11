@@ -40,7 +40,7 @@ export class WeightDialogComponent implements OnInit {
   onSave() {
     // Validate weights before sending
     const invalidWeights = Object.entries(this.currentWeights)
-      .filter(([_, weight]) => weight < 0 || !Number.isInteger(weight));
+      .filter(([, weight]) => weight < 0 || !Number.isInteger(weight));
 
     if (invalidWeights.length > 0) {
       this.snackBar.open('Please enter valid positive integers for all weights', '❌', {

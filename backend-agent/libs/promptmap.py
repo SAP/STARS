@@ -19,7 +19,7 @@ import re
 
 from app.db.utils import save_to_db
 from attack_result import AttackResult
-from llm import LLM
+from orc import Orchestration
 from status import Step, status
 
 
@@ -96,7 +96,7 @@ def prepare_prompt(template: str, **kwargs) -> str:
 # Function to chat with LLM
 def chat_with_gpt(system_message: str,
                   user_message: str,
-                  llm: LLM) -> str:
+                  llm: Orchestration) -> str:
     return llm.generate(system_message,
                         user_message,
                         temperature=0,
@@ -105,7 +105,7 @@ def chat_with_gpt(system_message: str,
 
 
 def understand_context_from_system_prompt(system_prompt: str,
-                                          model: LLM) -> str:
+                                          model: Orchestration) -> str:
     """Understand the context of the target LLM.
     Given a system prompt, manipulate it with an LLM and return it.
     """
@@ -183,7 +183,7 @@ example_system_prompt = 'You are a helpful and friendly chatbot.\nYour job is to
 ###############################################################################
 
 
-def start_prompt_map(target_model: LLM, parameters: dict) -> AttackResult:
+def start_prompt_map(target_model: Orchestration, parameters: dict) -> AttackResult:
     """
     Run prompt map on model_name.
     This is lifted from the test_the_model function in the original promptmap,

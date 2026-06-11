@@ -10,7 +10,7 @@ from codeattack.target_llm import TargetLLM
 
 from app.db.utils import save_to_db
 from attack_result import AttackResult
-from llm import LLM
+from orc import Orchestration
 from status import Step, status
 
 
@@ -29,7 +29,7 @@ structures), and uses another LLM to judge whether the attack was successful.
 
 # Override classes to call LLMs as defined by LLM class
 class TargetLLMBTP(TargetLLM):
-    def __init__(self, llm: LLM,
+    def __init__(self, llm: Orchestration,
                  model_name: str,
                  max_tokens: int = 512,
                  seed: int = 725,
@@ -56,7 +56,7 @@ class TargetLLMBTP(TargetLLM):
 
 
 class GPT4JudgeBTP(GPT4Judge):
-    def __init__(self, llm: LLM, model_name: str):
+    def __init__(self, llm: Orchestration, model_name: str):
         self.client = llm
         self.model_name = model_name
 
@@ -88,8 +88,8 @@ class GPT4JudgeBTP(GPT4Judge):
         return -1, judgement
 
 
-def start_codeattack(target_model: LLM,
-                     eval_model: LLM,
+def start_codeattack(target_model: Orchestration,
+                     eval_model: Orchestration,
                      parameters: dict) -> AttackResult:
     """
     Start an attack using the CodeAttack attack framework.

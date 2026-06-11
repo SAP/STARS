@@ -7,13 +7,15 @@
     <div class="weight-form-container">
         <div class="weight-form-section">
             <form>
-                <div *ngFor="let attack of attackNames">
-                    <mat-form-field appearance="outline" class="form-field">
-                        <mat-label>{{ attack }}</mat-label>
-                        <input matInput type="number" min="0" step="1" [(ngModel)]="currentWeights[attack]"
-                            name="{{ attack }}" />
-                    </mat-form-field>
-                </div>
+                @for (attack of attackNames; track attack) {
+                    <div>
+                        <mat-form-field appearance="outline" class="form-field">
+                            <mat-label>{{ attack }}</mat-label>
+                            <input matInput type="number" min="0" step="1" [(ngModel)]="currentWeights[attack]"
+                                name="{{ attack }}" />
+                        </mat-form-field>
+                    </div>
+                }
             </form>
         </div>
     </div>

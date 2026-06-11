@@ -38,7 +38,7 @@ from libs.pyrit import (
     start_pyrit_attack_crescendo,
     start_pyrit_attack_pair
 )
-from llm import LLM
+from orc import Orchestration
 from status import Trace
 
 logger = logging.getLogger(__name__)
@@ -129,7 +129,7 @@ class AttackSpecification:
     @property
     def target_model(self):
         target_model_name = self.spec['target-model']
-        return LLM.from_model_name(target_model_name)
+        return Orchestration.from_model_name(target_model_name)
 
     @target_model.setter
     def target_model(self, model_name: str):
@@ -146,14 +146,14 @@ class AttackSpecification:
         if 'attack-model' not in self.spec:
             raise MisconfigurationException(
                 'This attack specification requires an attack model, which was not configured.')  # noqa: E501
-        return LLM.from_model_name(self.spec['attack-model'])
+        return Orchestration.from_model_name(self.spec['attack-model'])
 
     @property
     def eval_model(self):
         if 'eval-model' not in self.spec:
             raise MisconfigurationException(
                 'This attack specification requires an eval model, which was not configured.')  # noqa: E501
-        return LLM.from_model_name(self.spec['eval-model'])
+        return Orchestration.from_model_name(self.spec['eval-model'])
 
     def start(self) -> AttackResult:
         """
@@ -276,7 +276,7 @@ class AttackSuite():
 
     name: str
     attacks: list[AttackSpecification]
-    llm: LLM | None = None
+    llm: Orchestration | None = None
 
     def from_dict(suite_specification: dict) -> 'AttackSuite':
         """
@@ -356,7 +356,7 @@ class AttackSuite():
         Remember to only return the summary and nothing else.
     """
         if not self.llm:
-            self.llm = LLM.from_model_name(
+            self.llm = Orchestration.from_model_name(
                 os.getenv('RESULT_SUMMARIZE_MODEL', 'gpt-4o'))
         result = json.dumps(asdict(attack_result))
         return self.llm.generate(system_prompt=system_prompt, prompt=result)\

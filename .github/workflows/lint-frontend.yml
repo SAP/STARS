@@ -36,7 +36,7 @@ jobs:
       - name: Install Node.js dependencies
         working-directory: frontend
         run: |
-          npm ci
+          npm install
 
       - name: Run linters
         uses: reviewdog/action-eslint@v1

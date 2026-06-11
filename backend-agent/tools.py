@@ -7,7 +7,7 @@ from langchain.tools import tool
 import libs.textattack
 from attack import AttackSpecification, AttackSuite
 from status import status
-from llm import LLM
+from orc import Orchestration
 
 ###############################################################################
 #                           Custom tools                                      #
@@ -322,4 +322,4 @@ def get_supported_models() -> str:
     This tool will list all currently available Large Language Models by name.
     """
 
-    return ','.join(LLM.get_supported_models())
+    return ','.join(Orchestration.get_supported_models())
