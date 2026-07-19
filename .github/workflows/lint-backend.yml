@@ -38,6 +38,6 @@ jobs:
           pip install flake8
 
       - name: Run linters
-        uses: wearerequired/lint-action@v2
+        uses: wearerequired/lint-action@v3
         with:
           flake8: true
